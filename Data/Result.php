@@ -7,9 +7,10 @@
         protected $_id;
         protected $_position;
         
-        public function __construct( $data )
+        public function __construct( $data, $id )
         {
             $this->_data = $data;
+            $this->_id = $id;
             $this->_read();
         }
 
@@ -32,11 +33,21 @@
         {
             if( isset( $this->_id ) )
             {
-                $this->data[ $data[ $this->_id ] ] = $this->_wrap( $data );
+                $this->data[ $data[ $this->_id ] ] = $this->_wrap( $data, $this->_id );
             }else
             {
                 $this->_data[] = $this->_wrap( $data );
             }
+        }
+
+        protected function count()
+        {
+            return count( $this->_data );
+        }
+
+        public function getId()
+        {
+            return $this->_id;
         }
 
         abstract protected function _read();

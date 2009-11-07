@@ -17,9 +17,9 @@
             return $this;
         }
 
-        protected function _wrap( $data )
+        protected function _wrap( $data, $id=null )
         {
-            return new WebLab_Data_Row_MySQLi( $data );
+            return new WebLab_Data_Row_MySQLi( $data, $id );
         }
 
     }

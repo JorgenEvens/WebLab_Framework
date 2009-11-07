@@ -15,7 +15,12 @@
             }
 
             $result = $this->_datasource->query( (string) $query );
-            return new WebLab_Data_Result_MySQLi( $result );
+            if( $query instanceof WebLab_Data_Operation_Select )
+            {
+                return new WebLab_Data_Result_MySQLi( $result, $query->id );
+            }
+
+            return $result;
         }
 
         public function register( $name )
