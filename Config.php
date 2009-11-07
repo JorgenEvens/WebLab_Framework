@@ -47,7 +47,7 @@
             {
                 $this->_config['Application']['Runtime'] = array();
             }
-	    $this->_config = $config;
+	    $this->_config = &$config;
 	    $this->_path = $path;
 	}
 
@@ -97,7 +97,13 @@
 		}
 	    }
 
-	    $path = $this->getPath() . implode( $currentPath, '.' );
+	    if( empty( $this->_path ) )
+            {
+                $path = implode( $currentPath, '.' );
+            }else
+            {
+                $path = $this->getPath() . '.' . implode( $currentPath, '.' );
+            }
 
 	    if( is_array( $config ) )
 	    {
@@ -114,12 +120,12 @@
          * @param * $value The value to be set.
          * @return WebLab_Config
          */
-	public function &set( $path, $value )
+	public function set( $path, $value )
 	{
-	    if( strpos( $this->getPath(), 'Application.Runtime' ) > -1 && strpos( $path, 'Application.Runtime.' ) > -1 )
+	    if( !( strpos( $this->getPath(), 'Application.Runtime' ) > -1 || strpos( $path, 'Application.Runtime.' ) > -1 ) )
 	    {
-		$config = $this->get( 'Application.Runtime' );
-		return $config->set( $path, $value );
+		$this->get( 'Application.Runtime' )->set( $path, $value );
+                return $this;
 	    }
 	    
 	    $path = explode( '.', $path );
@@ -129,9 +135,9 @@
 	    {
 		$config = &$config[ $directory ];
 
-		if( $config === null )
+		if( !isset( $config ) )
 		{
-		    $config[ $directory ] = null;
+		    $config = array();
 		}
 	    }
 

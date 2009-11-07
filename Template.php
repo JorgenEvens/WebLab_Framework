@@ -6,23 +6,37 @@
         protected $_variables;
         protected $_dir;
 
-        public function __constuct()
+        public function __construct( $template )
         {
             $config = WebLab_Config::getInstance()->get( 'Application.Templates.directory' );
+
             if( $config )
             {
                 $this->setTemplateDir( $config );
             }
+
+            $this->_variables = array();
+
+            if( !is_string( $template ) )
+            {
+                throw new WebLab_Exception_Template();
+            }
+
+            $this->_template = $template;
         }
 
-        public function attachTo( WebLab_Template $template, $moduleName )
+        public function attach( WebLab_Template &$template, $moduleName )
         {
-            $template->register( $this, $moduleName );
+            $this->_variables[ $moduleName ] = &$template;
+
+            return $this;
         }
 
         public function setTemplateDir( $dir )
         {
             $this->_dir = $dir;
+
+            return $this;
         }
 
         public function getVars()
@@ -33,17 +47,19 @@
         public function __set( $name, $value )
         {
             $this->_variables[ $name ] = $value;
+
+            return $this;
         }
 
-        public function __get( $name )
+        public function &__get( $name )
         {
             return $this->_variables[ $name ];
         }
 
-        public function render( $show )
+        public function render( $show=false )
         {
             ob_start();
-            require_once( $this->_dir . '/' . strtr( '_', '/', $this->_template ) );
+            require_once( $this->_dir . '/source/' . strtr( $this->_template, '_', '/' ) );
             $code = ob_get_clean();
             if( $show )
             {

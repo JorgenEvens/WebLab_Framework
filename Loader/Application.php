@@ -62,6 +62,8 @@
             WebLab_Config::getInstance()->set( 'Environment.modules.content', '' );
         }*/
 
+        abstract protected function _initShutdown();
+
         abstract protected function _initControlDispatcher();
 
     }

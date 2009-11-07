@@ -3,19 +3,29 @@
     {
 
         protected $_pattern = '{*}Controller';
+        protected $_default;
 
-        abstract public function __construct();
+        public function __construct( $default, $pattern )
+        {
+            $this->setPattern( $pattern )
+                ->setDefault( $default );
+        }
 
         public function classFromPattern( $variable )
         {
-            return strtr( '{*}', $variable, ucfirst( $this->_pattern ) );
+            return str_replace( '{*}', ucfirst( $variable ), $this->_pattern );
         }
 
         final public function setPattern( $pattern )
         {
             $this->_pattern = $pattern;
+            return $this;
         }
 
-        abstract protected function _default();
+        final protected function setDefault( $class )
+        {
+            $this->_default = $class;
+            return $this;
+        }
 
     }

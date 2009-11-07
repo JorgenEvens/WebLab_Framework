@@ -2,12 +2,10 @@
     class WebLab_Dispatcher_Visit extends WebLab_Dispatcher_Abstract
     {
 
-        protected $_default;
-
-        final public function __construct()
+        public function execute()
         {
-            $url = WebLab_Config::getInstance()->get( 'Application.Runtime.URL' );
-            
+            $url = WebLab_Config::getInstance()->get( 'Application.Runtime.URL' )->toArray();
+
             if( $url[ 'parameters' ][0] )
             {
                 $module = $this->classFromPattern( $url['parameters'][0] );
@@ -16,21 +14,14 @@
                     return new $module( $url['parameters'] );
                 }else
                 {
-                    return $this->_default();
-                } 
+                    $module = $this->classFromPattern( $this->_default );
+                    return new $module( $url['parameters'] );
+                }
             }else
             {
-                return $this->_default();
+                $module = $this->classFromPattern( $this->_default );
+                return new $module( $url['parameters'] );
             }
-        }
-
-        protected function _default()
-        {
-            if( !is_callable( $this->_default ) )
-            {
-                throw new WebLab_Exception_Dispatcher( 'Default module function not set!' );
-            }
-            call_user_func( $this->_default );
         }
 
     }
