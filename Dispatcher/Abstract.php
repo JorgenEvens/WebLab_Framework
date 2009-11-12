@@ -1,7 +1,8 @@
 <?php
     abstract class WebLab_Dispatcher_Abstract
     {
-
+        
+        protected $_parameters = array();
         protected $_pattern = '{*}Controller';
         protected $_default;
 

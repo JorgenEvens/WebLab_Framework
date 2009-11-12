@@ -54,16 +54,28 @@
 	    return array_shift( $this->getURI() );
         }
 
+        public function getBasePath()
+        {
+            $localPath = array_shift( explode( $this->getScriptname(), $_SERVER[ 'SCRIPT_FILENAME' ] ) );
+
+            $httpPath = array_pop( explode( $_SERVER[ 'DOCUMENT_ROOT' ], $localPath ) );
+            return $httpPath;
+        }
+
         public function getParameters()
         {
-            $params = array_pop( $this->getURI() );
-            $params = explode( '/', $param );
+            $params = array_pop( str_replace( $this->getBasePath(), '', $this->getURI() ) );
+            $params = explode( '/', $params );
+            $params = array_values( array_filter( $params ) );
 
             $tmp = array();
 
             foreach( $params as $param )
             {
-                $tmp[ $param ] = next( $params );
+                if( !empty( $param ) )
+                {
+                    $tmp[ $param ] = next( $params );
+                }
             }
 
             return array_merge( $tmp, $params );
