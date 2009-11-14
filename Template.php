@@ -23,6 +23,13 @@
             }
 
             $this->_template = $template;
+
+            $this->setBasicVariables();
+        }
+
+        protected function setBasicVariables()
+        {
+            $this->url = WebLab_Config::getInstance()->get( 'Application.Runtime.URL' )->toArray();
         }
 
         public function attach( WebLab_Template &$template, $moduleName )

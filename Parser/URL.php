@@ -42,6 +42,8 @@
             $fullUrl = $this->getProtocol() . '://' .
                 $_SERVER[ 'SERVER_NAME' ] .
                 $this->getDirectory();
+
+            return $fullUrl;
         }
 
         public function getScriptname()

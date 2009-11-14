@@ -5,10 +5,18 @@
         public function execute()
         {
             $url = WebLab_Config::getInstance()->get( 'Application.Runtime.URL' )->toArray();
+            $moduleAliasses = WebLab_Config::getInstance()->get( 'Application.Modules.Aliasses' )->toArray();
 
-            if( $url[ 'parameters' ][0] )
+            $module = $url[ 'parameters' ][0];
+
+            if( isset( $moduleAliasses[ $module ] ) )
             {
-                $module = $this->classFromPattern( $url['parameters'][0] );
+                $module = $moduleAliasses[ $module ];
+            }
+
+            if( $module )
+            {
+                $module = $this->classFromPattern( $module );
                 if( class_exists( $module ) )
                 {
                     return new $module( $url['parameters'] );
