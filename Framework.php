@@ -20,5 +20,5 @@
       */
     function __autoload( $className )
     {
-        require_once( strtr( $className, '_', '/' ) . '.php' );
+        return @include_once( strtr( $className, '_', '/' ) . '.php' );
     }

@@ -39,7 +39,8 @@
                     'scriptname',
                     'directory',
                     'parameters',
-                    'fullUrl'
+                    'fullUrl',
+                    'basePath'
                 );
                 
 	    WebLab_Config::getInstance()->set( 'Application.Runtime.URL', $url->get( $data ) );

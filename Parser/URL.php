@@ -78,7 +78,8 @@
                 }
             }
 
-            return array_merge( $tmp, $params );
+            $tmp = array_merge( $tmp, $params );
+            return array_merge( $tmp, $_GET );
         }
 
         public function getURI()
