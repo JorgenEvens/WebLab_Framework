@@ -24,6 +24,7 @@
             }
 
             $this->_fields = $fields;
+            $this->_updateSelect();
 
             if( !( $a instanceof WebLab_Data_DataSource ) )
             {

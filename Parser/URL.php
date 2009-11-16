@@ -61,6 +61,7 @@
             $localPath = array_shift( explode( $this->getScriptname(), $_SERVER[ 'SCRIPT_FILENAME' ] ) );
 
             $httpPath = array_pop( explode( $_SERVER[ 'DOCUMENT_ROOT' ], $localPath ) );
+
             return $httpPath;
         }
 
@@ -72,11 +73,12 @@
 
             $tmp = array();
 
-            foreach( $params as $param )
+            for( $i=0; $i<count($params);$i++ )
             {
-                if( !empty( $param ) )
+                $param = $params[ $i ];
+                if( !empty( $param ) && !is_numeric( $param ))
                 {
-                    $tmp[ $param ] = next( $params );
+                    $tmp[ $param ] = $params[ $i+1 ];
                 }
             }
 
@@ -86,7 +88,8 @@
 
         public function getURI()
         {
-            return explode( $this->getScriptname(), $_SERVER[ 'REQUEST_URI' ] );
+            $url = array_shift( explode( '?', $_SERVER[ 'REQUEST_URI' ] ) );
+            return explode( $this->getScriptname(), $url );
         }
 
         public function getProtocol()

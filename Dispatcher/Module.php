@@ -1,26 +1,32 @@
 <?php
-    abstract class WebLab_Dispatcher_Module extends WebLab_Dispatcher_Abstract
+    abstract class WebLab_Dispatcher_Module
     {
+        protected $_parameters = array();
+
+        public function __construct( $parameters )
+        {
+            $this->_parameters = $parameters;
+            $this->execute();
+        }
 
         public function execute()
         {
             if( $this->_parameters[1] )
             {
-                $module = $this->classFromPattern( $this->_parameters[1] );
-                echo "class that we are looking for: " . $module;
-                if( class_exists( $module ) )
+                $action = $this->_parameters[1];
+                if( method_exists( $this, $action ) )
                 {
-                    return new $action( $url['parameters'] );
+                    return $this->$action( $this->_parameters );
                 }else
                 {
-                    $module = $this->classFromPattern( $this->_default );
-                    return new $module( $url['parameters'] );
+                    $this->_default( $this->_parameters );
                 }
             }else
             {
-                $module = $this->classFromPattern( $this->_default );
-                return new $module( $url['parameters'] );
+                $this->_default( $this->_parameters );
             }
         }
+
+        abstract protected function _default( $parameters );
 
     }

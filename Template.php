@@ -29,7 +29,7 @@
 
         protected function setBasicVariables()
         {
-            $this->url = WebLab_Config::getInstance()->get( 'Application.Runtime.URL' )->toArray();
+            $this->url = (object) WebLab_Config::getInstance()->get( 'Application.Runtime.URL' )->toArray();
         }
 
         public function attach( WebLab_Template &$template, $moduleName )
@@ -66,7 +66,7 @@
         public function render( $show=false )
         {
             ob_start();
-            require_once( $this->_dir . '/source/' . strtr( $this->_template, '_', '/' ) );
+            include( $this->_dir . '/source/' . strtr( $this->_template, '_', '/' ) );
             $code = ob_get_clean();
             if( $show )
             {
