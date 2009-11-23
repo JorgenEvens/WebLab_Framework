@@ -67,7 +67,9 @@
 
         public function getParameters()
         {
-            $params = array_pop( str_replace( $this->getBasePath(), '', $this->getURI() ) );
+            $base = $this->getBasePath();
+            
+            $params = ( $base != '/' ) ? str_replace( $base, '', array_pop( $this->getURI() ) ) : array_pop( $this->getURI() );
             $params = explode( '/', $params );
             $params = array_values( array_filter( $params ) );
 
@@ -89,7 +91,7 @@
         public function getURI()
         {
             $url = array_shift( explode( '?', $_SERVER[ 'REQUEST_URI' ] ) );
-            return explode( $this->getScriptname(), $url );
+            return explode( $this->getScriptname(), $url ) ;
         }
 
         public function getProtocol()
