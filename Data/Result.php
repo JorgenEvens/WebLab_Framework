@@ -1,56 +1,43 @@
 <?php
     abstract class WebLab_Data_Result
     {
+        protected $_rows = array();
 
-        protected $_data;
-        protected $_resource;
-        protected $_id;
-        protected $_position;
-        
-        public function __construct( $data, $id )
+        abstract protected function _read( $result );
+
+        public function __construct( $result )
         {
-            $this->_data = $data;
-            $this->_id = $id;
-            $this->_read();
+            $this->_read( $result );
         }
 
-        public function fetch()
+        public function next()
         {
-            return next( $this->_data );
+            return next( $this->_rows );
         }
 
-        public function reset()
+        public function previous()
         {
-            reset( $this->_data );
+            return previous( $this->_rows );
         }
 
-        public function fetchAll()
+        public function current()
         {
-            return $this->_data;
+            return current( $this->_rows );
         }
 
-        protected function _add( $data )
+        public function fetch( $id )
         {
-            if( isset( $this->_id ) )
-            {
-                $this->data[ $data[ $this->_id ] ] = $this->_wrap( $data, $this->_id );
-            }else
-            {
-                $this->_data[] = $this->_wrap( $data );
-            }
+            return $this->_rows[ $id ];
         }
 
-        protected function count()
+        public function fetch_all()
         {
-            return count( $this->_data );
+            return $this->_rows;
         }
 
-        public function getId()
+        public function count()
         {
-            return $this->_id;
+            return count( $this->_rows );
         }
-
-        abstract protected function _read();
-        abstract protected function _wrap();
 
     }
