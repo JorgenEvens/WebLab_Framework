@@ -28,10 +28,10 @@
 	public function run()
 	{
 	    $loader = $this->_config->get( 'Application.Loader' );
-
+            
 	    if( isset( $loader ) )
 	    {
-		$this->acquire( $loader->get( 'location' ) );
+                $this->acquire( $loader->get( 'location' ) );
 		$loader = $loader->get( 'name' );
 		$loader = new $loader();
 	    }

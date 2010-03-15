@@ -1,32 +1,42 @@
 <?php
     abstract class WebLab_Dispatcher_Module
     {
-        protected $_parameters = array();
+        protected $param;
+        protected $layout;
 
-        public function __construct( $parameters )
+        public final function __construct( $parameters )
         {
-            $this->_parameters = $parameters;
-            $this->execute();
-        }
+            $this->layout = &WebLab_Config::getInstance()->get( 'Application.Runtime.Environment.template' );
+            
+            $this->param = !empty( $parameters ) ? $parameters : array();
 
-        public function execute()
-        {
-            if( $this->_parameters[1] )
+            if( $this->__init() )
             {
-                $action = $this->_parameters[1];
-                if( method_exists( $this, $action ) )
-                {
-                    return $this->$action( $this->_parameters );
-                }else
-                {
-                    $this->_default( $this->_parameters );
-                }
-            }else
-            {
-                $this->_default( $this->_parameters );
+                $this->execute();
             }
         }
 
-        abstract protected function _default( $parameters );
+        protected function __init()
+        { return true; }
+
+        public function execute()
+        {
+            if( $this->param[1] )
+            {
+                $action = $this->param[1];
+                if( method_exists( $this, $action ) )
+                {
+                    return $this->$action( $this->param );
+                }else
+                {
+                    $this->_default( $this->param );
+                }
+            }else
+            {
+                $this->_default( $this->param );
+            }
+        }
+
+        abstract protected function _default();
 
     }

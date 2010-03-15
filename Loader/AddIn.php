@@ -32,7 +32,7 @@
 
         public function addIncludePath( $path )
         {
-            set_include_path( get_include_path() . PATH_SEPARATOR . $path );
+            set_include_path( get_include_path() . PATH_SEPARATOR . getcwd() . '/' . $path );
         }
 
         public function deleteIncludePath( $path )

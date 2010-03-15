@@ -156,6 +156,15 @@
 	}
 
         /**
+         *
+         * @return array The configuration as an object.
+         */
+        public function toObject()
+        {
+            return (object) $this->_config;
+        }
+
+        /**
          * Gets the root configuration.
          * @return WebLab_Config The root configuration.
          */
@@ -176,6 +185,11 @@
          */
 	public function import( $file )
 	{
+            if( !file_exists( $file ) )
+            {
+                throw new Exception( 'Could not locate config file. ( ' . $file . ' )' );
+            }
+            
 	    $config = json_decode( file_get_contents( $file ), true );
 	    if( !isset( $config ) )
 	    {

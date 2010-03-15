@@ -6,20 +6,11 @@
         protected $_log = false;
         protected $_exception;
 
-        public function getErrorTemplate()
-        {
-            return $this->_template;
-        }
-
-        public function setErrorTemplate( $template )
-        {
-            $this->_template    =   $template;
-        }
-
         public function __construct( $register, $log )
         {
+            error_reporting(0);
             $this->_template = new Exception( 'No error occurred.' );
-            
+
             if( $register )
             {
                 $this->registerHook();
@@ -31,7 +22,19 @@
             }
         }
 
-        public function triggerError( $exception )
+        public function getErrorTemplate()
+        {
+            return $this->_template;
+        }
+
+        public function setErrorTemplate( $template )
+        {
+            $this->_template    =   $template;
+        }
+
+        
+
+        public function triggerException( $exception )
         {
             $this->_exception = $exception;
             
@@ -49,7 +52,7 @@
             $log = fopen( $this->_log, 'a' );
 
             $time = date( DateTime::COOKIE );
-            $exception = $time . $this->_exception->getMessage();
+            $exception = $time . ":\t" . $this->_exception->getMessage();
 
             fwrite( $log, $exception );
             fclose( $log );
@@ -67,7 +70,7 @@
 
         public function registerHook()
         {
-            set_exception_handler( array( $this, 'triggerError' ) );
+            set_exception_handler( array( $this, 'triggerException' ) );
         }
 
         public function unregisterHook()

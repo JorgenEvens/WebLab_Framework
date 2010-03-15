@@ -58,27 +58,40 @@
 
         public function getBasePath()
         {
-            $localPath = array_shift( explode( $this->getScriptname(), $_SERVER[ 'SCRIPT_FILENAME' ] ) );
-
-            $httpPath = array_pop( explode( $_SERVER[ 'DOCUMENT_ROOT' ], $localPath ) );
+            $urlParts = explode( '/', $_SERVER[ 'SCRIPT_NAME'] );
+            unset( $urlParts[ count($urlParts)-1 ] );
+            $httpPath = implode( '/', $urlParts ) . '/';
 
             return $httpPath;
+        }
+
+        public function clean( $value )
+        {
+            
+            if( empty( $value ) && !( $value === '0' ) )
+            {
+                return false;
+            }
+
+            return true;
         }
 
         public function getParameters()
         {
             $base = $this->getBasePath();
+
             
+
             $params = ( $base != '/' ) ? str_replace( $base, '', array_pop( $this->getURI() ) ) : array_pop( $this->getURI() );
             $params = explode( '/', $params );
-            $params = array_values( array_filter( $params ) );
+            $params = array_values( array_filter( $params, array( $this, 'clean' ) ) );
 
             $tmp = array();
 
             for( $i=0; $i<count($params);$i++ )
             {
                 $param = $params[ $i ];
-                if( !empty( $param ) && !is_numeric( $param ))
+                if( !empty( $param ) && !is_numeric( $param ) )
                 {
                     $tmp[ $param ] = $params[ $i+1 ];
                 }

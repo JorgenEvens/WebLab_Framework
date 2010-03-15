@@ -20,5 +20,6 @@
       */
     function __autoload( $className )
     {
-        return @include_once( strtr( $className, '_', '/' ) . '.php' );
+        $className = str_replace( 'wl_', 'WebLab_', $className );
+        return include_once( strtr( $className, '_', '/' ) . '.php' );
     }
