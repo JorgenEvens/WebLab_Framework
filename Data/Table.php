@@ -6,10 +6,14 @@
         protected $_alias;
         protected $_fields = array();
 
-        public function __construct( $name, $fields=array() )
+        public function __construct( $name, $fields=null )
         {
             $this->_name = $name;
-            $this->addFields( $fields );
+            
+            if( is_array( $fields ) )
+            {
+                call_user_func_array( array( $this, 'addFields'), $fields );
+            }
             
         }
 
@@ -18,8 +22,10 @@
             return $this->getField( $name );
         }
 
-        public function addFields(  $fields=array() )
+        public function addFields()
         {
+            $fields = func_get_args();
+            
             foreach( $fields as $field )
             {
                 $this->addField( $field );

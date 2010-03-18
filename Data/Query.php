@@ -8,12 +8,15 @@
 
         protected $_adapter;
         
-        public function __construct( $adapter=null )
+        public function __construct( WebLab_Data_Adapter $adapter=null )
         {
-            $this->_adapter = $adapter;
+            if( !empty( $adapter ) )
+            {
+                $this->setAdapter( $adapter );
+            }
         }
 
-        public function setAdapter( $adapter )
+        public function setAdapter( WebLab_Data_Adapter $adapter )
         {
             $this->_adapter = $adapter;
         }

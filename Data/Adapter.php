@@ -5,7 +5,8 @@
         protected $_resource;
         protected $_wildcard = '*';
         protected $_prefix = '';
-        
+
+        abstract public function __construct( $config );
         abstract protected function _query( $query );
         abstract public function isConnected();
         abstract public function insert_id();
@@ -16,7 +17,7 @@
         {
             $query = $this->_prefixTables( $query );
 
-            $this->_query( $query );
+            return $this->_query( $query );
         }
 
         protected function _prefixTables( $query )
@@ -25,33 +26,7 @@
             {
                 return $query;
             }
-            
-            if( is_string( $query ) )
-            {
-                return $this->_prefixTablesFromString( $query );
-            }elseif( $query instanceof WebLab_Data_Query )
-            {
-                return $this->_prefixTablesFromQuery( $query );
-            }else
-            {
-                throw new Exception( 'An invalid query has been passed on.' );
-            }
-        }
 
-        protected function _prefixTablesFromQuery( WebLab_Data_Query $query )
-        {
-            $tables = &$query->getTables();
-
-            foreach( $tables as &$table )
-            {
-                $table->setName( $this->getPrefix() . $table->getName() );
-            }
-
-            return $query;
-        }
-
-        protected function _prefixTablesFromString( $query )
-        {
             if( !is_string( $query ) )
             {
                 throw new Exception( 'Expecting that the query supplied is a string.' );
@@ -73,12 +48,12 @@
             foreach( $tables as $table )
             {
                 $table = trim( $table ); // Remove redundant spaces.
-
+                
                 // If the tablename contains a space then this is the end of the table listing.
                 $emptyChar = strpos( $table, ' ' );
                 if( $emptyChar > -1 )
                 {
-                    $table = substr( $table, strlen( $table ) - $emptyChar );
+                    $table = substr( $table, 0, $emptyChar );
                     $query = str_replace( $table, $this->getPrefix() . $table, $query );
                     break;
                 }
