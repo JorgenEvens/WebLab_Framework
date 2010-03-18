@@ -1,5 +1,5 @@
 <?php
-    class WebLab_Data_mySQLi_Adapter extends WebLab_Data_Adapter
+    class WebLab_Data_MySQLi_Adapter extends WebLab_Data_Adapter
     {
         
         protected $_connected = false;
@@ -11,10 +11,11 @@
 
             if( $this->_resource->connect_err )
             {
-                $this->$error = $this->_resource->connect_err;
+                $this->error = $this->_resource->connect_err;
                 return;
             }
 
+            $this->setPrefix( $login->prefix );
             $this->_connected = true;
         }
 
@@ -23,7 +24,7 @@
             return $this->_connected;
         }
 
-        public function query( $query )
+        protected function _query( $query )
         {
             $result = $this->_resource->query( $query ) or die( $this->_resource->error . '<br/>' . $query );
             
