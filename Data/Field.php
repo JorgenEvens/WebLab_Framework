@@ -17,7 +17,6 @@
         protected $_order;
         protected $_group = false;
 
-
         public function __construct( $name, $value=null, $default='NULL' )
         {
             $this->_name = $name;
@@ -29,10 +28,26 @@
             $this->_default = $default;
         }
 
+        public function __call( $name, $args )
+        {
+            if( method_exists( 'WebLab_Data_Criteria', $name ) )
+            {
+                $criteria = new WebLab_Data_Criteria( $this );
+                call_user_func_array( array( $criteria, $name ), $args );
+                return $criteria;
+            }
+
+            throw new Exception( 'Method wasn\'t found.' );
+        }
+
+        // Deprecated
+        // Will be moved out eventually.
+        // use $field->eq, etc instead.
         public function createCriteria()
         {
             return new WebLab_Data_Criteria( $this );
         }
+        // --------------------------------------------------
 
         public function setTable( WebLab_Data_Table $table )
         {

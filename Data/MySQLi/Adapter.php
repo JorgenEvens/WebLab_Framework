@@ -26,13 +26,16 @@
 
         protected function _query( $query )
         {
-            $result = $this->_resource->query( $query ) or die( $this->_resource->error . '<br/>' . $query );
-            
-            if( $result !== true )
+            $result = $this->_resource->query( $query );
+
+            var_dump( $this->_resource->error );
+            if( strlen( $this->_resource->error ) > 0 )
             {
-                return new WebLab_Data_mySQLi_Result( $result );
+                throw new Exception( $this->_resource->error . '<br /><strong>Query:</strong><br />' . $query . '<br />' );
+            }else
+            {
+                return new WebLab_Data_MySQLi_Result( $result );
             }
-            return $this;
         }
 
         public function insert_id()

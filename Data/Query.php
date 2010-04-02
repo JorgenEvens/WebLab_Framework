@@ -21,7 +21,16 @@
             $this->_adapter = $adapter;
         }
 
+
+        // Deprecated
+        // Only here for compatibility.
         public function getCriteriaChain()
+        {
+            return $this->getCriteria();
+        }
+        //-----------------------------------------
+
+        public function getCriteria()
         {
             if( !isset( $this->_criteriaChain ) )
             {
@@ -185,7 +194,7 @@
             return $this->_adapter->query( $q );
         }
 
-        public function insert()
+        public function insert( $update=false )
         {
             $this->_isConnected();
 
@@ -218,6 +227,15 @@
             }
 
             $q .= 'VALUES( ' . implode( ', ', $values ) . ' )';
+
+            if( $update )
+            {
+                $q .= ' ON DUPLICATE KEY UPDATE ';
+
+                // update code here please !
+                //////////////////////////////////////////////////////
+                //////////////////////////////////////////////////////
+            }
 
             $this->_last_query = $q;
 

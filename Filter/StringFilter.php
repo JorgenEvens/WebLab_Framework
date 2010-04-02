@@ -2,56 +2,34 @@
     class WebLab_Filter_StringFilter extends WebLab_Filter_Filter
     {
 
-        private $_value;
-        private $_test;
-
-        public static function Equals( $string )
+        protected function inArray( $testValue, $value )
         {
-            return self::_CreateFilter( $string, 'equals' );
+            return in_array( $value, $testValue );
         }
 
-        public static function Contains( $string )
+        protected function notEquals( $testValue, $value )
         {
-            return self::_CreateFilter( $string, 'contains' );
+            return !$this->equals( $testValue, $value );
         }
 
-        public static function NotEquals( $string )
+        protected function equals( $testValue, $value )
         {
-            return self::_CreateFilter( $string, 'notEquals' );
+            return $value == $testValue;
         }
 
-        public static function In( $array )
+        protected function contains( $testValue, $value )
         {
-            return self::_CreateFilter( $array, 'inArray' );
+            return ( strpos( $value, $testValue )  > -1 );
         }
 
-        protected static function _CreateFilter( $value, $test )
+        protected function maxLength( $testValue, $value )
         {
-            $instance = new self();
-            $instance->_value = $value;
-            $instance->_test = array( '$this', $test );
-
-            return $instance;
+            return !( strlen( $value ) > $testValue );
         }
 
-        protected function inArray( $value )
+        protected function minLength( $length, $value )
         {
-            return in_array( $value, $this->_value );
-        }
-
-        protected function notEquals( $value )
-        {
-            return !$this->equals( $value );
-        }
-
-        protected function equals( $value )
-        {
-            return $value == $this->_value;
-        }
-
-        protected function contains( $value )
-        {
-            return ( strpos( $this->_value, $value )  > -1 );
+            return !( strlen( $value ) < $testValue );
         }
 
     }

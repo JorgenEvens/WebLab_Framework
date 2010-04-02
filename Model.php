@@ -1,7 +1,7 @@
 <?php
     abstract class WebLab_Model
     {
-        protected $_db;
+        protected static $_db;
         
         public final function __construct()
         {
@@ -11,7 +11,7 @@
             call_user_func_array( array( $this, '__init' ), $args );
         }
 
-        protected function _loadDatabases()
+        private function _loadDatabases()
         {
             $databases = WebLab_Config::getInstance()->get( 'Application.Data' )->toArray();
 

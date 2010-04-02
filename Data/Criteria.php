@@ -143,10 +143,10 @@
                 
             }elseif( $value instanceof WebLab_Data_Field )
             {
-                $action .= $value->getName();
+                $action .= $value->getFullnName();
             }
 
-            $action = $this->_field->getName() . ' ' . $action;
+            $action = $this->_field->getFullName() . ' ' . $action;
 
             return $action;
         }
