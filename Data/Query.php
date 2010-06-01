@@ -39,6 +39,15 @@
             return $this->_criteriaChain;
         }
 
+        public function addTables()
+        {
+            $tables = func_get_args();
+
+            array_map( array( $this, 'addTable' ), $tables );
+
+            return $this;
+        }
+
         public function addTable( $table )
         {
             if( is_string( $table ) )
@@ -194,7 +203,7 @@
             return $this->_adapter->query( $q );
         }
 
-        public function insert( $update=false )
+        public function insert( $update=false, $ignoreInUpdate=array() )
         {
             $this->_isConnected();
 
@@ -231,10 +240,24 @@
             if( $update )
             {
                 $q .= ' ON DUPLICATE KEY UPDATE ';
+                $values = array();
+                foreach( $query->fields as $field )
+                {
+                    if( in_array( $field, $ignoreInUpdate ) )
+                    {
+                        continue;
+                    }
 
-                // update code here please !
-                //////////////////////////////////////////////////////
-                //////////////////////////////////////////////////////
+                    if( is_numeric( $field->getValue() ) )
+                    {
+                         $values[] = $field->getFullName() . '=' . $field->getValue();
+                    }else
+                    {
+                        $values[] = $field->getFullName() . '=\'' . $this->_adapter->escape_string( $field->getValue() ) . '\'';
+                    }
+                }
+
+                $q .= implode(', ', $values ) . ' ';
             }
 
             $this->_last_query = $q;

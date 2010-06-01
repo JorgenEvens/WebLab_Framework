@@ -66,7 +66,7 @@
         public function render( $show=false )
         {
             ob_start();
-            include( $this->_dir . '/source/' . strtr( $this->_template, '_', '/' ) );
+            include( $this->_dir . '/source/' . $this->_template );
             $code = ob_get_clean();
             if( $show )
             {

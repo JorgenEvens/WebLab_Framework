@@ -26,14 +26,14 @@
                 $action = $this->param[1];
                 if( method_exists( $this, $action ) )
                 {
-                    return $this->$action( $this->param );
+                    return $this->$action();
                 }else
                 {
-                    $this->_default( $this->param );
+                    $this->_default();
                 }
             }else
             {
-                $this->_default( $this->param );
+                $this->_default();
             }
         }
 

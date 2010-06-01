@@ -16,7 +16,7 @@
         public final function query( $query )
         {
             $query = $this->_prefixTables( $query );
-
+            
             return $this->_query( $query );
         }
 
@@ -33,12 +33,15 @@
             }
 
             // Take everything after the FROM keyword.
-            $query = strtolower( $query );
-            $start = strpos( $query, ' from ' ) + 6;
+            //$query = strtolower( $query );
+            preg_match( "/(from |into )/i", $query, $start, PREG_OFFSET_CAPTURE );
+            $start = $start[0][1] + 5;
+
+
 
             if( $start < 6 )
             {
-                throw new Exception( 'The FROM Keyword was not found, so this is not a valid query.' );
+                throw new Exception( 'The FROM / INTO Keyword was not found, so this is not a valid query.' );
             }
 
             // explode it to get the different tables;
@@ -48,21 +51,20 @@
             foreach( $tables as $table )
             {
                 $table = trim( $table ); // Remove redundant spaces.
-                
+
                 // If the tablename contains a space then this is the end of the table listing.
                 $emptyChar = strpos( $table, ' ' );
                 if( $emptyChar > -1 )
                 {
                     $table = substr( $table, 0, $emptyChar );
-                    $query = str_replace( $table, $this->getPrefix() . $table, $query );
+                    $query = preg_replace( '/\b' . $table . '\b/', $this->getPrefix() . $table, $query );
                     break;
                 }
 
                 // Otherwise just replace the table with it's prefixed form and continue;
-                $query = str_replace( $table, $this->getPrefix() . $table, $query );
+                $query = preg_replace( '/\b' . $table . '\b/', $this->getPrefix() . $table, $query );
             }
 
-            var_dump( $query );
             return $query;
         }
 

@@ -1,7 +1,7 @@
 <?php
     abstract class WebLab_Model
     {
-        protected static $_db;
+        private static $_db;
         
         public final function __construct()
         {
@@ -11,13 +11,22 @@
             call_user_func_array( array( $this, '__init' ), $args );
         }
 
-        private function _loadDatabases()
+        protected static function getDb()
+        {
+            if( !isset( self::$_db ) )
+            {
+                self::_loadDatabases();
+            }
+            return self::$_db;
+        }
+
+        private static function _loadDatabases()
         {
             $databases = WebLab_Config::getInstance()->get( 'Application.Data' )->toArray();
 
-            if( !isset( $this->_db ) )
+            if( !isset( self::$_db ) )
             {
-                $this->_db = new stdClass();
+                self::$_db = new stdClass();
             }
 
             foreach( $databases as $name => $configuration )
@@ -31,7 +40,7 @@
                 $adapterClass = 'WebLab_Data_' . $configuration->type . '_Adapter';
                 if( class_exists( $adapterClass ) )
                 {
-                    $this->_db->$name = new $adapterClass( $configuration );
+                    self::$_db->$name = new $adapterClass( $configuration );
                 }
             }
 
