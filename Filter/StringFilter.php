@@ -17,6 +17,11 @@
             return $value == $testValue;
         }
 
+        protected function equalsIgnoreCase( $testValue, $value )
+        {
+            return $this->equals( strtolower( $testValue ), strtolower( $value ) );
+        }
+
         protected function contains( $testValue, $value )
         {
             return ( strpos( $value, $testValue )  > -1 );
