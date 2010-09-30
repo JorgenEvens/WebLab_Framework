@@ -32,7 +32,7 @@
             return !( strlen( $value ) > $testValue );
         }
 
-        protected function minLength( $length, $value )
+        protected function minLength( $testValue, $value )
         {
             return !( strlen( $value ) < $testValue );
         }

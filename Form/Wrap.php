@@ -4,10 +4,16 @@
         const POST = 'POST';
         const GET = 'GET';
 
-        protected $_fields = array();
-        protected $_method = 'POST';
-        protected $_errors = array();
-        
+        private $_fields = array();
+        protected $_method = self::POST;
+        protected $_action = '';
+        private $_errors = array();
+
+        public function __construct( $action='', $method = self::POST ){
+            $this->_action = $action;
+            $this->_method = $method;
+        }
+
         public function add( WebLab_Form_Field $field ){
             if( empty( $field ) )
                 throw new WebLab_Exception_Form( 'Field not set' );
@@ -18,6 +24,7 @@
             if( array_key_exists( $field->name, $this->_fields ) )
                     throw new WebLab_Exception_Form( 'Duplicate name attribute for fields.' );
 
+            $field->setForm( $this );
             $this->_fields[$field->name] = $field;
 
             return $this;
@@ -41,8 +48,9 @@
         public function isValid(){
             foreach( $this->_fields as $key => $field ){
                 $response = $field->isValid();
-                if( $response !== true )
-                    $this->_errors = $response;
+                if( $response !== true ){
+                    $this->_errors[$key] = $response;
+                }
             }
             return ( count( $this->_errors ) == 0 );
         }
@@ -61,8 +69,31 @@
             return $this;
         }
 
+        public function getAction(){
+            return $this->_action;
+        }
+
+        public function setAction( $action ){
+            if( !is_string( $action ) )
+                throw new Exception( 'Action should be a string, pointing to the result page' );
+
+            $this->_action = $action;
+
+            return $this;
+        }
+
+        public function update(){
+            foreach( $this->_fields as $field ){
+                $field->update();
+            }
+        }
+
         public function getErrors(){
             return $this->_errors;
+        }
+
+        public function __get( $name ){
+            return $this->_fields[ $name ];
         }
 
     }
