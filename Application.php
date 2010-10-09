@@ -1,7 +1,7 @@
 <?php
 
     /**
-     * The main class to start an application using WebLab_Framework
+     * The main class to start an application using WebLab Framework
      *
      * @package WebLab_Framework
      */
@@ -9,7 +9,7 @@
     {
         /**
          * Application Configuration.
-         * @var WebLab_Config Holds an instance of WebLab_Config
+         * @var WebLab_Config   Holds an instance of WebLab_Config
          */
 	protected $_config;
 

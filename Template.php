@@ -1,11 +1,40 @@
 <?php
+    /**
+     *
+     * Template
+     *
+     * Represents a PHP Template file
+     *
+     * @author  Jorgen Evens <jorgen@wlab.be>
+     * @version 0.1
+     * @package WebLab_Framework
+     *
+     */
     class WebLab_Template
     {
 
+        /**
+         *
+         * @var String Contains the path to the template file.
+         */
         protected $_template;
+
+        /**
+         *
+         * @var Array All variables assigned to this template.
+         */
         protected $_variables;
+
+        /**
+         *
+         * @var String The directory in which to search for the templates.
+         */
         protected $_dir;
 
+        /**
+         * Constructs a new Template
+         * @param String $template The path to the template, relative to the configured template directory.
+         */
         public function __construct( $template )
         {
             $config = WebLab_Config::getInstance()->get( 'Application.Templates.directory' );

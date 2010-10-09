@@ -49,4 +49,9 @@
             return ( $testValue > $low && $testValue < $high );
         }
 
+        public function notBetween( $testValue, $value )
+        {
+            return !$this->between( $testValue, $value );
+        }
+
     }

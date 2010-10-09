@@ -1,8 +1,28 @@
 <?php
+    /**
+     *
+     * Abstract Model
+     *
+     * Implements basic model functions
+     * Relieves coder from having to connect to his database.
+     *
+     * @author  Jorgen Evens <jorgen@wlab.be>
+     * @version 0.1
+     * @package WebLab_Framework
+     *
+     */
+
     abstract class WebLab_Model
     {
+        /**
+         * Static instance of all databases configured
+         * @var Array   Contains all configured instances of the databaseconnection.
+         */
         private static $_db;
-        
+
+        /**
+         * Constructor of each model.
+         */
         public final function __construct()
         {
             $this->_loadDatabases();
@@ -11,6 +31,10 @@
             call_user_func_array( array( $this, '__init' ), $args );
         }
 
+        /**
+         * Initialises database connection if not yet created.
+         * @return Array    Contains all configured instances of the databaseconnection.
+         */
         protected static function getDb()
         {
             if( !isset( self::$_db ) )
@@ -20,6 +44,10 @@
             return self::$_db;
         }
 
+        /**
+         * Load the databases from the configuration.
+         * @return bool Indicating whether loading of database was successful.
+         */
         private static function _loadDatabases()
         {
             $databases = WebLab_Config::getInstance()->get( 'Application.Data' )->toArray();
