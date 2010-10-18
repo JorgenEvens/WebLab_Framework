@@ -94,14 +94,20 @@
 
         public function render( $show=false )
         {
-            ob_start();
-            include( $this->_dir . '/source/' . $this->_template );
-            $code = ob_get_clean();
+            $code = $this->_getCode();
             if( $show )
             {
                 echo $code;
             }
             return $code;
+        }
+
+        protected function _getCode()
+        {
+            explode( $this->_variables );
+            ob_start();
+            include( $this->_dir . '/source/' . $this->_template );
+            return ob_get_clean();
         }
 
         final public function __toString()

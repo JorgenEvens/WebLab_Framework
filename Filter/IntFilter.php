@@ -1,5 +1,5 @@
 <?php
-    class WebLab_Filter_IntFilter
+    class WebLab_Filter_IntFilter extends WebLab_Filter_Filter
     {
 
         public function equals( $testValue, $value )

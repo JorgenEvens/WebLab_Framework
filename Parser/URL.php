@@ -1,21 +1,23 @@
 <?php
     class WebLab_Parser_URL
     {
+        
+        protected $_url;
 
-        public function __construct( $values=null )
+        public function __construct()
         {
-            if( is_array( $values ) )
-            {
-                return $this->get( $values );
-            }
+            $this->_url = parse_url( $_SERVER['REQUEST_URI'] );
+            DEFINE( 'BASE', $this->getBasePath() );
         }
 
+        /*
+         * Get a collection of URL values
+         * @param   Array   $values Names of the values you want to retrieve.
+         */
         public function get( $values )
         {
             if( !is_array( $values ) )
-            {
                 throw new WebLab_Exception_Parser( 'WebLab_Parser_URL::get() only accepts arrays' );
-            }
 
             $array = array();
             foreach( $values as $value )
@@ -26,6 +28,10 @@
             return $array;
         }
 
+        /*
+         * Retrieves property by name
+         * @param   String   $method The name of the property to get.
+         */
         protected function _get( $method )
         {
             $method = 'get' . ucfirst( $method );
@@ -37,25 +43,32 @@
             return false;
         }
 
-        public function getFullUrl()
+        /*
+         * The full URL of the current page.
+         */
+        public function getFullURL()
         {
             $fullUrl = $this->getProtocol() . '://' .
-                $_SERVER[ 'SERVER_NAME' ] .
-                $this->getDirectory();
+                $this->getHostname() . ':' . $this->getPort() .
+                $this->getPath();
 
             return $fullUrl;
         }
 
+        /*
+         * The name of the current script running.
+         * This will probably be your entry page, mostly index.php
+         */
         public function getScriptname()
         {
             return array_pop( explode( '/', $_SERVER[ 'SCRIPT_FILENAME' ] ) );
         }
 
-        public function getDirectory()
-        {
-	    return array_shift( $this->getURI() );
-        }
-
+        /*
+         * The basepath for urls.
+         * This path exists out of
+         * document_root/folder/to/application/
+         */
         public function getBasePath()
         {
             $urlParts = explode( '/', $_SERVER[ 'SCRIPT_NAME'] );
@@ -65,24 +78,23 @@
             return $httpPath;
         }
 
-        public function clean( $value )
+        private function clean( $value )
         {
-            
-            if( empty( $value ) && !( $value === '0' ) )
-            {
-                return false;
-            }
-
-            return true;
+            return ( empty( $value ) && !( $value === '0' ) );
         }
 
+        /*
+         * Get the parameters supplied through URL
+         * This is everything behind the basepath and the $_GET parameter
+         */
         public function getParameters()
         {
             $base = $this->getBasePath();
+            $path = $this->_url['path'];
 
-            
+            if( $base != '/' )
+                $params = strtr( $path, $base, '' );
 
-            $params = ( $base != '/' ) ? str_replace( $base, '', array_pop( $this->getURI() ) ) : array_pop( $this->getURI() );
             $params = explode( '/', $params );
             $params = array_values( array_filter( $params, array( $this, 'clean' ) ) );
 
@@ -101,19 +113,36 @@
             return array_merge( $tmp, $_GET );
         }
 
-        public function getURI()
-        {
-            $url = array_shift( explode( '?', $_SERVER[ 'REQUEST_URI' ] ) );
-            return explode( $this->getScriptname(), $url ) ;
-        }
-
+        /*
+         * Get the protocol used to load this page.
+         */
         public function getProtocol()
         {
-            return strtolower(
-                array_shift(
-                    explode( '/', $_SERVER[ 'SERVER_PROTOCOL' ] )
-                    )
-                );
+            return $this->_url['scheme'];
+        }
+
+        /*
+         * Get the port on which the server is running.
+         */
+        public function getPort()
+        {
+            return $this->_url['port'];
+        }
+
+        /*
+         * Get the hostname.
+         */
+        public function getHostname()
+        {
+            return $this->_url['host'];
+        }
+
+        /*
+         * Get the path used to access this page.
+         */
+        public function getPath()
+        {
+            return $this->_url['path'];
         }
         
     }
