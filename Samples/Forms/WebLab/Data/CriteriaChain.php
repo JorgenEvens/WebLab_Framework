@@ -44,7 +44,7 @@
                     $tmp = $criteria->operator . ' ' . $criteria->criteria->get( $adapterSpecs ) . ' ';
                 }
 
-                if( $criteria->criteria instanceof WebLab_Data_CriteriaChain )
+                if( $criteria instanceof WebLab_Data_CriteriaChain )
                 {
                     $q .= '( ' . $tmp . ' )';
                 }else

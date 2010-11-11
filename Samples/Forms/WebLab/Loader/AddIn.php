@@ -5,8 +5,7 @@
         public function __construct( $register=false )
         {
             $includes = WebLab_Config::getInstance()->get( 'Application.Loader.includePaths' )->toArray();
-
-            array_map( array( $this, 'addIncludePath' ), $includes );
+            $this->addIncludePath( implode( PATH_SEPARATOR, $includes ) );
 
             if( $register ){ $this->register(); };
         }
@@ -28,7 +27,7 @@
 
         protected function _parseName( $className )
         {
-            require_once( strtr( $className, '_', PATH_SEPARATOR ) . '.php' );
+            require_once( strtr( $className, '_', '/' ) . '.php' );
         }
 
         public function addIncludePath( $path )

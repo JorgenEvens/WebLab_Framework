@@ -52,7 +52,6 @@
                 $img = file_get_contents( $image );
                 $name = basename( $image );
                 $contentType = array_pop( explode( '.', $name ) );
-                // TODO: Implement correct content type: /\.(jpg|jpeg|png|gif)$/
 
                 $html .= 'Content-Type: image/' . $contentType . '; name="' . $name . '"' . "\n" .
                             'Content-ID: <img' . $key . '>' . "\n" .

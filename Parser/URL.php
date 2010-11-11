@@ -80,7 +80,7 @@
 
         private function clean( $value )
         {
-            return ( empty( $value ) && !( $value === '0' ) );
+            return ( !empty( $value ) && $value !== '0' );
         }
 
         /*
@@ -93,11 +93,11 @@
             $path = $this->_url['path'];
 
             if( $base != '/' )
-                $params = strtr( $path, $base, '' );
+                $path = str_replace( $base, '', $path );
 
-            $params = explode( '/', $params );
-            $params = array_values( array_filter( $params, array( $this, 'clean' ) ) );
-
+            $params = explode( '/', $path );
+            $params = array_values( array_filter( $params ) );
+            
             $tmp = array();
 
             for( $i=0; $i<count($params);$i++ )
