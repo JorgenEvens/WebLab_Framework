@@ -7,7 +7,7 @@
      *
      * @author  Jorgen Evens <jorgen@wlab.be>
      * @version 0.1
-     * @package WebLab_Framework
+     * @package WebLab
      *
      */
     class WebLab_Template
@@ -32,42 +32,76 @@
         protected $_dir;
 
         /**
+         * @var String The directory of a specific theme. Defaults to 'source'.
+         */
+        protected $_theme = 'source';
+        
+        /**
          * Constructs a new Template
          * @param String $template The path to the template, relative to the configured template directory.
          */
-        public function __construct( $template )
+        public function __construct( $template, $theme=null )
         {
-            $config = WebLab_Config::getInstance()->get( 'Application.Templates.directory' );
+            $config = WebLab_Config::getInstance()->get( 'Application.Templates' )->toObject();
 
-            if( $config )
-            {
-                $this->setTemplateDir( $config );
-            }
+            if( is_string( $config->directory ) )
+                $this->setTemplateDir( $config->directory );
+            
+            if( $theme === null && is_string( $config->theme ) )
+            	$this->setTheme( $config->theme );
+                
+            if( is_string( $theme ) )
+            	$this->setTheme( $theme );
 
             $this->_variables = array();
 
             if( !is_string( $template ) )
-            {
                 throw new WebLab_Exception_Template();
-            }
 
             $this->_template = $template;
 
             $this->setBasicVariables();
         }
 
+        /**
+         * Sets the $url variable to the instance of the url parser in WebLab_Config.
+         */
         protected function setBasicVariables()
         {
             $this->url = (object) WebLab_Config::getInstance()->get( 'Application.Runtime.URL' )->toArray();
         }
 
+        /**
+         * Attaches a template as a variable to this template.
+         * @param WebLab_Template $template Template you would like to attach to this template.
+         * @param String $moduleName Variable name for $template.
+         * @return WebLab_Template This template instance.
+         * @deprecated Use $myTemplate->variableName = $template now.
+         */
         public function attach( WebLab_Template &$template, $moduleName )
         {
             $this->_variables[ $moduleName ] = &$template;
 
             return $this;
         }
+        
+		/**
+		 * Set the theme folder within the template directory.
+		 * @param String $dir Foldername of the theme.
+		 * @return WebLab_Template This template instance.
+		 */
+        public function setTheme( $dir )
+        {
+        	$this->_theme = $dir;
+        	
+        	return $this;
+        }
 
+        /**
+         * Set the location of the template directory.
+         * This directory contains all of the themes.
+         * @param String $dir The directory to look for templates and themes.
+         */
         public function setTemplateDir( $dir )
         {
             $this->_dir = $dir;
@@ -75,23 +109,43 @@
             return $this;
         }
 
+        /**
+         * Get the entire stack of variables currently attached to this template.
+         * @return Array Return an array of attached variables. VariableNames as keys.
+         */
         public function getVars()
         {
             return $this->_variables;
         }
 
-        public function __set( $name, $value )
+        /**
+         * Catches all the property calls to set the appropriate variable.
+         * @param String $name The name of the property (variable) being set.
+         * @param Object &$value The value to be set.
+         * @return WebLab_Template This template instance.
+         */
+        public function __set( $name, &$value )
         {
-            $this->_variables[ $name ] = $value;
+            $this->_variables[ $name ] = &$value;
 
             return $this;
         }
 
+        /**
+         * Catches all the property calls to return the appropriate variable.
+         * @param String $name The name of the property (variable) te get.
+         * @return Object The value of this property.
+         */
         public function &__get( $name )
         {
             return $this->_variables[ $name ];
         }
 
+        /**
+         * Renders the template to its compiled HTML form.
+         * @param bool $show Whether to send the output to the browser requesting it. Defaults to false.
+         * @return String The HTML code rendered.
+         */
         public function render( $show=false )
         {
             $code = $this->_getCode();
@@ -102,17 +156,30 @@
             return $code;
         }
 
+        /**
+         * Running the template file and thus obtaining the HTML code.
+         * @return String The HTML code rendered.
+         */
         protected function _getCode()
         {
             extract( $this->_variables );
             ob_start();
-            include( $this->_dir . '/source/' . $this->_template );
+            include( $this->_dir . ( empty( $this->_theme ) ? '/' : '/' . $this->_theme . '/' ) . $this->_template );
             return ob_get_clean();
         }
 
+        /**
+         * Returns the value of the function render.
+         * @return String Returns HTML that has been rendered by the render function. If a Exception occurs the message of this exception will be returned.
+         */
         final public function __toString()
         {
-            return $this->render();
+        	try {
+            	return $this->render();
+        	}catch( Exception $ex )
+        	{
+        		return $ex->getMessage();
+        	}
         }
 
     }

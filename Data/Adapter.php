@@ -31,38 +31,63 @@
             {
                 throw new Exception( 'Expecting that the query supplied is a string.' );
             }
-
-            // Take everything after the FROM keyword.
-            //$query = strtolower( $query );
-            preg_match( "/(from |into )/i", $query, $start, PREG_OFFSET_CAPTURE );
-            $start = $start[0][1] + 5;
-
-
-
-            if( $start < 6 )
+            
+            $pattern = '#\s(from|into)\s#i';
+            //$end_tabledefinition = '#([^\b\s]+)(\s+([^A][^S]|.+)\s+|\s*$)#iU';
+            $end_tabledefinition = '#(.+)\s+(([^A][^S])|.+)\s+#iU';
+            
+            // Take everything after the FROM / INTO keyword.
+            preg_match( $pattern, $query, $matches, PREG_OFFSET_CAPTURE );
+            
+            while( count($matches) > 0)
             {
-                throw new Exception( 'The FROM / INTO Keyword was not found, so this is not a valid query.' );
-            }
-
-            // explode it to get the different tables;
-            $tables = explode( ',', substr( $query, $start ) );
-
-            // Replace every table with it's prefixed form.
-            foreach( $tables as $table )
-            {
-                $table = trim( $table ); // Remove redundant spaces.
-
-                // If the tablename contains a space then this is the end of the table listing.
-                $emptyChar = strpos( $table, ' ' );
-                if( $emptyChar > -1 )
-                {
-                    $table = substr( $table, 0, $emptyChar );
-                    $query = preg_replace( '/\b' . $table . '\b/', $this->getPrefix() . $table, $query );
-                    break;
-                }
-
-                // Otherwise just replace the table with it's prefixed form and continue;
-                $query = preg_replace( '/\b' . $table . '\b/', $this->getPrefix() . $table, $query );
+	            $start = $matches[0][1] + 6;
+	            
+	            if( $start < 7 )
+	            {
+	                throw new Exception( 'The FROM / INTO Keyword was not found, so this is not a prefixable query.' );
+	            }
+	            
+	            // explode it to get the different tables;
+	            $tables = explode( ',', substr( $query, $start ) );
+	            
+	            // detect end of tabledefinition
+	            $end = null;
+	            foreach( $tables as $key => $table )
+	            {
+	            	if( !empty( $end ) )
+	            	{
+	            		// Ignore all other values, they are no valid tablenames for this part of the query
+	            		unset( $tables[$key] );
+	            		continue;
+	            	}
+	            		
+		            if( preg_match( $end_tabledefinition, $table, $match ) )
+	                {
+	                	unset( $tables[$key] );
+	                	$tables[] = $match[1];
+	                	$end = preg_quote( array_shift( explode( ' ', $match[2] ) ) );
+	                }
+	            }
+	            
+	            // Replace every table with it's prefixed form.
+	            foreach( $tables as $table )
+	            {
+	                $table = trim( $table ); // Remove redundant spaces
+					
+	                $tbl_pattern = '#(\b)' . $table . '(\b.+' . $end . '|\.|$)#U';
+	                // Otherwise just replace the table with it's prefixed form and continue;
+	                while( preg_match( $tbl_pattern, $query ) )
+	                {
+	                	$query = preg_replace( $tbl_pattern , '$1' . $this->getPrefix() . $table . '$2', $query, -1, $count );
+	                	
+	                	// Move forward to the point where Start is now located.
+	                	$start += $count * strlen($this->getPrefix());
+	                }
+	            }
+	            
+	            if( !preg_match( $pattern, $query, $matches, PREG_OFFSET_CAPTURE, $start ) )
+	            	break;
             }
 
             return $query;

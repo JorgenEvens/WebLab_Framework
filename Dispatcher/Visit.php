@@ -2,18 +2,26 @@
     class WebLab_Dispatcher_Visit
     {
 
-        public function __construct( $default, $pattern )
+    	protected $_default;
+    	protected $_param;
+    	
+        public function __construct( $default, $pattern, $param=null )
         {
             $this->setPattern( $pattern )
                 ->setDefault( $default );
+            
+			if( !is_array( $param ) ) {
+				$url = WebLab_Config::getInstance()->get( 'Application.Runtime.URL' )->toArray();
+				$this->_param = $url['parameters'];
+			} else
+				$this->_param = $param;
         }
         
         public function execute()
         {
-            $url = WebLab_Config::getInstance()->get( 'Application.Runtime.URL' )->toArray();
             $moduleAliasses = WebLab_Config::getInstance()->get( 'Application.Modules.Aliasses' )->toArray();
 
-            $module = $url[ 'parameters' ][0];
+            $module = $this->_param[0];
 
             if( isset( $moduleAliasses[ $module ] ) )
             {
@@ -25,16 +33,16 @@
                 $module = $this->classFromPattern( $module );
                 if( class_exists( $module ) )
                 {
-                    return new $module( $url['parameters'] );
+                    return new $module( $this->_param );
                 }else
                 {
                     $module = $this->classFromPattern( $this->_default );
-                    return new $module( $url['parameters'] );
+                    return new $module( $this->_param );
                 }
             }else
             {
                 $module = $this->classFromPattern( $this->_default );
-                return new $module( $url['parameters'] );
+                return new $module( $this->_param );
             }
         }
 

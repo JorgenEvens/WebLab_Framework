@@ -7,7 +7,7 @@
      *
      * @author  Jorgen Evens <jorgen@wlab.be>
      * @version 0.1
-     * @package WebLab_Framework
+     * @package WebLab
      *
      */
 

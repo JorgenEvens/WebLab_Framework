@@ -1,12 +1,51 @@
 <?php
+    /**
+     *
+     * Mail wrapper
+     *
+     * Send mails based on WebLab_Template.
+     * Joins images into the e-mail for optimal viewing.
+     *
+     * @author  Jorgen Evens <jorgen@wlab.be>
+     * @version 0.1
+     * @package WebLab
+     *
+     */
     class WebLab_Mail extends WebLab_Template
     {
 
+    	/**
+    	 * Receiver of the e-mail.
+    	 * @var String The e-mailaddress of the receiver.
+    	 */
         protected $_to;
+        
+        /**
+         * The sender of the e-mail.
+         * @var String The e-mailaddress of the sender.
+         */
         protected $_from;
+        
+        /**
+         * The subject of the e-mail.
+         * @var String The subject of the e-mail.
+         */
         protected $_subject;
+        
+        /**
+         * The boundary splitting multiple content types.
+         * @var String The boundary used to split content types.
+         */
         protected $_boundary;
 
+        /**
+         * 
+         * Enter description here ...
+         * @param unknown_type $template
+         * @param unknown_type $to
+         * @param unknown_type $subject
+         * @param unknown_type $from
+         */
         public function __construct( $template, $to, $subject='Automated mail', $from='admin@server' ){
             parent::__construct($template);
 

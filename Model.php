@@ -8,10 +8,9 @@
      *
      * @author  Jorgen Evens <jorgen@wlab.be>
      * @version 0.1
-     * @package WebLab_Framework
+     * @package WebLab
      *
      */
-
     abstract class WebLab_Model
     {
         /**
@@ -21,19 +20,23 @@
         private static $_db;
 
         /**
-         * Constructor of each model.
+         * Only here for backward compatibility
          */
-        public final function __construct()
+        public function __construct()
         {
-            $this->_loadDatabases();
-
             $args = func_get_args();
             call_user_func_array( array( $this, '__init' ), $args );
         }
 
         /**
+         * __init() used instead of __construct because database loading happens in __construct.
+         * @deprecated __construct is to be used freely again.
+         */
+        public abstract function __init()
+        
+        /**
          * Initialises database connection if not yet created.
-         * @return Array    Contains all configured instances of the databaseconnection.
+         * @return Array Contains all configured instances of the databaseconnection.
          */
         protected static function getDb()
         {
