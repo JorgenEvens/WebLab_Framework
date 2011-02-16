@@ -61,12 +61,12 @@
 	            		unset( $tables[$key] );
 	            		continue;
 	            	}
-	            		
+	            	
 		            if( preg_match( $end_tabledefinition, $table, $match ) )
 	                {
 	                	unset( $tables[$key] );
 	                	$tables[] = $match[1];
-	                	$end = preg_quote( array_shift( explode( ' ', $match[2] ) ) );
+	                	$end = preg_quote( array_shift( array_filter( explode( ' ', $match[2] ) ) ) );
 	                }
 	            }
 	            

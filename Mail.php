@@ -39,12 +39,11 @@
         protected $_boundary;
 
         /**
-         * 
-         * Enter description here ...
-         * @param unknown_type $template
-         * @param unknown_type $to
-         * @param unknown_type $subject
-         * @param unknown_type $from
+         * Generates a new Mail object.
+         * @param String $template The template path
+         * @param String $to The recipients
+         * @param String $subject The subject of this e-mail. Defaults to 'Automated mail'
+         * @param String $from From who the receiver gets this message. Defaults to 'admin@server'
          */
         public function __construct( $template, $to, $subject='Automated mail', $from='admin@server' ){
             parent::__construct($template);
@@ -58,20 +57,27 @@
             $this->_boundary = 'Mail_' . md5( uniqid( time() ) );
         }
 
+        /**
+         * Generates the body of the Mail.
+         * @param bool $show Output result of this function to the browser. Defaults to false.
+         * @return String The body of the e-mail.
+         */
         public function render( $show=false )
         {
-            ob_start();
-            include( $this->_dir . '/source/' . $this->_template );
-            $code = ob_get_clean();
+            $code = parent::render();
 
             $code = $this->_parseTemplate($code);
             if( $show )
-            {
                 echo $code;
-            }
+            
             return $code;
         }
 
+        /**
+         * Parses the code generate by the template for images.
+         * @param String $html_code The HTML code to parse.
+         * @return String The HTML code parsed to include images.
+         */
         protected function _parseTemplate( $html_code ){
             $regExp = "/(background|src)=\"(.*)\.(jpeg|png|gif|jpg)\"/i";
 
@@ -103,6 +109,10 @@
             return $html;
         }
 
+        /**
+         * Transmits the e-mail to all the receivers.
+         * @return bool Indicates whether the send operation was successful.
+         */
         public function send(){
             if( !empty( $this->_from ) )
                     $headers = 'FROM:' . $this->_from . "\n" .

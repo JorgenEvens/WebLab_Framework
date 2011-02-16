@@ -39,12 +39,16 @@
         /**
          * Constructs a new Template
          * @param String $template The path to the template, relative to the configured template directory.
+         * @param String $theme	The name of the theme to be used. default theme is 'source'
+         * @param String $directory The directory in which to look for the template. Defaults to configuration setting.
          */
-        public function __construct( $template, $theme=null )
+        public function __construct( $template, $theme=null, $directory=null )
         {
             $config = WebLab_Config::getInstance()->get( 'Application.Templates' )->toObject();
 
-            if( is_string( $config->directory ) )
+            if( !empty( $directory ) && is_string( $directory ) )
+            	$this->setTemplateDir( $directory );
+            elseif( is_string( $config->directory ) )
                 $this->setTemplateDir( $config->directory );
             
             if( $theme === null && is_string( $config->theme ) )
@@ -124,7 +128,7 @@
          * @param Object &$value The value to be set.
          * @return WebLab_Template This template instance.
          */
-        public function __set( $name, &$value )
+        public function __set( $name, $value )
         {
             $this->_variables[ $name ] = &$value;
 

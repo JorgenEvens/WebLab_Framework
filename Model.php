@@ -32,7 +32,8 @@
          * __init() used instead of __construct because database loading happens in __construct.
          * @deprecated __construct is to be used freely again.
          */
-        public abstract function __init()
+        public function __init()
+        {}
         
         /**
          * Initialises database connection if not yet created.
