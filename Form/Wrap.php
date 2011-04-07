@@ -44,6 +44,14 @@
             unset( $this->_fields[ $field ] );
             return $this;
         }
+        
+        public function isPostback(){
+        	foreach( $this->_fields as $key => $field ){
+                if( $field->isPostback() )
+                	return true;
+            }
+            return false;
+        }
 
         public function isValid(){
             foreach( $this->_fields as $key => $field ){

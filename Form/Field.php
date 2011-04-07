@@ -46,5 +46,6 @@
         public abstract function __toString();
         public abstract function update();
         public abstract function isValid();
+        public abstract function isPostback();
 
     }

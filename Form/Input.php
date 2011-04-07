@@ -3,13 +3,15 @@
     {
 
         protected $_filters = array();
+        protected $_isPostback = false;
 
         public function update(){
             if( empty( $this->_form ) )
                     return;
             
             $response = ( $this->_form->getMethod() == WebLab_Form_Wrap::POST ) ? $_POST : $_GET;
-
+			$this->_isPostback = isset( $response[ $this->name ] );
+            
             switch( $this->_properties['type'] ){
                 case 'checkbox':
                     $this->checked = ( $response[ $this->name ] === $this->value ) ? 'checked' : '';
@@ -56,6 +58,10 @@
                 return true;
             
             return $errors;
+        }
+        
+        public function isPostback(){
+        	return $this->_isPostback;
         }
 
     }

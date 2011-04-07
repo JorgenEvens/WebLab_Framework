@@ -20,6 +20,11 @@
       */
     function __autoload( $className )
     {
-        //$className = str_replace( 'wl_', 'WebLab_', $className );
-        return include_once( strtr( $className, '_', '/' ) . '.php' );
+        $c = strtr( $className, '_', '/' ) . '.php';
+        $cHandle = @fopen( $c, 'r', true );
+        if( !empty( $cHandle ) ){
+        	fclose( $cHandle );
+        	return include_once( $c );
+        }
+        return false;
     }
