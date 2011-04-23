@@ -94,6 +94,19 @@
             return $this;
         }
 
+        public function setValues( $values ){
+        	if( !is_array( $values ) )
+        		return $this;
+        		
+        	foreach( $values as $field => $value )
+        		if( isset( $this->_fields[$field] ) )
+        			$this->_fields[$field]->setValue( $value );
+        		else
+        			throw new WebLab_Database_Exception( 'Field ' . $field . ' not in this table.' );
+        			
+        	return $this;
+        }
+        
         public function __toString()
         {
             return $this->getName();

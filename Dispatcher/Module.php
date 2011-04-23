@@ -4,7 +4,7 @@
         protected $param;
         protected $layout;
 
-        public final function __construct( $parameters )
+        public final function __construct( $parameters=null )
         {
             $this->layout = &WebLab_Config::getInstance()->get( 'Application.Runtime.Environment.template' );
             

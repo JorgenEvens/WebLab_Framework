@@ -1,13 +1,11 @@
 <?php
-    class WebLab_Form_Input extends WebLab_Form_Field
-    {
-
-        protected $_filters = array();
+	class WebLab_Form_TextArea extends WebLab_Form_Field {
+		
+		protected $_filters = array();
         protected $_isPostback = false;
 
-        public function __construct( $name, $type, $value=null, $properties=array() ){
+        public function __construct( $name, $value=null, $properties=array() ){
         	$properties['name'] = $name;
-        	$properties['type'] = $type;
         	if( !empty( $value ) )
         		$properties['value'] = $value;
         		
@@ -20,30 +18,20 @@
             
             $response = ( $this->_form->getMethod() == WebLab_Form_Wrap::POST ) ? $_POST : $_GET;
 			$this->_isPostback = isset( $response[ $this->name ] );
-            
-            switch( $this->_properties['type'] ){
-                case 'checkbox':
-                    $this->checked = ( $response[ $this->name ] === $this->value ) ? 'checked' : '';
-                    break;
-
-                case 'radio':
-                    $this->selected = ( $response[ $this->name ] === $this->value ) ? 'selected' : '';
-                    break;
-
-                default:
-                    $this->value = $response[ $this->name ];
-                    break;
-            };
+            $this->value = $response[ $this->name ];
         }
 
         public function __toString(){
-            $html = '<input';
+            $html = '<textarea';
 
             foreach( $this->_properties as $key => $value ){
+            	if( $key == 'value' )
+            		continue;
+            		
                 $html .= ' ' . $key . '="' . addslashes( $value ) . '"';
             }
 
-            $html .= ' />';
+            $html .= '>' . $this->value . '</textarea>';
             return $html;
         }
 
@@ -72,5 +60,4 @@
         public function isPostback(){
         	return $this->_isPostback;
         }
-
-    }
+	}
