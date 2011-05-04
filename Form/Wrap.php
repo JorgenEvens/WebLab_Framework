@@ -8,7 +8,8 @@
         protected $_method = self::POST;
         protected $_action = '';
         private $_errors = array();
-
+		public $postback;
+        
         public function __construct( $action='', $method = self::POST ){
             $this->_action = $action;
             $this->_method = $method;
@@ -46,11 +47,17 @@
         }
         
         public function isPostback(){
-        	foreach( $this->_fields as $key => $field ){
-                if( $field->isPostback() )
-                	return true;
-            }
-            return false;
+        	return $this->getPostbackTest()->isPostback();
+        }
+        
+        public function getPostbackTest(){
+        	if( empty( $this->postback ) ){
+        		$this->postback = new WebLab_Form_Input( 'isPostback', 'hidden', 'true' );
+        		$this->postback->setForm( $this );
+        	}
+        		
+        	$this->postback->update();
+        	return $this->postback;
         }
 
         public function isValid(){

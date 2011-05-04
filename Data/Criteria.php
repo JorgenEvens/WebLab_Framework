@@ -144,6 +144,9 @@
             }elseif( $value instanceof WebLab_Data_Field )
             {
                 $action .= $value->getFullName();
+            }elseif( empty( $value ) )
+            {
+            	$action = 'IS NULL';
             }
 
             $action = $this->_field->getFullName() . ' ' . $action;

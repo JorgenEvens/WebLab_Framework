@@ -102,7 +102,7 @@
         		if( isset( $this->_fields[$field] ) )
         			$this->_fields[$field]->setValue( $value );
         		else
-        			throw new WebLab_Database_Exception( 'Field ' . $field . ' not in this table.' );
+        			throw new WebLab_Exception_Data( 'Field ' . $field . ' not in this table.' );
         			
         	return $this;
         }
