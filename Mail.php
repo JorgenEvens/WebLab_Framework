@@ -13,6 +13,8 @@
      */
     class WebLab_Mail extends WebLab_Template
     {
+    	
+    	// TODO: Set resources directory.
 
     	/**
     	 * Receiver of the e-mail.

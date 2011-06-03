@@ -42,9 +42,8 @@
         protected static function getDb()
         {
             if( !isset( self::$_db ) )
-            {
                 self::_loadDatabases();
-            }
+
             return self::$_db;
         }
 
@@ -65,9 +64,7 @@
             {
                 $configuration = (object)$configuration;
                 if( !$configuration->auto )
-                {
                     continue;
-                }
 
                 $adapterClass = 'WebLab_Data_' . $configuration->type . '_Adapter';
                 if( class_exists( $adapterClass ) )

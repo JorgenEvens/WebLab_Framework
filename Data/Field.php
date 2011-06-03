@@ -40,14 +40,15 @@
             throw new Exception( 'Method wasn\'t found.' );
         }
 
-        // Deprecated
-        // Will be moved out eventually.
-        // use $field->eq, etc instead.
+        /**
+         * Creates a criteria for this field.
+         * 
+         * @deprecated Use $field->equals...
+         */
         public function createCriteria()
         {
             return new WebLab_Data_Criteria( $this );
         }
-        // --------------------------------------------------
 
         public function setTable( WebLab_Data_Table $table )
         {
@@ -58,19 +59,21 @@
 
         public function setFunction( $function )
         {
-            $allowed = array(
+            /*$allowed = array(
                 'YEAR',
                 'MONTH',
                 'COUNT'
-            );
+            );*/
 
             $function = strtoupper( $function );
 
-            if( in_array( $function, $allowed ) )
+            /*if( in_array( $function, $allowed ) )
             {
-                $this->_function = $function;
-            }
+                
+            }*/
 
+            $this->_function = $function;
+            
             return $this;
         }
 
@@ -81,11 +84,12 @@
 
         public function getFullName()
         {
+        	$name = $this->_table->getName() . '.' . $this->_name;
+        	
             if( isset( $this->_function ) )
-            {
-                return strtoupper( $this->_function ) . '( ' . $this->_table->getName() . '.' . $this->_name . ' )';
-            }
-            return $this->_table->getName() . '.' . $this->_name;
+                $name = $this->_function . '( ' . $name . ' )';
+
+            return $name;
         }
 
         public function getName()
@@ -100,10 +104,10 @@
 
         public function setAlias( $alias )
         {
-            if( is_string( $alias ) )
-            {
-                $this->_alias = $alias;
-            }
+            if( !is_string( $alias ) )
+            	throw new WebLab_Exception_Data( 'Alias should be of type string.' );
+            
+            $this->_alias = $alias;
 
             return $this;
         }
@@ -121,7 +125,7 @@
             return isset( $this->_value ) ? $this->_value : $this->_default;
         }
 
-        public function altered()
+        public function isAltered()
         {
             return $this->_altered;
         }
@@ -140,8 +144,8 @@
 
         public function setOrder( $direction='ASC' )
         {
-            $this->_order = ( $direction == 'DESC' ) ? 'DESC' : 'ASC';
-            $this->_order = $direction == null ? null : $this->_order;
+        	if( $direction != null )
+            	$this->_order = ( $direction == 'DESC' ) ? 'DESC' : 'ASC';
 
             return $this;
         }

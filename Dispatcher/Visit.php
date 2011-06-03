@@ -21,7 +21,7 @@
         {
             $moduleAliasses = WebLab_Config::getInstance()->get( 'Application.Modules.Aliasses' )->toArray();
 
-            $module = $this->_param[0];
+            $module = isset( $this->_param[0] ) ? $this->_param[0] : '';
 
             if( isset( $moduleAliasses[ $module ] ) )
             {

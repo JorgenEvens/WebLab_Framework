@@ -1,7 +1,7 @@
 <?php
     class WebLab_Loader_AddIn
     {
-
+		// TODO: Rewrite.
         public function __construct( $register=false )
         {
             $includes = WebLab_Config::getInstance()->get( 'Application.Loader.includePaths' )->toArray();

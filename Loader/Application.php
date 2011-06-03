@@ -15,7 +15,7 @@
 	{
 	    if( method_exists( $this, $method ) )
 	    {
-		$this->$method();
+			$this->$method();
 	    }
 	}
 
@@ -23,10 +23,10 @@
 	{
 	    foreach( $this->_config->get( 'load' )->toArray() as $method => $start )
 	    {
-		if( $start )
-		{
-		    $this->_call( '_init' . ucfirst( $method ) );
-		}
+			if( $start )
+			{
+			    $this->_call( '_init' . ucfirst( $method ) );
+			}
 	    }
 	}
 

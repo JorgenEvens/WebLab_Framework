@@ -12,9 +12,7 @@
             $this->_template = new Exception( 'No error occurred.' );
 
             if( $register )
-            {
                 $this->registerHook();
-            }
 
             if( isset( $log ) )
             {

@@ -51,7 +51,7 @@
             elseif( is_string( $config->directory ) )
                 $this->setTemplateDir( $config->directory );
             
-            if( $theme === null && is_string( $config->theme ) )
+            if( $theme === null && !empty( $config->theme ) && is_string( $config->theme ) )
             	$this->setTheme( $config->theme );
                 
             if( is_string( $theme ) )

@@ -11,7 +11,7 @@
                 throw new Exception( 'Must supply a Criteria or a CriteriaChain' );
             }
             
-            $this->_criteria[] = (object) array( criteria => $criteria, operator => 'AND' );
+            $this->_criteria[] = (object) array( 'criteria' => $criteria, 'operator' => 'AND' );
 
             return $this;
         }
@@ -23,7 +23,7 @@
                 throw new Exception( 'Must supply a Criteria or a CriteriaChain' );
             }
             
-            $this->_criteria[] = (object) array( criteria => $criteria, operator => 'OR' );
+            $this->_criteria[] = (object) array( 'criteria' => $criteria, 'operator' => 'OR' );
 
             return $this;
         }

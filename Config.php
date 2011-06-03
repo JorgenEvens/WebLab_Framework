@@ -93,9 +93,10 @@
 			else
 				$path = $this->getPath() . '.' . implode( $currentPath, '.' );
 	
-		    if( is_array( $config ) )
-				return new self( $config, $path );
-		    else
+		    if( is_array( $config ) ) {
+		    	$newInstance = new self( $config, $path );
+				return $newInstance;
+		    } else
 				return $config;
 		}
 

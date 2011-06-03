@@ -318,9 +318,9 @@
             }
 
             return (object) array(
-                fields  => $fields,
-                order   => $order,
-                group   => $group
+                'fields'  => $fields,
+                'order'   => $order,
+                'group'   => $group
             );
         }
 

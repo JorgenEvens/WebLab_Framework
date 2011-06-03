@@ -9,9 +9,9 @@
         {
             $this->_resource = new mysqli( $login->host, $login->username, $login->password, $login->database, $login->port );
 
-            if( $this->_resource->connect_err )
+            if( !empty( $this->_resource->connect_error ) )
             {
-                $this->error = $this->_resource->connect_err;
+                $this->error = $this->_resource->connect_error;
                 return;
             }
 
@@ -27,7 +27,7 @@
         protected function _query( $query )
         {
             $result = $this->_resource->query( $query );
-
+			
             if( strlen( $this->_resource->error ) > 0 || $this->_resource->errno || !$result )
             {
                 throw new Exception( $this->_resource->error . '<br /><strong>Query:</strong><br />' . $query . '<br />' );
@@ -54,8 +54,8 @@
         public function getAdapterSpecs()
         {
             return (object) array(
-                escape_string   => array( $this, 'escape_string' ),
-                wildcard        => $this->_wildcard
+                'escape_string'   => array( $this, 'escape_string' ),
+                'wildcard'	      => $this->_wildcard
             );
         }
 

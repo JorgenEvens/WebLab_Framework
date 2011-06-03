@@ -21,7 +21,7 @@
 
         public function execute()
         {
-            if( $this->param[1] )
+            if( isset( $this->param[1] ) && !empty( $this->param[1] ) )
             {
                 $action = $this->param[1];
                 if( method_exists( $this, $action ) )

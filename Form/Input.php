@@ -19,8 +19,6 @@
                     return;
             
             $response = ( $this->_form->getMethod() == WebLab_Form_Wrap::POST ) ? $_POST : $_GET;
-            if( $this->name == 'isPostback' )
-            	var_dump( $response );
 			$this->_isPostback = isset( $response[ $this->name ] );
             
             switch( $this->_properties['type'] ){

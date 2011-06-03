@@ -120,7 +120,7 @@
                 $param = $params[ $i ];
                 if( !empty( $param ) && !is_numeric( $param ) )
                 {
-                    $tmp[ $param ] = $params[ $i+1 ];
+                    $tmp[ $param ] = isset( $params[ $i+1 ] ) ? $params[ $i+1 ] : '';
                 }
             }
 

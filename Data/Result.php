@@ -1,4 +1,10 @@
 <?php
+	/**
+	 * Read data from the resource.
+	 * 
+	 * @author jorgen
+	 *
+	 */
     abstract class WebLab_Data_Result
     {
         protected $_rows = array();
