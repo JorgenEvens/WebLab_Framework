@@ -9,7 +9,7 @@
     {
         protected $_rows = array();
 
-        abstract protected function _read( $result );
+        abstract protected function _read( &$result );
 
         public function __construct( $result )
         {

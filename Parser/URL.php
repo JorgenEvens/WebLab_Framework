@@ -20,10 +20,14 @@
         /**
          * Constructs a new URL Parser.
          */
-        public function __construct()
+        public function __construct( $url=null )
         {
-            $this->_url = parse_url( $_SERVER['REQUEST_URI'] );
-            DEFINE( 'BASE', $this->getBasePath() );
+        	$this->_url = parse_url( $url );
+        	if( empty( $url ) )
+            	$this->_url = parse_url( $_SERVER['REQUEST_URI'] );
+            	
+            if( !defined( 'BASE') )
+            	DEFINE( 'BASE', $this->getBasePath() );
         }
 
         /**

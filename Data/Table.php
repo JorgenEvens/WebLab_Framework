@@ -39,8 +39,8 @@
             foreach( $fields as &$field )
                 $this->addField( $field );
 
-            unset $field;
-            unset $fields;
+            unset( $field );
+            unset( $fields );
 
             return $this;
         }
