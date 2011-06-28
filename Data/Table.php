@@ -36,11 +36,11 @@
         {
             $fields = func_get_args();
             
+            if( count( $fields ) === 1 && is_array( $fields[0] ) )
+            	$fields = $fields[0];
+            
             foreach( $fields as &$field )
                 $this->addField( $field );
-
-            unset( $field );
-            unset( $fields );
 
             return $this;
         }
@@ -56,6 +56,9 @@
             if( is_string( $field ) )
                 $field = new WebLab_Data_Field( $field );
 
+            if( empty( $field ) )
+            	return null;
+                
             $field->setTable( $this );
             $this->_fields[ $field->getName() ] = $field;
 

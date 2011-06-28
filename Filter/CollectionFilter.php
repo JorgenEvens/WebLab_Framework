@@ -9,8 +9,7 @@
 
         public function keyExists( $testValue, $value )
         {
-            $keys = array_keys( $testValue );
-            return in_array( $value, $keys );
+        	return array_key_exists( $value, $testValue );
         }
 
         public function notContains( $testValue, $value )

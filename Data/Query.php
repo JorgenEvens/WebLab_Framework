@@ -20,6 +20,10 @@
         {
             $this->_adapter = $adapter;
         }
+        
+        public function getAdapter(){
+        	return $this->_adapter;
+        }
 
 
         // Deprecated
@@ -119,6 +123,7 @@
                 $tmp = array();
                 foreach( $query->fields as $field )
                 {
+                	if( !$field->getSelect() ) continue;
                     $alias = $field->getAlias();
                     $tmp[] = empty( $alias ) ? $field : $field->__toString() . ' AS ' . $alias;
                 }

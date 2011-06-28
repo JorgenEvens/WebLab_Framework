@@ -16,6 +16,8 @@
         
         protected $_order;
         protected $_group = false;
+        
+        protected $_select = true;
 
         public function __construct( $name, $value=null, $default='NULL' )
         {
@@ -170,6 +172,14 @@
         public function __toString()
         {
             return $this->getFullName();
+        }
+        
+        public function setSelect( $select ){
+        	$this->_select = $select;
+        }
+        
+        public function getSelect(){
+        	return $this->_select;
         }
 
     }

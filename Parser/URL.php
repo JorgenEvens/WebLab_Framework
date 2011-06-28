@@ -26,7 +26,7 @@
         	if( empty( $url ) )
             	$this->_url = parse_url( $_SERVER['REQUEST_URI'] );
             	
-            if( !defined( 'BASE') )
+            if( !defined( 'BASE' ) )
             	DEFINE( 'BASE', $this->getBasePath() );
         }
 
