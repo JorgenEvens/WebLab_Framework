@@ -4,6 +4,7 @@
         protected $_tables = array();
         protected $_criteriaChain;
         protected $_limit;
+        protected $_count_limitless = false;
         public $_last_query;
 
         protected $_adapter;
@@ -24,8 +25,7 @@
         public function getAdapter(){
         	return $this->_adapter;
         }
-
-
+        
         // Deprecated
         // Only here for compatibility.
         public function getCriteriaChain()
@@ -101,6 +101,14 @@
         {
             unset( $this->_limit );
         }
+        
+        public function countLimitless( $count ){
+        	$this->_count_limitless = $count;
+        }
+        
+        public function getCountLimitless(){
+        	return $this->_count_limitless;
+        }
 
        public function select()
         {
@@ -114,6 +122,9 @@
             }
 
             $q = 'SELECT ';
+            
+            if( $this->getCountLimitless() )
+            	$q .= 'SQL_CALC_FOUND_ROWS ';
 
             if( count( $query->fields ) == 0 )
             {
@@ -154,7 +165,14 @@
 
             $this->_last_query = $q;
 
-            return $this->_adapter->query( $q );
+            $result = $this->_adapter->query( $q );
+            
+            if( $this->getCountLimitless() ) {
+            	$row_count = $this->_adapter->query( 'SELECT FOUND_ROWS() AS count' );
+            	$result->setTotalRows( $row_count->current()->count );
+            }
+            
+            return $result;
         }
 
         public function update()

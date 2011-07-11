@@ -8,6 +8,7 @@
     abstract class WebLab_Data_Result
     {
         protected $_rows = array();
+        protected $_total = 0;
 
         abstract protected function _read( &$result );
 
@@ -44,6 +45,14 @@
         public function count()
         {
             return count( $this->_rows );
+        }
+        
+        public function setTotalRows( $total ){
+        	$this->_total = $total;
+        }
+        
+        public function getTotalRows(){
+        	return $this->_total;
         }
 
     }
