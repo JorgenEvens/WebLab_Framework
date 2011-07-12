@@ -16,12 +16,14 @@
             if( empty( $this->_form ) )
                     return;
             
-            $response = ( $this->_form->getMethod() == WebLab_Form_Wrap::POST ) ? $_POST : $_GET;
+            $response = ( $this->_form->getMethod() == WebLab_Form::POST ) ? $_POST : $_GET;
 			$this->_isPostback = isset( $response[ $this->name ] );
             $this->value = $response[ $this->name ];
         }
 
         public function __toString(){
+        	$this->_prepare();
+        	
             $html = '<textarea';
 
             foreach( $this->_properties as $key => $value ){
@@ -55,9 +57,5 @@
                 return true;
             
             return $errors;
-        }
-        
-        public function isPostback(){
-        	return $this->_isPostback;
         }
 	}

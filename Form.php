@@ -1,5 +1,6 @@
 <?php
-    class WebLab_Form_Wrap
+	// TODO: Review entire WebLab_Form tree for cleanup & optimizations
+    abstract class WebLab_Form
     {
         const POST = 'POST';
         const GET = 'GET';
@@ -8,11 +9,17 @@
         protected $_method = self::POST;
         protected $_action = '';
         private $_errors = array();
-		public $postback;
+        public $postback = null;
         
         public function __construct( $action='', $method = self::POST ){
             $this->_action = $action;
             $this->_method = $method;
+            
+            $this->_setupPostback();
+        }
+        
+        protected function _setupPostback(){
+        	$this->postback = new WebLab_Form_Input( $this->getFormId(), 'hidden', 'postback' );
         }
 
         public function add( WebLab_Form_Field $field ){
@@ -46,18 +53,18 @@
             return $this;
         }
         
-        public function isPostback(){
-        	return $this->getPostbackTest()->isPostback();
+        public function getFormId(){
+        	return substr( md5( $this->_action . '-' . $this->_method ), 0, 6 );
         }
         
-        public function getPostbackTest(){
-        	if( empty( $this->postback ) ){
-        		$this->postback = new WebLab_Form_Input( 'isPostback', 'hidden', 'true' );
-        		$this->postback->setForm( $this );
-        	}
-        		
-        	$this->postback->update();
-        	return $this->postback;
+        public function isPostback(){
+        	$postback_code = $this->getFormId();
+        	$response = $this->_getResponse();
+        	return isset( $response[$postback_code] );
+        }
+        
+        public function _getResponse(){
+        	return ( $this->_method == self::POST ) ? $_POST : $_GET;
         }
 
         public function isValid(){
@@ -96,6 +103,10 @@
 
             return $this;
         }
+        
+        public function getFields(){
+        	return $this->_fields;
+        }
 
         public function update(){
             foreach( $this->_fields as $field ){
@@ -109,6 +120,15 @@
 
         public function __get( $name ){
             return $this->_fields[ $name ];
+        }
+        
+        // TODO: allow string
+        public function getValue( WebLab_Form_Field $field ){
+        	$response = $this->_getResponse();
+        	if( isset( $response[ $field->name ] ) )
+        		return $response[ $field->name ];
+        	else
+        		return null;
         }
 
     }

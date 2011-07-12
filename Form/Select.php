@@ -4,9 +4,11 @@
 		protected $_options;
 		protected $_selected;
 		
-		public function __construct( $name, $options=array() ){
-			$this->name = $name;
+		public function __construct( $name, $options=array(), $properties=array() ){
 			$this->_options = $options;
+			$properties['name'] = $name;
+			
+			parent::__construct( $properties );
 		}
 		
 		public function addOption( $text, $value ){
@@ -20,6 +22,8 @@
 		}
 		
 		public function __toString(){
+			$this->_prepare();
+        	
 			$html = '<select';
 
             foreach( $this->_properties as $key => $value ){
@@ -41,15 +45,11 @@
 		}
 		
         public function update(){
-        	$this->_selected = ( $this->getForm()->getMethod() == WebLab_Form_Wrap::POST ) ? $_POST[$this->name] : $_GET[$this->name];
+        	$this->_selected = $this->_form->getValue($this);
         }
         
         public function isValid(){
         	return true;
-        }
-        
-        public function isPostback(){
-        	return !empty( $this->_selected );
         }
 		
 	}

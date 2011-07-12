@@ -3,7 +3,6 @@
     {
 
         protected $_filters = array();
-        protected $_isPostback = false;
 
         public function __construct( $name, $type, $value=null, $properties=array() ){
         	$properties['name'] = $name;
@@ -18,25 +17,25 @@
             if( empty( $this->_form ) )
                     return;
             
-            $response = ( $this->_form->getMethod() == WebLab_Form_Wrap::POST ) ? $_POST : $_GET;
-			$this->_isPostback = isset( $response[ $this->name ] );
-            
+            $value = $this->_form->getValue($this);
             switch( $this->_properties['type'] ){
                 case 'checkbox':
-                    $this->checked = ( $response[ $this->name ] === $this->value ) ? 'checked' : '';
+                    $this->checked = ( $value === $this->value ) ? 'checked' : '';
                     break;
 
                 case 'radio':
-                    $this->selected = ( $response[ $this->name ] === $this->value ) ? 'selected' : '';
+                    $this->selected = ( $value === $this->value ) ? 'selected' : '';
                     break;
 
                 default:
-                    $this->value = $response[ $this->name ];
+                    $this->value = $value;
                     break;
             };
         }
 
         public function __toString(){
+        	$this->_prepare();
+        	
             $html = '<input';
 
             foreach( $this->_properties as $key => $value ){
@@ -47,7 +46,7 @@
             return $html;
         }
 
-        public function addFilter( WebLab_Filter_Filter $filter, $errorMessage ){
+        public function addFilter( WebLab_Filter $filter, $errorMessage ){
             $this->_filters[] = (object)array(
                 'filter' => $filter,
                 'errorMessage' => $errorMessage
@@ -59,18 +58,14 @@
             $errors = array();
             
             foreach( $this->_filters as $filter ){
-                if( !$filter->filter->test( $this->value ) )
+                if( !$filter->filter->test( trim( $this->value ) ) )
                         $errors[] = $filter->errorMessage;
             }
-
+			
             if( !count( $errors ) )
                 return true;
             
             return $errors;
-        }
-        
-        public function isPostback(){
-        	return $this->_isPostback;
         }
 
     }

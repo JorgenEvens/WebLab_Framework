@@ -1,5 +1,5 @@
 <?php
-    class WebLab_Filter_StringFilter extends WebLab_Filter_Filter
+    class WebLab_Filter_String extends WebLab_Filter
     {
 
         protected function inArray( $testValue, $value )

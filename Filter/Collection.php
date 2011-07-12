@@ -1,5 +1,5 @@
 <?php
-    class WebLab_Filter_CollectionFilter extends WebLab_Filter_Filter
+    class WebLab_Filter_Collection extends WebLab_Filter
     {
 
         public function contains( $testValue, $value )

@@ -1,5 +1,5 @@
 <?php
-    abstract class WebLab_Filter_Filter
+    abstract class WebLab_Filter
     {
 
         protected $_test = array();

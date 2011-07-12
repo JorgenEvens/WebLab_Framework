@@ -1,5 +1,5 @@
 <?php
-    class WebLab_Filter_EmailFilter extends WebLab_Filter_Filter
+    class WebLab_Filter_Email extends WebLab_Filter
     {
         protected $_rule = '/^[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/';
 
