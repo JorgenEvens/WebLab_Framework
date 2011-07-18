@@ -21,7 +21,10 @@
         }
 
         public function __get( $property ){
-            return $this->_properties[ $property ];
+        	if( isset( $this->_properties[$property] ) )
+            	return $this->_properties[ $property ];
+            	
+            return null;
         }
 
         public function __set( $property, $value ){

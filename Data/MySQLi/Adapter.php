@@ -58,5 +58,19 @@
                 'wildcard'	      => $this->_wildcard
             );
         }
+        
+        protected function _start_transaction() {
+        	$this->_resource->autocommit( false );
+        }
+        
+        protected function _quit_transaction( $commit ) {
+        	$this->_resource->autocommit( true );
+        	
+        	if( $commit ) {
+        		$this->_resource->commit();
+        	} else {
+        		$this->_resource->rollback();
+        	}
+        }
 
     }

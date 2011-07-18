@@ -117,20 +117,20 @@
          */
         public function send(){
             if( !empty( $this->_from ) )
-                    $headers = 'FROM:' . $this->_from . "\n" .
+                    $headers = 'FROM:' . $this->_from . "\r\n" .
                         'Content-Type: multipart/related;' .
-                        'boundary="' . $this->_boundary . '"' . "\n";
+                        'boundary="' . $this->_boundary . '"' . "\r\n";
             $content = $this->render();
 
-
+			$error_address = array();
             foreach( $this->_to as $email ){
-                try{
-                    mail( $email, $this->_subject, $content, $headers );
-                }catch( Exception $ex ){
-
-                }
+            	if( !mail( $email, $this->_subject, $content, $headers ) )
+            		$error_address[] = $email;
             }
 
+            if( count( $error_address ) > 0 )
+            	return $error_address;
+            	
             return true;
         }
 

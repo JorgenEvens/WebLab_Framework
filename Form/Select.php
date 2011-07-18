@@ -3,6 +3,7 @@
 		
 		protected $_options;
 		protected $_selected;
+		protected $_filters = array();
 		
 		public function __construct( $name, $options=array(), $properties=array() ){
 			$this->_options = $options;
@@ -48,8 +49,26 @@
         	$this->_selected = $this->_form->getValue($this);
         }
         
+		public function addFilter( WebLab_Filter $filter, $errorMessage ){
+            $this->_filters[] = (object)array(
+                'filter' => $filter,
+                'errorMessage' => $errorMessage
+            );
+            return $this;
+        }
+        
         public function isValid(){
-        	return true;
+        	$errors = array();
+
+            foreach( $this->_filters as $filter ){
+            	if( !$filter->filter->test( trim( $this->_selected ) ) )
+            		$errors[] = $filter->errorMessage;
+            }
+			
+            if( !count( $errors ) )
+                return true;
+            
+            return $errors;
         }
 		
 	}

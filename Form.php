@@ -130,5 +130,17 @@
         	else
         		return null;
         }
+        
+        public function getResults(){
+        	$fields = array_keys( $this->_fields );
+        	$response = $this->_getResponse();
+        	$data = array();
+        	
+        	foreach( $response as $key => $value )
+        		if( in_array( $key, $fields) )
+        			$data[$key] = $value;
+        			
+        	return $data;
+        }
 
     }

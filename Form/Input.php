@@ -33,12 +33,25 @@
             };
         }
 
+        protected function _prepare(){
+        	parent::_prepare();
+        	
+        	if( isset( $this->_properties['checked'] ) && $this->_properties['checked'] !== 'checked' )
+        		unset( $this->_properties['checked'] );
+        		
+        	if( isset( $this->_properties['selected'] ) && $this->_properties['selected'] !== 'selected' )
+        		unset( $this->_properties['selected'] );
+        }
+        
         public function __toString(){
         	$this->_prepare();
         	
             $html = '<input';
 
             foreach( $this->_properties as $key => $value ){
+            	if( $this->_properties['type'] == 'password' && $key == 'value' )
+            		continue;
+            		
                 $html .= ' ' . $key . '="' . addslashes( $value ) . '"';
             }
 
@@ -58,8 +71,22 @@
             $errors = array();
             
             foreach( $this->_filters as $filter ){
-                if( !$filter->filter->test( trim( $this->value ) ) )
-                        $errors[] = $filter->errorMessage;
+            	switch( $this->_properties['type'] ){
+            		case 'checkbox':
+	                    if( !$filter->filter->test( $this ) )
+	                        $errors[] = $filter->errorMessage;
+	                    break;
+	
+	                case 'radio':
+	                    if( !$filter->filter->test( $this ) )
+	                        $errors[] = $filter->errorMessage;
+	                    break;
+	
+	                default:
+	                    if( !$filter->filter->test( trim( $this->value ) ) )
+	                        $errors[] = $filter->errorMessage;
+	                    break;
+            	}
             }
 			
             if( !count( $errors ) )

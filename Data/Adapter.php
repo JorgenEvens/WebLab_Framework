@@ -5,6 +5,7 @@
         protected $_resource;
         protected $_wildcard = '*';
         protected $_prefix = '';
+        protected $_transaction_depth = 0;
 
         abstract public function __construct( $config );
         abstract protected function _query( $query );
@@ -12,6 +13,8 @@
         abstract public function insert_id();
         abstract public function escape_string( $str );
         abstract public function getAdapterSpecs();
+        abstract protected function _start_transaction();
+        abstract protected function _quit_transaction( $commit );
 
         public final function query( $query )
         {
@@ -32,7 +35,7 @@
                 throw new Exception( 'Expecting that the query supplied is a string.' );
             }
             
-            $pattern = '#\s(from|into)\s#i';
+            $pattern = '#(\s|^)(from|into|update)\s#i';
             //$end_tabledefinition = '#([^\b\s]+)(\s+([^A][^S]|.+)\s+|\s*$)#iU';
             $end_tabledefinition = '#(.+)\s+(([^A][^S])|.+)\s+#iU';
             
@@ -41,7 +44,7 @@
             
             while( count($matches) > 0)
             {
-	            $start = $matches[0][1] + 6;
+	            $start = $matches[0][1] + strlen( $matches[0][0] );
 	            
 	            if( $start < 7 )
 	            {
@@ -107,5 +110,21 @@
         public function getAdapterSpecification()
         {
             return $this->getAdapterSpecs();
+        }
+        
+        public function startTransaction(){
+        	$this->_transaction_depth++;
+        	
+        	if( $this->_transaction_depth == 1 )
+        		$this->_start_transaction();
+        }
+        
+        public function quitTransaction( $commit ){
+        	$this->_transaction_depth--;
+        	
+        	if( $this->_transaction_depth < 1 || !$commit ) {
+        		$this->_quit_transaction( $commit );
+        		$this->_transaction_depth = 0;
+        	}
         }
     }

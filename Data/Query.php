@@ -191,7 +191,7 @@
             $fields = array();
             foreach( $query->fields as $field )
             {
-                if( $field->altered() )
+                if( $field->isAltered() )
                 {
                     if( !is_numeric( $field->getValue() ) )
                     {
