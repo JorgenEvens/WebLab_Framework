@@ -38,7 +38,7 @@
             	
         	$basepath = $this->getBasePath();
         	$url_config = WebLab_Config::getInstance()->get('Application.Parser.URL');
-        	if( empty( $url_config ) )
+        	if( !empty( $url_config ) )
         		$url_config = $url_config->toObject();
         	
         	if( empty( $url_config ) || $url_config->mod_rewrite ) {
