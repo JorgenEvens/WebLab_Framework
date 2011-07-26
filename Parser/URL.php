@@ -132,6 +132,12 @@
             $base = BASE; // This conforms to the mod_rewrite status, $this->getBasePath() does not.
             $path = $this->_url['path'];
 
+            // Original fix for IIS6 host
+            // When using PHP_SELF trailing slash on the basepath may cause problems.
+            if( substr( $base, strlen( $base ) -1 ) == '/' ){
+            	$base = substr( $base, 0, strlen( $base ) -1 );
+            }
+            
             if( $base != '/' )
                 $path = str_replace( $base, '', $path );
 
