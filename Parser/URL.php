@@ -26,14 +26,33 @@
         	if( empty( $url ) )
             	$this->_url = parse_url( $_SERVER['REQUEST_URI'] );
             	
-            if( !defined( 'BASE' ) )
-            	DEFINE( 'BASE', $this->getBasePath() );
+            $this->_defineConstants();
+        }
+        
+        /**
+         * Defines URL constants such as BASE and RES_BASE, basepath and resource basepath.
+         */
+        protected function _defineConstants() {
+        	if( defined( 'BASE' ) )
+            	return;
+            	
+        	$basepath = $this->getBasePath();
+        	$url_config = WebLab_Config::getInstance()->get('Application.Parser.URL')->toObject();
+        	
+        	if( empty( $url_config ) || $url_config->mod_rewrite ) {
+            	DEFINE( 'BASE', $basepath );
+            	DEFINE( 'RES_BASE', $basepath );
+        	} else {
+        		DEFINE( 'BASE', $basepath . ( $url_config->entrypoint ? $url_config->entrypoint : 'index.php' ) . '/' );
+        		DEFINE( 'RES_BASE', $basepath . ( $url_config->resources ? $url_config->resources : 'www' ) . '/' );
+        	}
         }
 
         /**
          * Get a collection of URL values
          * @param Array $values Names of the values you want to retrieve.
          * @return Array Returns the computed values for the requested values.
+         * @deprecated
          */
         public function get( $values )
         {
@@ -91,6 +110,7 @@
          * This path exists out of
          * document_root/folder/to/application/
          * @return String Path to the current application root.
+         * @deprecated
          */
         public function getBasePath()
         {
@@ -108,7 +128,8 @@
          */
         public function getParameters()
         {
-            $base = $this->getBasePath();
+            //$base = $this->getBasePath();
+            $base = BASE; // This conforms to the mod_rewrite status, $this->getBasePath() does not.
             $path = $this->_url['path'];
 
             if( $base != '/' )

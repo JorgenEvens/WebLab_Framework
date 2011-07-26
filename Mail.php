@@ -39,6 +39,12 @@
          * @var String The boundary used to split content types.
          */
         protected $_boundary;
+        
+        /**
+         * Defines primary content type
+         * @var String Defaults to text/html
+         */
+        protected $_content_type = 'text/html';
 
         /**
          * Generates a new Mail object.
@@ -47,7 +53,7 @@
          * @param String $subject The subject of this e-mail. Defaults to 'Automated mail'
          * @param String $from From who the receiver gets this message. Defaults to 'admin@server'
          */
-        public function __construct( $template, $to, $subject='Automated mail', $from='admin@server' ){
+        public function __construct( $template, $to, $subject='Automated mail', $from='admin@server', $content_type='text/html' ){
             parent::__construct($template);
 
             if( !is_array( $to ) )
@@ -57,6 +63,7 @@
             $this->_subject = $subject;
             $this->_from = $from;
             $this->_boundary = 'Mail_' . md5( uniqid( time() ) );
+            $this->_content_type = $content_type;
         }
 
         /**
@@ -91,7 +98,7 @@
                 $images[count($images)] = $match[2];
             }
             $html = '--' . $this->_boundary . "\n";
-            $html .= 'Content-Type: text/html;' ."\n\n" . $html_code;
+            $html .= 'Content-Type: ' . $this->_content_type . ';' ."\n\n" . $html_code;
 
             foreach( $images as $key => $image )
             {
@@ -107,7 +114,8 @@
                 $html .= chunk_split( base64_encode( $img ), 68, "\n" );
                 $html .= "\n";
             }
-            $html .= '--' . $this->_boundary . '--' . "\n";
+            $html = trim( $html, "\n" );
+            $html .= "\n\n" . '--' . $this->_boundary . '--' . "\n";
             return $html;
         }
 
