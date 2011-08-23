@@ -5,41 +5,73 @@
 	 * Parses the url and makes it accessible through an instance of this object.
 	 * 
      * @author  Jorgen Evens <jorgen@wlab.be>
-     * @version 0.1
      * @package WebLab
+     * @subpackage WebLab_Parser
 	 *
 	 */
     class WebLab_Parser_URL
     {
+    	/**
+    	 * Contains the URL Parser for current request.
+    	 * @var WebLab_Parser_URL
+    	 */
+    	protected static $_request_url;
+    	
+    	/**
+    	 * Returns the URL Parser for the current request.
+    	 * 
+    	 * @return WebLab_Parser_URL
+    	 */
+    	public static function getForRequest() {
+    		if( empty( self::$_request_url ) ) {
+    			$url = $_SERVER['REQUEST_URI'];
+    			if( empty( $url ) )
+    				$url = $_SERVER['PHP_SELF'];
+    				
+    			self::$_request_url = new self( $url );
+    			self::$_request_url->defineConstants();
+    		}
+    		
+    		return self::$_request_url;
+    	}
+    	
+    	/**
+    	 * Escapes an url to a browser and user friendly version.
+    	 * @param String $url
+    	 */
+    	public static function escape( $url ){
+			return trim( preg_replace( '#([^a-zA-Z\d]+)#U', '-', strtolower( $url ) ), '-' );
+		}
+    	
         /**
          * Holds the parsed url
          * @var Array Holds the parts of the url.
          */
         protected $_url;
+        
+        /**
+         * Holds the computed parameters once generated.
+         * @var array
+         */
+        protected $_parameters;
 
         /**
          * Constructs a new URL Parser.
          */
-        public function __construct( $url=null )
+        public function __construct( $url )
         {
         	$this->_url = parse_url( $url );
-        	if( empty( $url ) )
-            	$this->_url = parse_url( $_SERVER['REQUEST_URI'] );
-            	
-            $this->_defineConstants();
         }
         
         /**
          * Defines URL constants such as BASE and RES_BASE, basepath and resource basepath.
          */
-        protected function _defineConstants() {
+        public function defineConstants() {
         	if( defined( 'BASE' ) )
-            	return;
+            	return false;
             	
         	$basepath = $this->getBasePath();
-        	$url_config = WebLab_Config::getInstance()->get('Application.Parser.URL');
-        	if( !empty( $url_config ) )
-        		$url_config = $url_config->toObject();
+        	$url_config = config('Application.Parser.URL');
         	
         	if( empty( $url_config ) || $url_config->mod_rewrite ) {
             	DEFINE( 'BASE', $basepath );
@@ -56,14 +88,13 @@
          * @return Array Returns the computed values for the requested values.
          * @deprecated
          */
-        public function get( $values )
-        {
+        public function get( $values ) {
             if( !is_array( $values ) )
                 throw new WebLab_Exception_Parser( 'WebLab_Parser_URL::get() only accepts arrays' );
 
             $array = array();
             foreach( $values as $value )
-                $array[ $value ] = $this->_get( $value );
+                $array[ $value ] = $this->__get( $value );
 
             return $array;
         }
@@ -73,11 +104,9 @@
          * @param String $method The name of the property to get.
          * @return Object|bool If the requested property exists its value is returned. Otherwise false is returned.
          */
-        protected function _get( $method )
-        {
+        public function __get( $method ) {
             $method = 'get' . ucfirst( $method );
-            if( method_exists( $this, $method ) )
-            {
+            if( method_exists( $this, $method ) ) {
                 return $this->$method();
             }
 
@@ -88,8 +117,7 @@
          * The full URL of the current page.
          * @return String Returns the full URL.
          */
-        public function getFullURL()
-        {
+        public function getFullURL() {
             $fullUrl = $this->getProtocol() . '://' .
                 $this->getHostname() . ':' . $this->getPort() .
                 $this->getPath();
@@ -102,8 +130,7 @@
          * This will probably be your entry page, mostly index.php
          * @return String The name of the current script running. This will probably be your entry page, mostly index.php
          */
-        public function getScriptname()
-        {
+        public function getScriptname() {
             return array_pop( explode( '/', $_SERVER[ 'SCRIPT_FILENAME' ] ) );
         }
 
@@ -114,8 +141,7 @@
          * @return String Path to the current application root.
          * @deprecated
          */
-        public function getBasePath()
-        {
+        public function getBasePath() {
             $urlParts = explode( '/', $_SERVER[ 'SCRIPT_NAME'] );
             unset( $urlParts[ count($urlParts)-1 ] );
             $httpPath = implode( '/', $urlParts ) . '/';
@@ -128,8 +154,10 @@
          * This is everything behind the basepath and the $_GET parameter
          * @return Array Everything behind the basepath and the $_GET parameter as an array.
          */
-        public function getParameters()
-        {
+        public function getParameters() {
+        	if( !empty( $this->_parameters ) )
+        		return $this->_parameters;
+        		
             //$base = $this->getBasePath();
             $base = BASE; // This conforms to the mod_rewrite status, $this->getBasePath() does not.
             $path = $this->_url['path'];
@@ -158,15 +186,16 @@
             }
 
             $tmp = array_merge( $tmp, $params );
-            return array_merge( $tmp, $_GET );
+            $this->_parameters = array_merge( $tmp, $_GET );
+            
+            return $this->_parameters;
         }
 		
         /**
          * Get the protocol used to load this page.
          * @return String Locked at http for now.
          */
-        public function getProtocol()
-        {
+        public function getProtocol() {
         	// Temporary fix
         	return 'http';
         	
@@ -177,8 +206,7 @@
          * Get the port on which the server is running.
          * @return Integer Locked at 80 for now.
          */
-        public function getPort()
-        {
+        public function getPort() {
         	// Temporary fix
         	return '80';
         	
@@ -189,8 +217,7 @@
          * Get the hostname.
          * @return String Shorthand for $_SERVER['HTTP_HOST']
          */
-        public function getHostname()
-        {
+        public function getHostname() {
             return $_SERVER['HTTP_HOST'];
         }
 
@@ -198,8 +225,7 @@
          * Get the path used to access this page.
          * @return String The path of the URL that is currently being viewed.
          */
-        public function getPath()
-        {
+        public function getPath() {
             return $this->_url['path'];
         }
         
@@ -207,8 +233,7 @@
          * Get the relative path to the current install
          * @return String The absolute path to this application.
          */
-        public function getDirectory()
-        {
+        public function getDirectory() {
         	$start = strpos( $this->getBasePath(), $this->getPath() ) + strlen( $this->getBasePath() );
         	$dir = substr( $this->getPath(), $start );
         	if( empty( $dir ) )

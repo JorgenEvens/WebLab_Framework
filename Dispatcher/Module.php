@@ -1,14 +1,21 @@
 <?php
-    abstract class WebLab_Dispatcher_Module
+	/**
+	 * 
+	 * @author jorgen
+	 * @package WebLab
+	 * @subpackage WebLab_Dispatcher
+	 *
+	 */
+    abstract class WebLab_Dispatcher_Module implements WebLab_Dispatcher
     {
         protected $param;
         protected $layout;
 
-        public final function __construct( $parameters=null )
+        public final function __construct()
         {
-            $this->layout = &WebLab_Config::getInstance()->get( 'Application.Runtime.Environment.template' );
+            $this->layout = &WebLab_Template::getRootTemplate();
             
-            $this->param = !empty( $parameters ) ? $parameters : array();
+            $this->param = WebLab_Parser_URL::getForRequest()->parameters;
 
             if( $this->__init() )
             {
@@ -16,14 +23,35 @@
             }
         }
 
+        /**
+         * Called before calling the execute method.
+         * Authentication or denying access can be done here.
+         * If returned true, execute will be called. Otherwise it will not.
+         * 
+         * @return boolean
+         */
         protected function __init()
         { return true; }
+        
+        /**
+         * Define the name of the module, this makes reading the action more robust.
+         * 
+         * @return String
+         */
+        protected function _getName() {
+        	return 1;
+        }
 
+        /**
+         * Called if __init returns true, will do the routing to the correct action.
+         * 
+         * @return *
+         */
         public function execute()
         {
-            if( isset( $this->param[1] ) && !empty( $this->param[1] ) )
+            if( !empty( $this->param[$this->_getName()] ) )
             {
-                $action = $this->param[1];
+                $action = $this->param[$this->_getName()];
                 if( method_exists( $this, $action ) )
                 {
                     return $this->$action();
@@ -37,6 +65,10 @@
             }
         }
 
+        /**
+         * Will be called when no valid action is found.
+         * This acts as a catch-all.
+         */
         abstract protected function _default();
 
     }

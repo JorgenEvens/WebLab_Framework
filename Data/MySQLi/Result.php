@@ -1,5 +1,15 @@
 <?php
-    class WebLab_Data_mySQLi_Result extends WebLab_Data_Result
+	/**
+     *
+     * Implementation of a result using mySQLi resources.
+     *
+     * @see WebLab_Data_Result
+     * @author  Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
+     * @subpackage WebLab_Data_MySQLi
+     *
+     */
+    class WebLab_Data_MySQLi_Result extends WebLab_Data_Result
     {
 
         protected function _read( &$result )

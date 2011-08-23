@@ -1,4 +1,11 @@
 <?php
+	/**
+	 * 
+	 * @author jorgen
+	 * @package WebLab
+	 * @subpackage WebLab_Filter
+	 *
+	 */
     class WebLab_Filter_Int extends WebLab_Filter
     {
 

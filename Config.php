@@ -1,191 +1,149 @@
 <?php
-    /**
-     *
-     * Configuration
-     *
-     * This class manages all configuration settings.
-     *
-     * @author  Jorgen Evens <jorgen@wlab.be>
-     * @version 0.1
-     * @package WebLab
-     *
-     */
-
-     /**
-      * WebLab_Config manages all configuration data.
-      *
-      * @package    WebLab_Framework
-      */
-    class WebLab_Config
-    {
-        /**
-         * Holds configuration in an array.
-         * @var array Holds the configuration in an array.
-         */
+	/**
+	 * Hold configuration form a specified configuration file.
+	 * 
+	 * @author jorgen
+	 * @package WebLab
+	 *
+	 */
+	class WebLab_Config {
+		
+		/**
+		 * Constant that indicates you want the get function to return RAW data.
+		 * In the default implementation this will be an array.
+		 * 
+		 * @var string
+		 */
+		const RAW = 'raw';
+		
+		/**
+		 * Constant that indicates you want the get function to return the data as an object.
+		 * 
+		 * @var string
+		 */
+		const OBJECT = 'object';
+		
+		/**
+		 * Constant that indicates you want the get function to return the data wrapped in a new instance of WebLab_Config.
+		 * 
+		 * @var string
+		 */
+		const CONFIG_WRAP = 'weblab_config';
+		
+		/**
+		 * Holds the configuration used by the application.
+		 * This location of this configuration file should be set at startup of the application.
+		 * 
+		 * @see WebLab_Application
+		 * @see setApplicationConfig()
+		 * @var WebLab_Config
+		 */
+		protected static $_application_config;
+		
+		/**
+		 * Return the configuration used by the application.
+		 * This function lazy loads the configuration file.
+		 * 
+		 * @return WebLab_Config
+		 */
+		public static function getApplicationConfig() {
+			if( !empty( self::$_application_config ) && !( self::$_application_config instanceof self ) ) {
+				self::$_application_config = new self( self::$_application_config );
+			}
+			
+			return self::$_application_config;
+		}
+		
+		/**
+		 * Set the path to the configuration file, or set the application config to an instance of WebLab_Config.
+		 * 
+		 * @param string|WebLab_Config $file
+		 */
+		public static function setApplicationConfig( $file ) {
+			self::$_application_config = $file;
+		}
+		
+		/**
+		 * Holds the configuration data of the instance.
+		 * 
+		 * @var mixed[]
+		 */
 		protected $_config;
 		
-        /**
-         * Holds the root configuration instance
-         * @var WebLab_Config Default configuration instance
-         */
-		protected static $_instance = null;
+		/**
+		 * Constructs a new instance of WebLab_Config based on a file or an array.
+		 * 
+		 * @param string|mixed[] $file
+		 * @throws WebLab_Exception_Config If the file could not be found.
+		 * @throws WebLab_Exception_Config If there is an error in the configuration file.
+		 */
+		public function __construct( $file ) {
+			if( is_string( $file ) ) {
+				if( !file_exists( $file ) )
+	                throw new WebLab_Exception_Config( 'Could not locate config file. ( ' . $file . ' )' );
+		            
+			    $config = json_decode( file_get_contents( $file ), true );
+			    if( !isset( $config ) )
+					throw new WebLab_Exception_Config( 'There seems to be an error in your config file. ( ' . $file . ')' );
+			} else {
+				$config = $file;
+			}
+			
+            $this->_config = $config;
+		}
 		
-        /**
-         * Holds the path from which configuration tree current @link $_config
-         * is derived.
-         * @var string The path of $_config within original configuration.
-         */
-		protected $_path;
-
-        /**
-         * Constructor for a new instance.
-         * Only callable from within another instance.
-         * @param array &$config The configuration this instance will be holding.
-         * @param string $path The path where this configuration lives.
-         */
-		protected function __construct( &$config=array(), $path="" )
-		{
-		    if( empty( $path ) )
-				$this->_config['Application']['Runtime'] = array();
+		/**
+		 * Retrieve data from the configuration tree using a '.' delimited path.
+		 * If the resulting value is another branch in the configuration tree, values will be returned according to the optional $return_type parameter.
+		 * All other values will be returned as the types they were interpreted as.
+		 * 
+		 * @see RAW
+		 * @see OBJECT
+		 * @see CONFIG_WRAP
+		 * @param string $path
+		 * @param string $return_type
+		 * @throws WebLab_Exception_Config If the requested node is not available.
+		 * @return mixed
+		 */
+		public function get( $path, $return_type=self::RAW ) {
+			$properties = explode( '.', $path );
+			
+			$value = $this->_config;
+			while( count( $properties ) > 0 ) {
+				if( !isset( $value[$properties[0]] ) )
+					throw new WebLab_Exception_Config( 'The node specified is not available, current node is "' . $properties[0] . '". ( ' . $path . ' )' );
 				
-		    $this->_config = &$config;
-		    $this->_path = $path;
+				$value = $value[$properties[0]];
+				array_splice( $properties, 0, 1 );
+			}
+			
+			if( is_array( $value ) && $return_type != self::RAW ) {
+				switch( $return_type ) {
+					case self::OBJECT:
+						return (object)$value;
+
+					case self::CONFIG_WRAP:
+						return new WebLab_Config( null, $value );
+				}
+			}
+			
+			return $value;
 		}
-
-        /**
-         * Keeps the object from being cloned.
-         */
-		protected function __clone(){}
-
-        /**
-         * Returns the path from which this configuration is derived.
-         * @return string
-         */
-		public function getPath()
-		{
-		    return $this->_path;
-		}
-
-        /**
-         * Get a value from the configuration tree.
-         * @param string $path The path to fetch from configuration.
-         * @return self|WebLab_Config
-         */
-		public function &get( $path )
-		{
-		    $path = explode( '.', $path );
-	
-	        if( !isset( $path ) )
-				return $this->_instance;
-	
-		    $config = &$this->_config;
-	
-		    foreach( $path as $value )
-		    {
-				$config = &$config[ $value ];
-				$currentPath[] = $value;
-				if( $config === null )
-				    break;
-		    }
-	
-		    if( empty( $this->_path ) )
-				$path = implode( $currentPath, '.' );
-			else
-				$path = $this->getPath() . '.' . implode( $currentPath, '.' );
-	
-		    if( is_array( $config ) ) {
-		    	$newInstance = new self( $config, $path );
-				return $newInstance;
-		    } else
-				return $config;
-		}
-
-	    /**
-	    * Set a property to a specific value in the configuration tree.
-	    * @param string $path The path of the property to set.
-	    * @param * $value The value to be set.
-	    * @return WebLab_Config
-	    */
-		public function set( $path, $value )
-		{
-		    if( !( strpos( $this->getPath(), 'Application.Runtime' ) > -1 || strpos( $path, 'Application.Runtime.' ) > -1 ) )
-		    {
-			$this->get( 'Application.Runtime' )->set( $path, $value );
-	                return $this;
-		    }
-		    
-		    $path = explode( '.', $path );
-		    $config = &$this->_config;
-	
-		    foreach( $path as $directory )
-		    {
-				$config = &$config[ $directory ];
-				
-				if( !isset( $config ) )
-				    $config = array();
-		    }
-	
-		    $config = $value;
-	
-		    return $this;
-		}
-
+		
 		/**
-		*
-		* @return array The configuration as an array.
-		*/
-		public function toArray()
-		{
-		    return $this->_config;
+		 * Returns whether a node exists.
+		 * 
+		 * @param string $path
+		 * @return boolean
+		 */
+		public function exists( $path ) {
+			try {
+				$this->get( $path );
+			} catch( WebLab_Exception_Config $ex ) {
+				return false;
+			}
+			
+			return true;
 		}
-	
-		/**
-		*
-		* @return array The configuration as an object.
-		*/
-		public function toObject()
-		{
-			return (object) $this->_config;
-		}
-	
-		/**
-		* Gets the root configuration.
-		* @return WebLab_Config The root configuration.
-		*/
-		public static function getInstance()
-		{
-		    if( self::$_instance === NULL )
-				self::$_instance = new self();
-		    
-		    return self::$_instance;
-		}
-	
-		/**
-		* Import a configuration file.
-		* @param string $file The path to the configuration file.
-		* @return WebLab_Config
-		*/
-		public function import( $file )
-		{
-            if( !file_exists( $file ) )
-                throw new Exception( 'Could not locate config file. ( ' . $file . ' )' );
-	            
-		    $config = json_decode( file_get_contents( $file ), true );
-		    if( !isset( $config ) )
-				throw new WebLab_Exception_Config( 'There seems to be an error in your config file. ( ' . $file . ')' );
-	
-            $this->_config = array_merge( $this->_config, $config );
-	
-		    return $this;
-		}
-	
-		/**
-		* Return the string value.
-		* @return string Configuration as string.
-		*/
-		public function __toString()
-		{
-			return var_export( $this->_config, true );
-		}
-
-    }
+		
+	}

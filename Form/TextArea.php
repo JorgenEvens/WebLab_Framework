@@ -1,4 +1,11 @@
 <?php
+	/**
+	 * 
+	 * @author jorgen
+	 * @package WebLab
+	 * @subpackage WebLab_Form
+	 *
+	 */
 	class WebLab_Form_TextArea extends WebLab_Form_Field {
 		
 		protected $_filters = array();

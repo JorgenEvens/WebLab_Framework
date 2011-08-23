@@ -4,6 +4,8 @@
 	 * Represents a table in the database.
 	 * 
 	 * @author Jorgen Evens
+	 * @package WebLab
+	 * @subpackage WebLab_Data
 	 *
 	 */
    class WebLab_Data_Table

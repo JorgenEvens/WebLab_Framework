@@ -8,7 +8,6 @@
      *
      * @author  Jorgen Evens <jorgen@wlab.be>
      * @version 0.1
-     * @package WebLab
      *
      */
     class WebLab_Mail extends WebLab_Template

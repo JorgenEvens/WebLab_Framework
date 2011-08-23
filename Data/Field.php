@@ -1,4 +1,11 @@
 <?php
+	/**
+	 * 
+	 * @author jorgen
+	 * @package WebLab
+	 * @subpackage WebLab_Data
+	 *
+	 */
     class WebLab_Data_Field
     {
         protected $_table;

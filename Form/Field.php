@@ -1,4 +1,11 @@
 <?php
+	/**
+	 * 
+	 * @author jorgen
+	 * @package WebLab
+	 * @subpackage WebLab_Form
+	 *
+	 */
     abstract class WebLab_Form_Field
     {
         protected $_label = '';
@@ -41,7 +48,6 @@
                     $this->_form->remove( $this );
 
             $this->_form = $form;
-            $this->update();
             return $this;
         }
 

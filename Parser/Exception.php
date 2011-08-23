@@ -1,4 +1,11 @@
 <?php
+	/**
+	 * 
+	 * @author jorgen
+	 * @package WebLab
+	 * @subpackage WebLab_Parser
+	 *
+	 */
     class WebLab_Parser_Exception
     {
 

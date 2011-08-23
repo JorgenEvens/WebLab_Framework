@@ -1,4 +1,11 @@
 <?php
+	/**
+	 * 
+	 * @author jorgen
+	 * @package WebLab
+	 * @subpackage WebLab_Form
+	 *
+	 */
     class WebLab_Form_Input extends WebLab_Form_Field
     {
 
@@ -9,7 +16,7 @@
         	$properties['type'] = $type;
         	if( !empty( $value ) )
         		$properties['value'] = $value;
-        		
+        	
         	parent::__construct( $properties );
         }
         

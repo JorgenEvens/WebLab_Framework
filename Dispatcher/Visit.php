@@ -1,66 +1,105 @@
 <?php
-    class WebLab_Dispatcher_Visit
+	/**
+	 * 
+	 * @author jorgen
+	 * @package WebLab
+	 * @subpackage WebLab_Dispatcher
+	 *
+	 */
+    class WebLab_Dispatcher_Visit implements WebLab_Dispatcher
     {
-
-    	protected $_default;
-    	protected $_param;
+		protected static $_config;
+    	protected static $_param;
     	
-        public function __construct( $default, $pattern, $param=null )
-        {
-            $this->setPattern( $pattern )
-                ->setDefault( $default );
-            
-			if( !is_array( $param ) ) {
-				$url = WebLab_Config::getInstance()->get( 'Application.Runtime.URL' )->toArray();
-				$this->_param = $url['parameters'];
-			} else
-				$this->_param = $param;
+    	protected static function _setup() {
+    		if( isset( self::$_config ) ) {
+    			return;
+    		}
+    		
+    		self::$_config = config( 'Application.Modules.Dispatcher.Visit' );
+    		
+    		if( !isset( self::$_config->default ) || !isset( self::$_config->prefix ) ) {
+    			throw new WebLab_Exception_Dispatcher( 'Incomplete configuration.' );
+    		}
+    		self::$_param = WebLab_Parser_URL::getForRequest()->parameters;
+    	}
+    	
+        public function __construct() {
+			self::_setup();
         }
         
-        public function execute()
-        {
-            $moduleAliasses = WebLab_Config::getInstance()->get( 'Application.Modules.Aliasses' )->toArray();
+        public function execute() {
+        	$alias = config( 'Application.Modules.Aliasses', WebLab_Config::RAW );
+        	$path = array();
+        	$home = $_SERVER['DOCUMENT_ROOT'] . BASE;
+        	$i = 0;
+        	
+        	if( empty( self::$_param[0] ) && isset( $alias[""] ) ) {
+        		$module = self::$_config->prefix . '_' . $alias[""];
+        	} else {
+        		$module = self::$_config->prefix . '_' . self::$_config->default;
+        	}
+        	
+        	while( isset( self::$_param[$i] ) ) {
+        		array_push( $path, ucfirst( self::$_param[$i] ) );
+        		$module_name = implode( '_', $path );
 
-            $module = isset( $this->_param[0] ) ? $this->_param[0] : '';
+        		if( isset( $alias[$module_name] ) ) {
+        			$module_name = $alias[$module_name];
+        		}
+        		
+        		$module_name = self::$_config->prefix . '_' . $module_name;
+        		if( class_exists( $module_name ) ) {
+        			$module = $module_name;
+        			break;
+        		}
+        		$i++;
+        	}
+        	
+        	return new $module();
+        	
+        	/*
+            
+            $aliasses = config( 'Application.Modules.Aliasses', WebLab_Config::RAW );
+            $module = isset( $this->_param[$depth] ) ? $this->_param[$depth] : '';
 
-            if( isset( $moduleAliasses[ $module ] ) )
-            {
-                $module = $moduleAliasses[ $module ];
+            if( isset( $aliasses[ $module ] ) ) {
+                $module = $aliasses[ $module ];
             }
 
-            if( $module )
-            {
-                $module = $this->classFromPattern( $module );
-                if( class_exists( $module ) )
-                {
+            if( $module ) {
+                $module = $this->_generateClass( $module );
+                if( class_exists( $module ) ) {
                     return new $module( $this->_param );
-                }else
-                {
+                } else {
                     $module = $this->classFromPattern( $this->_default );
+                    if( !class_exists( $module ) ) {
+                    	throw new WebLab_Exception_Dispatcher( 'The requested and default modules could not be found!' );
+                    }
                     return new $module( $this->_param );
                 }
-            }else
-            {
-                $module = $this->classFromPattern( $this->_default );
+            } else {
+                $module = $this->classFromPattern( self::$_config->default );
                 return new $module( $this->_param );
             }
+            
+            */
         }
 
-        public function classFromPattern( $variable )
-        {
-            return str_replace( '{*}', ucfirst( $variable ), $this->_pattern );
-        }
-
-        final public function setPattern( $pattern )
-        {
+        public function setPattern( $pattern ) {
             $this->_pattern = $pattern;
-            return $this;
+        }
+        
+        public function getPattern() {
+        	return $this->_pattern;
         }
 
-        final protected function setDefault( $class )
-        {
+        public function setDefault( $class ) {
             $this->_default = $class;
-            return $this;
+        }
+        
+        public function getDefault() {
+        	return $this->_default;
         }
 
     }

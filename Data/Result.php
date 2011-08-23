@@ -3,6 +3,8 @@
 	 * Read data from the resource.
 	 * 
 	 * @author jorgen
+	 * @package WebLab
+	 * @subpackage WebLab_Data
 	 *
 	 */
     abstract class WebLab_Data_Result
