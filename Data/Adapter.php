@@ -243,7 +243,7 @@
 	                $tbl_pattern = '#(\b)' . $table . '(\b.+' . $end . '|\.|$)#U';
 	                // Otherwise just replace the table with it's prefixed form and continue;
 	                while( preg_match( $tbl_pattern, $query ) ) {
-	                	$query = preg_replace( $tbl_pattern , '$1' . $this->getPrefix() . $table . '$2', $query, -1, $count );
+	                	$query = preg_replace( $tbl_pattern , '${1}' . $this->getPrefix() . $table . '${2}', $query, -1, $count );
 	                	
 	                	// Move forward to the point where Start is now located.
 	                	$start += $count * strlen($this->getPrefix());
