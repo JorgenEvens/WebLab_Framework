@@ -25,7 +25,7 @@
             
             $response = ( $this->_form->getMethod() == WebLab_Form::POST ) ? $_POST : $_GET;
 			$this->_isPostback = isset( $response[ $this->name ] );
-            $this->value = $response[ $this->name ];
+            $this->value = isset( $response[ $this->name ] ) ? $response[$this->name] : '';
         }
 
         public function __toString(){

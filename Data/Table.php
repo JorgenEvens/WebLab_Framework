@@ -82,7 +82,7 @@
         public function getField( $name )
         {
             if( !isset( $this->_fields[ $name ] ) )
-                throw new Exception( 'Field "' . $name . '" not in table.' );
+                throw new Exception( 'Field "' . $name . '" not in table ' . $this->getName() . '.' );
 
             return $this->_fields[ $name ];
         }

@@ -19,9 +19,12 @@
         {
             if( !( $this->_resource = @mysql_connect( $login->host . ':' . $login->port, $login->username, $login->password ) ) )
             {
-                throw new WebLab_Exception_Database( mysql_error(), mysql_errno() );
+                throw new WebLab_Exception_Data( mysql_error(), mysql_errno() );
             }
-            mysql_select_db( $login->database, $this->_resource );
+            if( !mysql_select_db( $login->database, $this->_resource ) )
+            {
+            	throw new WebLab_Exception_Data( mysql_error(), mysql_errno() );
+            }
 
             $this->setPrefix( $login->prefix );
             $this->_connected = true;
@@ -31,6 +34,10 @@
         {
             return $this->_connected;
         }
+        
+        public function newQuery() {
+        	return new WebLab_Data_MySQL_Query( $this );
+        }
 
         protected function _query( $query )
         {
@@ -38,7 +45,7 @@
 
             if( strlen( mysql_error( $this->_resource ) ) > 0 || mysql_errno( $this->_resource ) || !$result )
             {
-                throw new WebLab_Exception_Database( mysql_error( $this->_resource ) . '<br /><strong>Query:</strong><br />' . $query . '<br />' );
+                throw new WebLab_Exception_Data( mysql_error( $this->_resource ) . '<br /><strong>Query:</strong><br />' . $query . '<br />' );
             }elseif( strtolower(gettype($result)) != 'resource' )
             {
                 return $result;

@@ -6,29 +6,50 @@
 		protected static $_fields;
 		protected static $_instance;
 		
+		private static $_properties = array();
+		
+		private static function getProperties( $class_name ) {
+			$properties = &self::$_properties[$class_name];
+			if( empty( $properties ) ) {
+				$class = new ReflectionClass( $class_name  );
+				$properties = $class->getStaticProperties();
+			}
+			
+			return $properties;
+		}
+		
+		private static function &getProperty( $class, $name ) {
+			$props = self::getProperties( $class );
+			
+			return $props[$name];
+		}
+		
 		public static function getInstance(){
-			if( empty( static::$_instance ) ){
-				static::$_instance = new static();
+			$class_name = get_called_class();
+			$instance = &self::getProperty( get_called_class(), '_instance' );
+			
+			if( empty( $instance ) ){
+				$instance = new $class_name();
 			}
 				
-			return static::$_instance;
+			return $instance;
 		}
 		
 		public static function startTransaction() {
-			db(static::$_database)->startTransaction();
+			db(self::getProperty( get_called_class(), '_database'))->startTransaction();
 		}
 		
 		public static function quitTransaction( $commit=true ) {
-			db(static::$_database)->quitTransaction( $commit );
+			db(self::getProperty( get_called_class(), '_database'))->quitTransaction( $commit );
 		}
 		
 		public function createTable(){
-			$t = new WebLab_Data_Table( static::$_table );
-			return $t->addFields( static::$_fields );
+			$t = new WebLab_Data_Table( self::getProperty( get_class( $this ), '_table') );
+			return $t->addFields( self::getProperty( get_class( $this ), '_fields') );
 		}
 		
 		public function create( &$object ){
-			$q = db(static::$_database)->newQuery();
+			$q = db(self::getProperty( get_class( $this ), '_database'))->newQuery();
 			
 			$table = $q->addTable( $this->createTable() );
 			
@@ -39,7 +60,7 @@
 				$object['deleted'] = 0;
 			
 			foreach( $object as $key => &$value )
-				if( in_array( $key, static::$_fields ) )
+				if( in_array( $key, self::getProperty( get_class( $this ), '_fields') ) )
 					$table->getField($key)->setValue( $value );
 				
 			$q->insert();
@@ -48,9 +69,9 @@
 		}
 		
 		public function delete( &$object ){
-			$q = db(static::$_database)->newQuery();
+			$q = db(self::getProperty( get_class( $this ), '_database'))->newQuery();
 			
-			$table = $q->addTable( static::$_table )->addFields( 'id', 'online', 'deleted' );
+			$table = $q->addTable( self::getProperty( get_class( $this ), '_table') )->addFields( 'id', 'online', 'deleted' );
 			
 			$q->getCriteria()->addAnd( $table->id->eq( $object['id'] ) );
 			
@@ -61,21 +82,21 @@
 		}
 		
 		public function update( &$object ){
-			$q = db(static::$_database)->newQuery();
+			$q = db(self::getProperty( get_class( $this ), '_database'))->newQuery();
 			
-			$table = $q->addTable( static::$_table )->addFields( 'id' );
+			$table = $q->addTable( self::getProperty( get_class( $this ), '_table') )->addFields( 'id' );
 			
 			$q->getCriteria()->addAnd( $table->id->eq( $object['id'] ) );
 			
 			foreach( $object as $key => &$value )
-				if( $key != 'id' && in_array( $key, static::$_fields ) )
+				if( $key != 'id' && in_array( $key, self::getProperty( get_class( $this ), '_fields') ) )
 					$table->addField($key)->setValue( $value );
 			
 			$q->update();
 		}
 		
-		public function find( $id ){
-			$q = db(static::$_database)->newQuery();
+		public function find( $id ) {
+			$q = db(self::getProperty( get_class( $this ), '_database'))->newQuery();
 			
 			$table = $q->addTable( $this->createTable() );
 			
@@ -87,7 +108,7 @@
 		}
 		
 		public function findAll( $count=null, $start=0, &$result_count=0 ){
-			$q = db(static::$_database)->newQuery();
+			$q = db(self::getProperty( get_class( $this ), '_database'))->newQuery();
 			$q->countLimitless( true );
 			
 			$table = $q->addTable( $this->createTable() );
@@ -105,9 +126,9 @@
 		}
 		
 		public function countAll(){
-			$q = db(static::$_database)->newQuery();
+			$q = db(self::getProperty( get_class( $this ), '_database'))->newQuery();
 			
-			$table = $q->addTable( static::$_table )
+			$table = $q->addTable( self::getProperty( get_class( $this ), '_table') )
 				->addFields( 'id', 'online', 'deleted' );
 			$table->online->setSelect( false );
 			$table->deleted->setSelect( false );

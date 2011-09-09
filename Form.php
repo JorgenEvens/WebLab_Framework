@@ -122,6 +122,10 @@
             return $this->_fields[ $name ];
         }
         
+        public function __isset( $name ) {
+        	return isset( $this->_fields[$name] );
+        }
+        
         // TODO: allow string
         public function getValue( WebLab_Form_Field $field ){
         	$response = $this->_getResponse();

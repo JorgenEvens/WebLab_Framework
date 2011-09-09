@@ -12,7 +12,7 @@
     class WebLab_Data_MySQL_Result extends WebLab_Data_Result
     {
 
-        protected function _read( $result )
+        protected function _read( &$result )
         {
            if( mysql_num_rows( $result ) == 0 )
            {
