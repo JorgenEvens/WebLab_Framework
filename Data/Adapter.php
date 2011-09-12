@@ -47,6 +47,13 @@
         protected $_transaction_depth = 0;
 
         /**
+         * Holds the original strings while prefixing a query
+         * 
+         * @var array
+         */
+        protected $_original_strings;
+        
+        /**
          * Default constructor for creating a Adapter.
          * 
          * @param mixed $config
@@ -203,11 +210,18 @@
                 throw new Exception( 'Expecting that the query supplied is a string.' );
             }
             
+            $string_pattern = '#[^\\\\]("|\').+[^\\\\]("|\')#iU';
+            $string_placeholder = '#\$(\d+)#';
+            
+            $this->_original_strings = array();
+            
+            $query = preg_replace_callback( $string_pattern, array( $this, '_stripStrings' ), $query );
+            
             $pattern = '#(\s|^)(from|into|update)\s#i';
             //$end_tabledefinition = '#([^\b\s]+)(\s+([^A][^S]|.+)\s+|\s*$)#iU';
             $end_tabledefinition = '#(.+)\s+(([^A][^S])|.+)\s+#iU';
             
-            // Take everything after the FROM / INTO keyword.
+            // Take everything after the FROM / INTO / UPDATE keyword.
             preg_match( $pattern, $query, $matches, PREG_OFFSET_CAPTURE );
             
             while( count($matches) > 0) {
@@ -254,7 +268,21 @@
 	            	break;
 	            }
             }
+            
+            $query = preg_replace_callback( $string_placeholder, array( $this, '_setStrings' ), $query );
 
             return $query;
+        }
+        
+        protected function _stripStrings( $match ) {
+        	$index = count( $this->_original_strings );
+        	
+        	$this->_original_strings[] = $match[0];
+        	
+        	return '$' . $index;
+        }
+        
+        protected function _setStrings( $match ) {
+        	return $this->_original_strings[$match[1]];
         }
     }

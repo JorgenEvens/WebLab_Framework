@@ -44,7 +44,7 @@
             return $html;
         }
 
-        public function addFilter( WebLab_Filter_Filter $filter, $errorMessage ){
+        public function addFilter( WebLab_Filter $filter, $errorMessage ){
             $this->_filters[] = (object)array(
                 'filter' => $filter,
                 'errorMessage' => $errorMessage
