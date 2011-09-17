@@ -69,8 +69,8 @@
         public function getAdapterSpecs()
         {
             return (object) array(
-                escape_string   => array( $this, 'escape_string' ),
-                wildcard        => $this->_wildcard 
+                'escape_string'   => array( $this, 'escape_string' ),
+                'wildcard'        => $this->_wildcard 
             );
         }
         

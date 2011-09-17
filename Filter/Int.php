@@ -8,6 +8,10 @@
 	 */
     class WebLab_Filter_Int extends WebLab_Filter
     {
+    	
+    	public function isNumeric( $testValue, $value ) {
+    		return is_numeric( $value );
+    	}
 
         public function equals( $testValue, $value )
         {

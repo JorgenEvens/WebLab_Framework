@@ -83,7 +83,7 @@
             foreach( $query->fields as $field ) {
                 if( $field->isAltered() ) {
                     if( !is_numeric( $field->getValue() ) ) {
-                        $fields[] = $field . ' = \'' . $field->getValue() . '\'';
+                        $fields[] = $field . ' = \'' . call_user_func( $this->_adapter->getAdapterSpecs()->escape_string, $field->getValue() ) . '\'';
                     } else {
                         $fields[] = $field . ' = ' . $field->getValue();
                     }

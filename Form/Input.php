@@ -52,7 +52,6 @@
         
         public function __toString(){
         	$this->_prepare();
-        	
             $html = '<input';
 
             foreach( $this->_properties as $key => $value ){
