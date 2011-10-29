@@ -185,6 +185,8 @@
         public function notNull() {
             $this->_action = 'IS NOT NULL';
             $this->_value = '';
+            
+            return $this;
         }
 
         /**
@@ -195,7 +197,35 @@
         public function isNull() {
             $this->_action = 'IS NULL';
             $this->_value = '';
+            
+            return $this;
         }
+        
+        /**
+         * Sets the criteria to use the IN keyword.
+         * 
+         * @param array $collection
+         * @return WebLab_Data_Criteria
+         */
+        public function in( $collection ) {
+			$this->_action = 'IN';
+			$this->_value = $collection;
+			
+			return $this;
+		}
+		
+		/**
+         * Sets the criteria to use the NOT IN keyword.
+         * 
+         * @param array $collection
+         * @return WebLab_Data_Criteria
+         */
+        public function notIn( $collection ) {
+			$this->_action = 'NOT IN';
+			$this->_value = $collection;
+			
+			return $this;
+		}
 
         /**
          * Returns a text representation of the criteria, based on the adapter specifications.
@@ -212,7 +242,7 @@
             }
 
             // Means that there are 2 values AKA -> BETWEEN x AND y
-            if( is_array( $value ) ) {
+            if( is_array( $value ) && $action == 'BETWEEN' ) {
                 $action = $action . ' ' . $value[0] . ' AND';
                 $value = $value[1];
             }
@@ -228,7 +258,9 @@
                 if( !empty( $value ) ) {
                     $action .= ' \'' . call_user_func( $adapterSpecs->escape_string, $value ) . '\'';
                 }
-                
+            } elseif( is_array( $value ) ){
+				$value = array_map($adapterSpecs->escape_string, $value);
+				$action .=' (' . implode( ', ', $value ) . ')';
             } elseif( $value instanceof WebLab_Data_Field ) {
                 $action .= $value->getFullName();
             } elseif( empty( $value ) ) {
