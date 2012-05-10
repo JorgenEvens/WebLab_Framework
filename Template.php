@@ -39,14 +39,14 @@
     	 * Set the root template for current request.
     	 * @param WebLab_Template $template
     	 */
-    	public function setRootTemplate( WebLab_Template $template ) {
+    	public static function setRootTemplate( WebLab_Template $template ) {
     		self::$_root = $template;
     	}
     	
     	/**
     	 * Get the root template for current request.
     	 */
-    	public function &getRootTemplate() {
+    	public static function &getRootTemplate() {
     		return self::$_root;
     	}
     	
