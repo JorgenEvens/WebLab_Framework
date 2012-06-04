@@ -42,7 +42,7 @@
          */
 		public function run()
 		{
-		    $loader = config( 'Application.Loader' );
+		    $loader = WebLab_Config::getApplicationConfig()->get( 'Application.Loader', WebLab_Config::OBJECT, false );
 	            
 		    if( isset( $loader ) )
 		    {

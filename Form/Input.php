@@ -8,97 +8,113 @@
 	 */
     class WebLab_Form_Input extends WebLab_Form_Field
     {
-
-        protected $_filters = array();
-
-        public function __construct( $name, $type, $value=null, $properties=array() ){
-        	$properties['name'] = $name;
-        	$properties['type'] = $type;
+        /**
+         * Constructs a new input field.
+         * 
+         * @param string $name
+         * @param string $type
+         * @param string $label
+         * @param string $value
+         * @param array $attributes
+         */
+        public function __construct( $name, $type, $label='', $value=null, $attributes=array() ){
+        	$attributes['name'] = $name;
+        	$attributes['type'] = $type;
         	if( !empty( $value ) )
-        		$properties['value'] = $value;
+        		$attributes['value'] = $value;
         	
-        	parent::__construct( $properties );
+        	parent::__construct( $attributes, $label );
         }
         
+        /**
+         * (non-PHPdoc)
+         * @see WebLab_Form_Field::update()
+         */
         public function update(){
             if( empty( $this->_form ) )
-                    return;
+				return;
             
+            $attr = &$this->_attributes;
+            $type = $attr[ 'type' ];
             $value = $this->_form->getValue($this);
-            switch( $this->_properties['type'] ){
-                case 'checkbox':
-                    $this->checked = ( $value === $this->value ) ? 'checked' : '';
-                    break;
-
-                case 'radio':
-                    $this->selected = ( $value === $this->value ) ? 'selected' : '';
-                    break;
-
-                default:
-                    $this->value = $value;
-                    break;
-            };
-        }
-
-        protected function _prepare(){
-        	parent::_prepare();
-        	
-        	if( isset( $this->_properties['checked'] ) && $this->_properties['checked'] !== 'checked' )
-        		unset( $this->_properties['checked'] );
-        		
-        	if( isset( $this->_properties['selected'] ) && $this->_properties['selected'] !== 'selected' )
-        		unset( $this->_properties['selected'] );
+            
+            
+            if( $type == 'checkbox' ) {
+            	if( empty( $value ) ) {
+            		$attr['checked'] = false;
+            	} else {
+            		$attr['checked'] = 'checked';
+            		$attr['value'] = $value;
+            	}
+            } elseif( $type == 'radio' ) {
+            	if( empty( $value ) ) {
+            		$attr['selected'] = false;
+            	} else {
+            		$attr['selected'] = 'selected';
+            		$attr['value'] = $value;
+            	}
+            } else {
+            	$attr['value'] = $value;
+            }
         }
         
+        /**
+         * (non-PHPdoc)
+         * @see WebLab_Form_Field::__toString()
+         */
         public function __toString(){
-        	$this->_prepare();
             $html = '<input';
 			
-            foreach( $this->_properties as $key => $value ){
-            	if( $this->_properties['type'] == 'password' && $key == 'value' )
+            $type = $this->_attributes[ 'type' ];
+            
+            foreach( $this->_attributes as $key => $value ) {
+            	if( $type == 'password' && $key == 'value' )
             		continue;
-            	
-                $html .= ' ' . $key . '="' . addslashes( $value ) . '"';
+
+            	if( is_array( $value ) )
+            		$value = implode( ' ', $value );
+
+                $html .= ' ' . $key . '="' . htmlentities( $value ) . '"';
             }
             
             $html .= ' />';
             return $html;
         }
-
-        public function addFilter( WebLab_Filter $filter, $errorMessage ){
-            $this->_filters[] = (object)array(
-                'filter' => $filter,
-                'errorMessage' => $errorMessage
-            );
-            return $this;
+        
+        /**
+         * (non-PHPdoc)
+         * @see WebLab_Form_Field::getValue()
+         */
+        public function getValue() {
+        	$this->update();
+        	
+        	$attr = &$this->_attributes;
+        	$type = $attr[ 'type' ];
+        	$value = $this->_form->getValue($this);
+        	
+        	if( $type == 'checkbox' ) {
+        		if( empty( $attr[ 'checked' ] ) ) {
+        			return '';
+        		} else {
+        			return $attr['value'];
+        		}
+        	} elseif( $type == 'radio' ) {
+        		if( empty( $attr[ 'selected' ] ) ) {
+        			return '';
+        		} else {
+        			return $attr[ 'value' ];
+        		}
+        	} else {
+        		return $attr[ 'value' ];
+        	}
         }
-
-        public function isValid(){
-            $errors = array();
-            
-            foreach( $this->_filters as $filter ){
-            	switch( $this->_properties['type'] ){
-            		case 'checkbox':
-	                    if( !$filter->filter->test( $this ) )
-	                        $errors[] = $filter->errorMessage;
-	                    break;
-	
-	                case 'radio':
-	                    if( !$filter->filter->test( $this ) )
-	                        $errors[] = $filter->errorMessage;
-	                    break;
-	
-	                default:
-	                    if( !$filter->filter->test( trim( $this->value ) ) )
-	                        $errors[] = $filter->errorMessage;
-	                    break;
-            	}
-            }
-			
-            if( !count( $errors ) )
-                return true;
-            
-            return $errors;
+        
+        /**
+         * (non-PHPdoc)
+         * @see WebLab_Form_Field::setValue()
+         */
+        public function setValue( $value ) {
+        	$this->_attributes['value'] = $value;
         }
 
     }

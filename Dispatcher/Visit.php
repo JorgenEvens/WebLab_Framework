@@ -15,8 +15,8 @@
     		if( isset( self::$_config ) ) {
     			return;
     		}
-    		
-    		self::$_config = config( 'Application.Modules.Dispatcher.Visit' );
+
+    		self::$_config = WebLab_Config::getApplicationConfig()->get( 'Application.Modules.Dispatcher.Visit', WebLab_Config::OBJECT, false );
     		
     		if( !isset( self::$_config->default ) || !isset( self::$_config->prefix ) ) {
     			throw new WebLab_Exception_Dispatcher( 'Incomplete configuration.' );
@@ -29,7 +29,7 @@
         }
         
         public function execute() {
-        	$alias = config( 'Application.Modules.Aliasses', WebLab_Config::RAW );
+        	$alias = WebLab_Config::getApplicationConfig()->get( 'Application.Modules.Aliasses', WebLab_Config::RAW, false );
         	$path = array();
         	$home = $_SERVER['DOCUMENT_ROOT'] . BASE;
         	$i = 0;
@@ -41,7 +41,7 @@
         	}
         	
         	while( isset( self::$_param[$i] ) ) {
-        		array_push( $path, ucfirst( self::$_param[$i] ) );
+        		array_push( $path, $this->_parseParam( self::$_param[$i] ) );
         		$module_name = implode( '_', $path );
 
         		if( isset( $alias[$module_name] ) ) {
@@ -84,6 +84,11 @@
             }
             
             */
+        }
+        
+        protected function _parseParam( $param ) {
+        	$param = preg_replace_callback( '#-+(.)#', create_function( '$m', 'return strtoupper( $m[1] );'), $param );
+        	return ucfirst( $param );
         }
 
         public function setPattern( $pattern ) {

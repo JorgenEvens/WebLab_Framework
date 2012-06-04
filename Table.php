@@ -22,9 +22,33 @@
 			db(static::$_database)->quitTransaction( $commit );
 		}
 		
+		protected static function _hasField( $field ) {
+			return in_array( $field, static::$_fields );
+		}
+		
 		public function createTable(){
 			$t = new WebLab_Data_Table( static::$_table );
 			return $t->addFields( static::$_fields );
+		}
+		
+		public function save( &$object ){
+			$q = db(static::$_database)->newQuery();
+				
+			$table = $q->addTable( $this->createTable() );
+				
+			if( !isset( $object['online'] ) && self::_hasField( 'online' ) )
+				$object['online'] = 1;
+		
+			if( !isset( $object['deleted'] ) && self::_hasField( 'deleted' ) )
+				$object['deleted'] = 0;
+				
+			foreach( $object as $key => &$value )
+				if( in_array( $key, static::$_fields ) )
+				$table->getField($key)->setValue( $value );
+		
+			$q->insert( true, array( 'id' ) );
+				
+			$object['id'] = $q->getAdapter()->insert_id();
 		}
 		
 		public function create( &$object ){
@@ -32,10 +56,10 @@
 			
 			$table = $q->addTable( $this->createTable() );
 			
-			if( !isset( $object['online'] ) )
+			if( !isset( $object['online'] ) && self::_hasField( 'online' ) )
 				$object['online'] = 1;
 				
-			if( !isset( $object['deleted'] ) )
+			if( !isset( $object['deleted'] ) && self::_hasField( 'deleted' ) )
 				$object['deleted'] = 0;
 			
 			foreach( $object as $key => &$value )
@@ -48,16 +72,23 @@
 		}
 		
 		public function delete( &$object ){
+			$has_deleted = self::_hasField( 'deleted' );
+			$has_online = self::_hasField( 'online' );
 			$q = db(static::$_database)->newQuery();
-			
-			$table = $q->addTable( static::$_table )->addFields( 'id', 'online', 'deleted' );
-			
+			$table = $q->addTable( static::$_table )->addFields( 'id' );
 			$q->getCriteria()->addAnd( $table->id->eq( $object['id'] ) );
 			
-			$table->deleted->setValue( 1 );
-			$table->online->setValue( 0 );
-			
-			$q->update();
+			if( $has_deleted || $has_online ) {
+				if( $has_deleted )
+					$table->addField( 'deleted' )->setValue( 1 );
+				
+				if( $has_online )
+					$table->addField( 'online' )->setValue( 0 );
+				
+				$q->update();
+			} else {
+				$q->delete();
+			}
 		}
 		
 		public function update( &$object ){
@@ -79,9 +110,13 @@
 			
 			$table = $q->addTable( $this->createTable() );
 			
-			$q->getCriteria()->addAnd( $table->id->eq( $id ) )
-				->addAnd( $table->online->eq( 1 ) )
-				->addAnd( $table->deleted->eq( 0 ) );
+			$criteria = $q->getCriteria()->addAnd( $table->id->eq( $id ) );
+			
+			if( self::_hasField( 'online' ) )
+				$criteria->addAnd( $table->online->eq( 1 ) );
+			
+			if( self::_hasField( 'deleted' ) )
+				$criteria->addAnd( $table->deleted->eq( 0 ) );
 			
 			return $q->select()->current();
 		}
@@ -92,8 +127,13 @@
 			
 			$table = $q->addTable( $this->createTable() );
 			
-			$q->getCriteria()->addAnd( $table->online->eq( 1 ) )
-				->addAnd( $table->deleted->eq( 0 ) );
+			$criteria = $q->getCriteria();
+			
+			if( self::_hasField( 'online' ) )
+				$criteria->addAnd( $table->online->eq( 1 ) );
+			
+			if( self::_hasField( 'deleted' ) )
+				$criteria->addAnd( $table->deleted->eq( 0 ) );
 			
 			if( $count != null )
 				$q->setLimit( $count, $start );
@@ -108,16 +148,22 @@
 			$q = db(static::$_database)->newQuery();
 			
 			$table = $q->addTable( static::$_table )
-				->addFields( 'id', 'online', 'deleted' );
-			$table->online->setSelect( false );
-			$table->deleted->setSelect( false );
-				
-				
+				->addFields( 'id' );
+
 			$table->id->setFunction( 'COUNT' )
 				->setAlias( 'count' );
 			
-			$q->getCriteria()->addAnd( $table->online->eq( 1 ) )
-				->addAnd( $table->deleted->eq( 0 ) );
+			$criteria = $q->getCriteria();
+			
+			if( self::_hasField( 'online' ) ) {
+				$table->addField( 'online' )->setSelect( false );
+				$criteria->addAnd( $table->online->eq( 1 ) );
+			}
+			
+			if( self::_hasField( 'deleted' ) ) {
+				$table->addField( 'deleted' )->setSelect( false );
+				$criteria->addAnd( $table->deleted->eq( 0 ) );
+			}
 			
 			return $q->select()->current()->count;
 		}

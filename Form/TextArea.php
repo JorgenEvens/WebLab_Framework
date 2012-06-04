@@ -7,62 +7,66 @@
 	 *
 	 */
 	class WebLab_Form_TextArea extends WebLab_Form_Field {
-		
-		protected $_filters = array();
-        protected $_isPostback = false;
 
-        public function __construct( $name, $value=null, $properties=array() ){
-        	$properties['name'] = $name;
+		public $value;
+		
+		/**
+		 * Constructs new textarea
+		 * 
+		 * @param string $name
+		 * @param string $value
+		 * @param array $attributes
+		 */
+        public function __construct( $name, $label='', $value=null, $attributes=array() ){
+        	$attributes['name'] = $name;
+        	
         	if( !empty( $value ) )
-        		$properties['value'] = $value;
+        		$this->value = $value;
         		
-        	parent::__construct( $properties );
+        	parent::__construct( $attributes, $label );
         }
         
+        /**
+         * (non-PHPdoc)
+         * @see WebLab_Form_Field::update()
+         */
         public function update(){
             if( empty( $this->_form ) )
                     return;
             
-            $response = ( $this->_form->getMethod() == WebLab_Form::POST ) ? $_POST : $_GET;
-			$this->_isPostback = isset( $response[ $this->name ] );
-            $this->value = isset( $response[ $this->name ] ) ? $response[$this->name] : '';
+            $this->value = $this->_form->getValue($this);
         }
 
+        /**
+         * (non-PHPdoc)
+         * @see WebLab_Form_Field::__toString()
+         */
         public function __toString(){
-        	$this->_prepare();
-        	
             $html = '<textarea';
 
-            foreach( $this->_properties as $key => $value ){
-            	if( $key == 'value' )
-            		continue;
-            		
-                $html .= ' ' . $key . '="' . addslashes( $value ) . '"';
+            foreach( $this->_attributes as $key => $value ) {            		
+                $html .= ' ' . htmlentities( $key ) . '="' . htmlentities( $value ) . '"';
             }
 
             $html .= '>' . $this->value . '</textarea>';
             return $html;
         }
-
-        public function addFilter( WebLab_Filter $filter, $errorMessage ){
-            $this->_filters[] = (object)array(
-                'filter' => $filter,
-                'errorMessage' => $errorMessage
-            );
-            return $this;
+        
+        /**
+         * (non-PHPdoc)
+         * @see WebLab_Form_Field::getValue()
+         */
+        public function getValue() {
+        	return $this->value;
+        }
+        
+        /**
+         * (non-PHPdoc)
+         * @see WebLab_Form_Field::setValue()
+         */
+        public function setValue( $value ) {
+        	$this->value = $value;
+        	return $this;
         }
 
-        public function isValid(){
-            $errors = array();
-            
-            foreach( $this->_filters as $filter ){
-                if( !$filter->filter->test( $this->value ) )
-                        $errors[] = $filter->errorMessage;
-            }
-
-            if( !count( $errors ) )
-                return true;
-            
-            return $errors;
-        }
 	}

@@ -93,7 +93,11 @@
 
         public function getFullName()
         {
-        	$name = $this->_table->getName() . '.' . $this->_name;
+        	if( $this->_name instanceof WebLab_Data_Query ) {
+        		$name = '(' . $this->_name->builder()->select() . ')';
+        	} else {
+        		$name = $this->_table->getName() . '.' . $this->_name;
+        	}
         	
             if( isset( $this->_function ) )
                 $name = $this->_function . '( ' . $name . ' )';

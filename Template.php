@@ -29,7 +29,7 @@
     	 */
     	protected static function _getConfig() {
     		if( empty( self::$_config ) ) {
-            	self::$_config = config( 'Application.Templates' );
+            	self::$_config = WebLab_Config::getApplicationConfig()->get( 'Application.Templates', WebLab_Config::OBJECT, false );
     		}
             	
             return self::$_config;

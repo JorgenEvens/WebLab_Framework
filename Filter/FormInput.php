@@ -16,4 +16,9 @@
 			return $value->selected === 'selected';
 		}
 		
+		public function required( $testValue, $value ) {
+			$value = trim( $value );
+			return !empty( $value  );
+		}
+		
 	}

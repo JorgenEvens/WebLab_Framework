@@ -71,7 +71,7 @@
             	return false;
             	
         	$basepath = $this->getBasePath();
-        	$url_config = config('Application.Parser.URL');
+      		$url_config = WebLab_Config::getApplicationConfig()->get( 'Application.Parser.URL', WebLab_Config::OBJECT, false );
         	
         	if( empty( $url_config ) || $url_config->mod_rewrite ) {
             	DEFINE( 'BASE', $basepath );

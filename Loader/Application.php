@@ -12,7 +12,7 @@
 		protected $_config;
 	
 		public function __construct() {
-		    $this->_config = config( 'Application.Loader' );
+		    $this->_config = WebLab_Config::getApplicationConfig()->get( 'Application.Loader', WebLab_Config::OBJECT, false );
 		    $this->start();
 		}
 	

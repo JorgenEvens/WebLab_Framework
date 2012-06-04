@@ -30,15 +30,3 @@
         }
         return false;
     }
-    
-    function db( $name ) {
-		return WebLab_Database::getDb( $name );
-	}
-	
-	function config( $path, $return_type=WebLab_Config::OBJECT ) {
-		try {
-			return WebLab_Config::getApplicationConfig()->get( $path, $return_type );
-		} catch( WebLab_Exception_Config $ex ) {
-			return null;
-		}
-	}

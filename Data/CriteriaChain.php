@@ -71,5 +71,9 @@
 
             return $q;
         }
+        
+        public function hasCriteria() {
+        	return !empty( $this->_criteria );
+        }
 
     }

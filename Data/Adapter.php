@@ -210,20 +210,22 @@
                 throw new Exception( 'Expecting that the query supplied is a string.' );
             }
             
-            $string_pattern = '#[^\\\\]("|\').+[^\\\\]("|\')#iU';
+            $string_pattern = '#([^\\\\])(("|\').+[^\\\\]("|\'))#iU';
             $string_placeholder = '#\$(\d+)#';
             
             $this->_original_strings = array();
             
+            $query = preg_replace_callback( '#()(""|\'\')#iU', array( $this, '_stripStrings' ), $query );
             $query = preg_replace_callback( $string_pattern, array( $this, '_stripStrings' ), $query );
-            
-            $pattern = '#(\s|^)(from|into|update)\s#i';
+
+            $pattern = '#(\sfrom|\sinto|^update)\s#i';
             //$end_tabledefinition = '#([^\b\s]+)(\s+([^A][^S]|.+)\s+|\s*$)#iU';
             $end_tabledefinition = '#(.+)\s+(([^A][^S])|.+)\s+#iU';
             
             // Take everything after the FROM / INTO / UPDATE keyword.
             preg_match( $pattern, $query, $matches, PREG_OFFSET_CAPTURE );
             
+            $done_tables = array();
             while( count($matches) > 0) {
 	            $start = $matches[0][1] + strlen( $matches[0][0] );
 	            
@@ -245,7 +247,10 @@
 	            	
 		            if( preg_match( $end_tabledefinition, $table, $match ) ) {
 	                	unset( $tables[$key] );
-	                	$tables[] = $match[1];
+	                	
+	                	if( !in_array( $match[1], $done_tables ) ) {
+	                		$tables[] = $match[1];
+	                	}
 	                	$end = preg_quote( array_shift( array_filter( explode( ' ', $match[2] ) ) ) );
 	                }
 	            }
@@ -259,6 +264,8 @@
 	                while( preg_match( $tbl_pattern, $query ) ) {
 	                	$query = preg_replace( $tbl_pattern , '${1}' . $this->getPrefix() . $table . '${2}', $query, -1, $count );
 	                	
+	                	$done_tables[] = $this->getPrefix() . $table;
+	                	
 	                	// Move forward to the point where Start is now located.
 	                	$start += $count * strlen($this->getPrefix());
 	                }
@@ -270,16 +277,16 @@
             }
             
             $query = preg_replace_callback( $string_placeholder, array( $this, '_setStrings' ), $query );
-
+			
             return $query;
         }
         
         protected function _stripStrings( $match ) {
         	$index = count( $this->_original_strings );
         	
-        	$this->_original_strings[] = $match[0];
+        	$this->_original_strings[] = $match[2];
         	
-        	return '$' . $index;
+        	return $match[1] . '$' . $index;
         }
         
         protected function _setStrings( $match ) {

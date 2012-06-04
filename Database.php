@@ -31,7 +31,7 @@
 		 */
 		protected static function _getConfig() {
 			if( empty( self::$_config ) )
-				self::$_config = config( 'Application.Data.DB', WebLab_Config::RAW );
+				self::$_config = WebLab_Config::getApplicationConfig()->get( 'Application.Data.DB', WebLab_Config::RAW, false );
 			
 			return self::$_config;
 		}

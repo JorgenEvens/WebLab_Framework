@@ -105,13 +105,18 @@
 		 * @throws WebLab_Exception_Config If the requested node is not available.
 		 * @return mixed
 		 */
-		public function get( $path, $return_type=self::RAW ) {
+		public function get( $path, $return_type=self::RAW, $throwError=true ) {
 			$properties = explode( '.', $path );
 			
 			$value = $this->_config;
 			while( count( $properties ) > 0 ) {
-				if( !isset( $value[$properties[0]] ) )
-					throw new WebLab_Exception_Config( 'The node specified is not available, current node is "' . $properties[0] . '". ( ' . $path . ' )' );
+				if( !isset( $value[$properties[0]] ) ) {
+					if( $throwError ) {
+						throw new WebLab_Exception_Config( 'The node specified is not available, current node is "' . $properties[0] . '". ( ' . $path . ' )' );
+					} else {
+						return null;
+					}
+				}
 				
 				$value = $value[$properties[0]];
 				array_splice( $properties, 0, 1 );

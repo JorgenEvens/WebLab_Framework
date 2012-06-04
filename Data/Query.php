@@ -38,6 +38,14 @@
         protected $_criteriaChain;
         
         /**
+         * The criteriachain used in this query.
+         * This is used to build the HAVING statement.
+         *
+         * @var WebLab_Data_CriteriaChain
+         */
+        protected $_havingChain;
+        
+        /**
          * Holds limit information that is set for this query.
          * 
          * @var object
@@ -135,6 +143,20 @@
             }
             return $this->_criteriaChain;
         }
+        
+        /**
+         * Gets the criteriachain for this query.
+         * Criteria chain equals the HAVING statement in a query.
+         *
+         * @return WebLab_Data_CriteriaChain
+         */
+        public function getHaving()
+        {
+        	if( !isset( $this->_havingChain ) ) {
+        		$this->_havingChain = new WebLab_Data_CriteriaChain();
+        	}
+        	return $this->_havingChain;
+        }
 
 		/**
 		 * Add multiple tables to the query.
@@ -224,6 +246,10 @@
 
             $this->_limit = (object) array( 'count' => $count, 'start' => $start );
         }
+        
+        public function getLimit() {
+        	return $this->_limit;
+        }
 
         /**
          * Remove limit from query.
@@ -252,38 +278,6 @@
          */
         public function getCountLimitless() {
         	return $this->_count_limitless;
-        }
-
-        /**
-         * Decompile the query into an easier to use format.
-         * 
-         * @return object
-         */
-        protected function _parseQuery()
-        {
-            $fields = array();
-            $order = array();
-            $group = array();
-
-            foreach( $this->_tables as $table ) {
-                foreach( $table->getFields() as $field ) {
-                    $fields[] = $field;
-
-                    if( $field->getOrder() != null ) {
-                        $order[] = $field . ' ' . $field->getOrder();
-                    }
-
-                    if( $field->getGroup() ) {
-                        $group[] = $field;
-                    }
-                }
-            }
-
-            return (object) array(
-                'fields'  => $fields,
-                'order'   => $order,
-                'group'   => $group
-            );
         }
 
         /**

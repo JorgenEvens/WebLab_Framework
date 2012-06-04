@@ -19,7 +19,7 @@
 		// TODO: Rewrite.
         public function __construct( $register=false )
         {
-            $includes = config( 'Application.Loader.includePaths', WebLab_Config::RAW );
+            $includes = WebLab_Config::getApplicationConfig()->get( 'Application.Loader.includePaths', WebLab_Config::RAW, false );
 
             array_map( array( $this, 'addIncludePath' ), $includes );
 
