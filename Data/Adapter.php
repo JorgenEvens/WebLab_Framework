@@ -125,8 +125,6 @@
          * @param string $query
          */
         public final function query( $query ) {
-            $query = $this->_prefixTables( $query );
-            
             return $this->_query( $query );
         }
 
@@ -193,103 +191,5 @@
         		$this->_transaction_depth = 0;
         	}
         }
-    
-        /**
-         * Prefixes the tables in the provided query.
-         * 
-         * @param string $query
-         * @throws Exception
-         * @return string
-         */
-		protected function _prefixTables( $query ) {
-            if( empty( $this->_prefix ) ) {
-                return $query;
-            }
 
-            if( !is_string( $query ) ) {
-                throw new Exception( 'Expecting that the query supplied is a string.' );
-            }
-            
-            $string_pattern = '#([^\\\\])(("|\').+[^\\\\]("|\'))#iU';
-            $string_placeholder = '#\$(\d+)#';
-            
-            $this->_original_strings = array();
-            
-            $query = preg_replace_callback( '#()(""|\'\')#iU', array( $this, '_stripStrings' ), $query );
-            $query = preg_replace_callback( $string_pattern, array( $this, '_stripStrings' ), $query );
-
-            $pattern = '#(\sfrom|\sinto|^update)\s#i';
-            //$end_tabledefinition = '#([^\b\s]+)(\s+([^A][^S]|.+)\s+|\s*$)#iU';
-            $end_tabledefinition = '#(.+)\s+(([^A][^S])|.+)\s+#iU';
-            
-            // Take everything after the FROM / INTO / UPDATE keyword.
-            preg_match( $pattern, $query, $matches, PREG_OFFSET_CAPTURE );
-            
-            $done_tables = array();
-            while( count($matches) > 0) {
-	            $start = $matches[0][1] + strlen( $matches[0][0] );
-	            
-	            if( $start < 7 ) {
-	                throw new Exception( 'The FROM / INTO Keyword was not found, so this is not a prefixable query.' );
-	            }
-	            
-	            // explode it to get the different tables;
-	            $tables = explode( ',', substr( $query, $start ) );
-	            
-	            // detect end of tabledefinition
-	            $end = null;
-	            foreach( $tables as $key => $table ) {
-	            	if( !empty( $end ) ) {
-	            		// Ignore all other values, they are no valid tablenames for this part of the query
-	            		unset( $tables[$key] );
-	            		continue;
-	            	}
-	            	
-		            if( preg_match( $end_tabledefinition, $table, $match ) ) {
-	                	unset( $tables[$key] );
-	                	
-	                	if( !in_array( $match[1], $done_tables ) ) {
-	                		$tables[] = $match[1];
-	                	}
-	                	$end = preg_quote( array_shift( array_filter( explode( ' ', $match[2] ) ) ) );
-	                }
-	            }
-	            
-	            // Replace every table with it's prefixed form.
-	            foreach( $tables as $table ) {
-	                $table = trim( $table ); // Remove redundant spaces
-					
-	                $tbl_pattern = '#(\b)' . $table . '(\b.+' . $end . '|\.|$)#U';
-	                // Otherwise just replace the table with it's prefixed form and continue;
-	                while( preg_match( $tbl_pattern, $query ) ) {
-	                	$query = preg_replace( $tbl_pattern , '${1}' . $this->getPrefix() . $table . '${2}', $query, -1, $count );
-	                	
-	                	$done_tables[] = $this->getPrefix() . $table;
-	                	
-	                	// Move forward to the point where Start is now located.
-	                	$start += $count * strlen($this->getPrefix());
-	                }
-	            }
-	            
-	            if( !preg_match( $pattern, $query, $matches, PREG_OFFSET_CAPTURE, $start ) ) {
-	            	break;
-	            }
-            }
-            
-            $query = preg_replace_callback( $string_placeholder, array( $this, '_setStrings' ), $query );
-			
-            return $query;
-        }
-        
-        protected function _stripStrings( $match ) {
-        	$index = count( $this->_original_strings );
-        	
-        	$this->_original_strings[] = $match[2];
-        	
-        	return $match[1] . '$' . $index;
-        }
-        
-        protected function _setStrings( $match ) {
-        	return $this->_original_strings[$match[1]];
-        }
     }

@@ -22,12 +22,16 @@
 			db(static::$_database)->quitTransaction( $commit );
 		}
 		
+		public static function table() {
+			return db(static::$_database)->getPrefix() . static::$_table;
+		}
+		
 		protected static function _hasField( $field ) {
 			return in_array( $field, static::$_fields );
 		}
-		
+
 		public function createTable(){
-			$t = new WebLab_Data_Table( static::$_table );
+			$t = new WebLab_Data_Table( static::table() );
 			return $t->addFields( static::$_fields );
 		}
 		
@@ -75,7 +79,7 @@
 			$has_deleted = self::_hasField( 'deleted' );
 			$has_online = self::_hasField( 'online' );
 			$q = db(static::$_database)->newQuery();
-			$table = $q->addTable( static::$_table )->addFields( 'id' );
+			$table = $q->addTable( static::table() )->addFields( 'id' );
 			$q->getCriteria()->addAnd( $table->id->eq( $object['id'] ) );
 			
 			if( $has_deleted || $has_online ) {
@@ -94,7 +98,7 @@
 		public function update( &$object ){
 			$q = db(static::$_database)->newQuery();
 			
-			$table = $q->addTable( static::$_table )->addFields( 'id' );
+			$table = $q->addTable( static::table() )->addFields( 'id' );
 			
 			$q->getCriteria()->addAnd( $table->id->eq( $object['id'] ) );
 			
@@ -147,7 +151,7 @@
 		public function countAll(){
 			$q = db(static::$_database)->newQuery();
 			
-			$table = $q->addTable( static::$_table )
+			$table = $q->addTable( static::table() )
 				->addFields( 'id' );
 
 			$table->id->setFunction( 'COUNT' )
