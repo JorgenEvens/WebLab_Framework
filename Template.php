@@ -74,6 +74,16 @@
         protected $_theme = 'source';
         
         /**
+         * @var string Determines if logic should be called.
+         */
+        protected $_setup = false;
+        
+		/**
+		 * @var int  
+		 */
+        protected $_cache = 0;
+        
+        /**
          * Constructs a new Template
          * @param String $template The path to the template, relative to the configured template directory.
          * @param String $theme	The name of the theme to be used. default theme is 'source'
@@ -96,7 +106,14 @@
             	$this->setTheme( $theme );
             }
 
-            $this->_variables = array();
+            $variables = array(
+            		'template' => $this,
+            		't' => $this,
+            		'self' => $this
+            	);
+            $variables['variables'] = $variables;
+            
+            $this->_variables = $variables;
 
             if( !is_string( $template ) ) {
                 throw new WebLab_Exception_Template( 'Template name shoud refer to the path within the theme.' );
@@ -104,6 +121,7 @@
 
             $this->_template = $template;
 
+            $this->_init();
             $this->setBasicVariables();
         }
         
@@ -117,12 +135,35 @@
          * @param WebLab_Template $template Template you would like to attach to this template.
          * @param String $moduleName Variable name for $template.
          * @return WebLab_Template This template instance.
-         * @deprecated Use $myTemplate->variableName = $template now.
+         * @deprecated Use WebLab_Template::set now.
          */
         public function attach( WebLab_Template &$template, $moduleName ) {
             $this->_variables[ $moduleName ] = &$template;
 
             return $this;
+        }
+        
+        /**
+         * Set a template variable value.
+         * 
+         * @param string $variable
+         * @param mixed $value
+         * @return WebLab_Template
+         */
+        public function set( $variable, $value ) {
+        	$this->_variables[ $variable ] = $value;
+        	
+        	return $this;
+        }
+        
+        /**
+         * Get a template variable.
+         * 
+         * @param string $variable
+         * @return mixed:
+         */
+        public function get( $variable ) {
+        	return $this->_variables[ $variable ];
         }
         
 		/**
@@ -194,14 +235,38 @@
          * Running the template file and thus obtaining the HTML code.
          * @return String The HTML code rendered.
          */
-        protected function _getCode() {
-        	if( isset( self::_getConfig()->extract_vars ) && self::_getConfig()->extract_vars ) {
-            	extract( $this->_variables );
+        protected function _getCode() {       	
+        	if( !$this->_setup ) {
+        		$this->_setup = true;
+        		$this->_load( 'setup' );
         	}
         	
             ob_start();
-            include( $this->_dir . ( empty( $this->_theme ) ? '/' : '/' . $this->_theme . '/' ) . $this->_template );
+            $this->_load();
             return ob_get_clean();
+        }
+
+        /**
+         * Include a component file for current template
+         * $component will be attached behind the filename, including a suffix .php
+         * 
+         * @param string $component
+         * @param array $variables
+         */
+        protected function _load( $component='', $extract=true ) {
+        	if( isset( self::_getConfig()->extract_vars ) && self::_getConfig()->extract_vars && $extract ) {
+        		extract( $this->_variables );
+        	}
+        	
+        	include( $this->_dir . ( empty( $this->_theme ) ? '/' : '/' . $this->_theme . '/' ) . $this->_template . $component . '.php' );
+        }
+        
+        /**
+         * Loads the init component of a template.
+         * Injecting headers, scripts or styles should be done here.
+         */
+        protected function _init() {
+        	 @$this->_load( 'init', false );
         }
 
         /**
