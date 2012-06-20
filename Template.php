@@ -50,6 +50,11 @@
     		return self::$_root;
     	}
     	
+    	/**
+    	 * @var int The maximum age in seconds of a cached template.
+    	 */
+    	public $max_cache_age = 0;
+    	
         /**
          *
          * @var String Contains the path to the template file.
@@ -78,11 +83,6 @@
          */
         protected $_setup = false;
         
-		/**
-		 * @var int  
-		 */
-        protected $_cache = 0;
-        
         /**
          * Constructs a new Template
          * @param String $template The path to the template, relative to the configured template directory.
@@ -105,13 +105,8 @@
             if( is_string( $theme ) ) {
             	$this->setTheme( $theme );
             }
-
-            $variables = array(
-            		'template' => $this,
-            		't' => $this,
-            		'self' => $this
-            	);
-            $variables['variables'] = $variables;
+            
+            $variables['variables'] = array();
             
             $this->_variables = $variables;
 
@@ -254,11 +249,24 @@
          * @param array $variables
          */
         protected function _load( $component='', $extract=true ) {
+        	if( !empty( $component ) ) {
+        		$component = '.' . $component;
+        	}
+        	
+        	$path = $this->_dir . ( empty( $this->_theme ) ? '/' : '/' . $this->_theme . '/' ) . $this->_template . $component . '.php';
+        	
+        	$exists = @fopen( $path, 'r', true );
+        	if( $exists === false ) {
+        		if( empty( $component ) ) throw new WebLab_Exception_Template( 'Template (' . $this->_template . ') not found!' );
+        		return;
+        	}
+        	fclose( $exists );
+        	
         	if( isset( self::_getConfig()->extract_vars ) && self::_getConfig()->extract_vars && $extract ) {
         		extract( $this->_variables );
         	}
         	
-        	include( $this->_dir . ( empty( $this->_theme ) ? '/' : '/' . $this->_theme . '/' ) . $this->_template . $component . '.php' );
+        	include( $path );
         }
         
         /**
@@ -266,16 +274,57 @@
          * Injecting headers, scripts or styles should be done here.
          */
         protected function _init() {
-        	 @$this->_load( 'init', false );
+        	 $this->_load( 'init', false );
         }
 
+        /**
+         * Retrieve cached template
+         * @return string|NULL
+         */
+        protected function _getCache( $path ) {
+        	if( file_exists( $path ) && ( time() - filemtime( $path ) ) < $this->max_cache_age ) {
+        		return file_get_contents( $path, true );
+        	}
+        	
+        	return null;
+        }
+        
+        /**
+         * Put cached code
+         * @param string $code
+         */
+        protected function _putCache( $path, $code ) {
+        	$folder = dirname( $path );
+        	if( !is_dir( $folder ) ) {
+        		mkdir( $folder, 0755, true );
+        	}
+        	if( !empty( $this->max_cache_age ) ) {
+        		file_put_contents( $path, $code );
+        	}
+        }
+        
         /**
          * Returns the value of the function render.
          * @return String Returns HTML that has been rendered by the render function. If a Exception occurs the message of this exception will be returned.
          */
         final public function __toString() {
+        	$cache_dir = $path = WebLab_Config::getApplicationConfig()->get( 'Application.Templates.cache_dir', WebLab_Config::RAW );
+        	$theme_dir = empty( $this->_theme ) ? '/' : '/' . $this->_theme . '/';
+        	
+        	$param = md5( serialize( $this->_variables ) );
+        	
+        	$cache_file = $theme_dir . $this->_template . $param . '.php';
+        	$cache_file = $_SERVER['DOCUMENT_ROOT'] . BASE . $cache_dir . '/' . $theme_dir . md5( $cache_file );
+        	
+        	$cache = $this->_getCache( $cache_file );
+        	if( !empty( $cache ) ) {
+        		return $cache;
+        	}
+        	        	
         	try {
-            	return $this->render();
+            	$code = $this->render();
+            	$this->_putCache( $cache_file, $code );
+            	return $code;
         	} catch( Exception $ex ) {
         		return $ex->getMessage();
         	}
