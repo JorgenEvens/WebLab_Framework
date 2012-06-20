@@ -308,23 +308,35 @@
          * @return String Returns HTML that has been rendered by the render function. If a Exception occurs the message of this exception will be returned.
          */
         final public function __toString() {
-        	$cache_dir = $path = WebLab_Config::getApplicationConfig()->get( 'Application.Templates.cache_dir', WebLab_Config::RAW );
-        	$theme_dir = empty( $this->_theme ) ? '/' : '/' . $this->_theme . '/';
-        	
-        	$param = md5( serialize( $this->_variables ) );
-        	
-        	$cache_file = $theme_dir . $this->_template . $param . '.php';
-        	$cache_file = $_SERVER['DOCUMENT_ROOT'] . BASE . $cache_dir . '/' . $theme_dir . md5( $cache_file );
-        	
-        	$cache = $this->_getCache( $cache_file );
-        	if( !empty( $cache ) ) {
-        		return $cache;
-        	}
-        	        	
         	try {
-            	$code = $this->render();
-            	$this->_putCache( $cache_file, $code );
-            	return $code;
+        		/*
+        		 * Hot path for uncached templates.
+        		 */
+	        	if( empty( $this->max_cache_age ) ) {
+	        		return $this->render();
+	        	} else {
+	        		/*
+	        		 * Slower path, cache lookup
+	        		 */
+	        		
+	        		$cache_dir = $path = WebLab_Config::getApplicationConfig()->get( 'Application.Templates.cache_dir', WebLab_Config::RAW );
+	        		$theme_dir = empty( $this->_theme ) ? '/' : '/' . $this->_theme . '/';
+	        		 
+	        		$param = md5( serialize( $this->_variables ) );
+	        		 
+	        		$cache_file = $theme_dir . $this->_template . $param . '.php';
+	        		$cache_file = $_SERVER['DOCUMENT_ROOT'] . BASE . $cache_dir . '/' . $theme_dir . md5( $cache_file );
+	        		 
+	        		$cache = $this->_getCache( $cache_file );
+	        		
+	        		if( !empty( $cache ) ) {
+	        			return $cache;
+	        		}
+	        		
+	        		$code = $this->render();
+	        		$this->_putCache( $cache_file, $code );
+	        		return $code;
+	        	}
         	} catch( Exception $ex ) {
         		return $ex->getMessage();
         	}
