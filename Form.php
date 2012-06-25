@@ -110,19 +110,11 @@
                     throw new WebLab_Exception_Form( 'Cannot add a field to a form without the field having a name.' );
 
             $field_exists = isset( $this->_fields[ $field_name ] );
-            $field_list = ( strpos( $field->name, '[]' ) !== false );
             
-            if( $field_list && $field_exists )
+            if( $field_exists )
             	throw new WebLab_Exception_Form( 'Duplicate name attribute for fields.' );
-            
-            if( $field_list && !is_array( $this->_fields[ $field_name ] ) )
-            	$this->_fields[ $field_name ] = array();
-            
-            if( $field_list ) {
-            	$this->_fields[ $field_name ][] = $field;
-            } else {
-            	$this->_fields[ $field_name ] = $field;
-            }
+
+            $this->_fields[ $field_name ] = $field;
 
             $field->setForm( $this );
 
@@ -179,7 +171,7 @@
          */
         public function isPostback(){
         	$postback_code = $this->getFormId();
-        	$response = $this->_getResponse();
+        	$response = $this->getResponse();
         	return isset( $response[$postback_code] );
         }
         
@@ -188,7 +180,7 @@
          * 
          * @return array
          */
-        public function _getResponse(){
+        public function getResponse(){
         	return ( $this->_method == self::POST ) ? $_POST : $_GET;
         }
 
@@ -330,11 +322,35 @@
         		$field = $field->getAttribute( 'name' );
         	}
         	
-        	if( !isset( $this->_fields[ $field ] ) )
+        	// name[]
+        	$name = strpos( $field, '[' );
+        	if( $name !== false ) {
+        		$name = substr( $field, 0, $name );
+        	} else {
+        		$name = $field;
+        		$field = null;
+        	}
+
+        	if( !isset( $this->_fields[ $name ] ) )
         		throw new WebLab_Exception_Form( 'The field to remove should be either of type WebLab_Form_Field or string.' );
         	
-        	$resp = $this->_getResponse();
-        	return isset( $resp[ $field ] ) ? $resp[ $field ] : null;
+        	$resp = $this->getResponse();
+        	
+        	if( empty( $field ) ) {
+        		$value = isset( $resp[ $name ] ) ? $resp[ $name ] : null;
+        	} else {
+        		$value = isset( $resp[ $name ] ) ? $resp[ $name ] : null;
+        		
+        		preg_match_all( '#\[([^\]]+)\]#', $field, $matches, PREG_SET_ORDER );
+        		
+        		foreach( $matches as $match ) {
+        			if( empty( $value ) ) break;
+        			
+        			@$value = $value[ $match[1] ];
+        		}
+        	}
+
+        	return $value;
         }
         
         /**

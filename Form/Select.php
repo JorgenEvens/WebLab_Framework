@@ -69,15 +69,18 @@
 		 */
 		public function __toString() {
 			$html = '<select';
-
+			
             foreach( $this->_attributes as $key => $value ){
                 $html .= ' ' . htmlentities( $key ) . '="' . htmlentities( $value ) . '"';
             }
 
             $html .= '>';
+            $value = $this->getValue();
             
             foreach( $this->_options as $option ){
-            	$html .= '<option value="' . htmlentities( $option->value ) . '">' . htmlentities( $option->text ) . '</option>';
+            	$html .= '<option value="' . htmlentities( $option->value ) . '"';
+            	if( $value == $option->value ) $html .= ' selected="selected"';
+            	$html .= '>' . htmlentities( $option->text ) . '</option>';
             }
             
             $html .= '</select>';

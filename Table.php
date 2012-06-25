@@ -50,7 +50,7 @@
 				if( in_array( $key, static::$_fields ) )
 				$table->getField($key)->setValue( $value );
 		
-			$q->insert( true, array( 'id' ) );
+			$q->insert( true, array( $table->getField( 'id' ) ) );
 				
 			$object['id'] = $q->getAdapter()->insert_id();
 		}
