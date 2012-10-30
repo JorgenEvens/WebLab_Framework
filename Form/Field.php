@@ -79,6 +79,18 @@
         }
 
         /**
+         * Shorthand for setAttribute and getAttribute
+         *
+         * @param string $name
+         * @param string $value
+         * @return string
+         */
+        public function attr( $name, $value=null ) {
+            if( empty( $value ) ) return $this->getAttribute( $name );
+            return $this->setAttribute( $name, $value );
+        }
+
+        /**
          * Set the value of an attribute.
          * 
          * @param string $attribute

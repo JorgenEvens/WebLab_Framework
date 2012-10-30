@@ -44,18 +44,21 @@
 
         protected function _parseName( $className )
         {
-            require_once( strtr( $className, '_', PATH_SEPARATOR ) . '.php' );
+            require_once( strtr( $className, '_', DIRECTORY_SEPARATOR ) . '.php' );
         }
 
         public function addIncludePath( $path )
         {
-            set_include_path( get_include_path() . PATH_SEPARATOR . getcwd() . '/' . $path );
+        	if( $path[0] != '/' ) {
+        		$path = getcwd() . '/' . $path;
+        	}
+            set_include_path( $path . PATH_SEPARATOR . get_include_path() );
         }
 
         public function deleteIncludePath( $path )
         {
-            $includes = explode( ':' . $path . ':', get_include_path() );
-            set_include_path( implode( ':', $includes ) );
+            $includes = explode( PATH_SEPARATOR . $path . PATH_SEPARATOR, get_include_path() );
+            set_include_path( implode( PATH_SEPARATOR, $includes ) );
         }
 
     }

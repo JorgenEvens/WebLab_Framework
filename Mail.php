@@ -61,7 +61,6 @@
             $this->_to = $to;
             $this->_subject = $subject;
             $this->_from = $from;
-            $this->_boundary = 'Mail_' . md5( uniqid( time() ) );
             $this->_content_type = $content_type;
         }
 
@@ -96,25 +95,32 @@
                 $html_code = str_replace( $match[2], 'cid:img' . count( $images ), $html_code);
                 $images[count($images)] = $match[2];
             }
-            $html = '--' . $this->_boundary . "\n";
-            $html .= 'Content-Type: ' . $this->_content_type . ';' ."\n\n" . $html_code;
-
-            foreach( $images as $key => $image )
-            {
-                $html .= '--' . $this->_boundary . "\n";
-                $img = file_get_contents( $image );
-                $name = basename( $image );
-                $contentType = array_pop( explode( '.', $name ) );
-
-                $html .= 'Content-Type: image/' . $contentType . '; name="' . $name . '"' . "\n" .
-                            'Content-ID: <img' . $key . '>' . "\n" .
-                            'Content-Transfer-Encoding: base64' . "\n" .
-                            'Content-Disposition: inline' . "\n\n";
-                $html .= chunk_split( base64_encode( $img ), 68, "\n" );
-                $html .= "\n";
+            
+            if( empty( $images ) ) {
+            	return $html_code;
+            } else {
+            	$this->_boundary = md5( uniqid( time() ) );
+            	
+	            $html = '--' . $this->_boundary . "\n";
+	            $html .= 'Content-Type: ' . $this->_content_type . ';' ."\n\n" . $html_code;
+	
+	            foreach( $images as $key => $image )
+	            {
+	                $html .= '--' . $this->_boundary . "\n";
+	                $img = file_get_contents( $image );
+	                $name = basename( $image );
+	                $contentType = array_pop( explode( '.', $name ) );
+	
+	                $html .= 'Content-Type: image/' . $contentType . '; name="' . $name . '"' . "\n" .
+	                            'Content-ID: <img' . $key . '>' . "\n" .
+	                            'Content-Transfer-Encoding: base64' . "\n" .
+	                            'Content-Disposition: inline' . "\n\n";
+	                $html .= chunk_split( base64_encode( $img ), 68, "\n" );
+	                $html .= "\n";
+	            }
+	            $html = trim( $html, "\n" );
+	            $html .= "\n\n" . '--' . $this->_boundary . '--' . "\n";
             }
-            $html = trim( $html, "\n" );
-            $html .= "\n\n" . '--' . $this->_boundary . '--' . "\n";
             return $html;
         }
 
@@ -123,10 +129,17 @@
          * @return bool Indicates whether the send operation was successful.
          */
         public function send(){
-            if( !empty( $this->_from ) )
-                    $headers = 'FROM:' . $this->_from . "\r\n" .
-                        'Content-Type: multipart/related;' .
-                        'boundary="' . $this->_boundary . '"' . "\r\n";
+            if( !empty( $this->_from ) ) {
+            	$headers = 'FROM:' . $this->_from . "\n";
+            	if( !empty( $this->_boundary ) ) {
+            		$headers .= 'Content-Type: multipart/related; ' .
+            			'boundary=' . $this->_boundary . "\n";
+            	} else {
+            		$headers .= 'Content-Type: ' . $this->_content_type . "\n";
+            	}
+            			
+            }
+                    
             $content = $this->render();
 
 			$error_address = array();

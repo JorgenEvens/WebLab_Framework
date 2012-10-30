@@ -296,7 +296,7 @@
          * @return WebLab_Form_Field|array
          */
         public function get( $name ) {
-        	return $this->_fields[ $name ];
+        	return isset( $this->_fields[ $name ] ) ? $this->_fields[ $name ] : null;
         }
         
         /**

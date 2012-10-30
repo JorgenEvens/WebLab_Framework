@@ -158,7 +158,10 @@
          * @return mixed:
          */
         public function get( $variable ) {
-        	return $this->_variables[ $variable ];
+            if( isset( $this->_variables[ $variable ] ) ) {
+        	   return $this->_variables[ $variable ];
+            }
+            return null;
         }
         
 		/**

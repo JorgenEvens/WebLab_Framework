@@ -30,18 +30,16 @@
         
         public function execute() {
         	$alias = WebLab_Config::getApplicationConfig()->get( 'Application.Modules.Aliasses', WebLab_Config::RAW, false );
-        	$path = array();
-        	$home = $_SERVER['DOCUMENT_ROOT'] . BASE;
-        	$i = 0;
+        	$path = array_filter( array_keys( self::$_param ), create_function( '&$input', '$input=ucfirst($input); return !is_numeric($input) && !empty($input);' ) );
+        	$i = count( $path );
         	
-        	if( empty( self::$_param[0] ) && isset( $alias[""] ) ) {
+        	if( empty( $path ) && isset( $alias[""] ) ) {
         		$module = self::$_config->prefix . '_' . $alias[""];
         	} else {
         		$module = self::$_config->prefix . '_' . self::$_config->default;
         	}
         	
-        	while( isset( self::$_param[$i] ) ) {
-        		array_push( $path, $this->_parseParam( self::$_param[$i] ) );
+        	while( $i-- > 0 ) {
         		$module_name = implode( '_', $path );
 
         		if( isset( $alias[$module_name] ) ) {
@@ -49,11 +47,12 @@
         		}
         		
         		$module_name = self::$_config->prefix . '_' . $module_name;
+
         		if( class_exists( $module_name ) ) {
         			$module = $module_name;
         			break;
         		}
-        		$i++;
+                array_pop( $path );
         	}
         	
         	return new $module();

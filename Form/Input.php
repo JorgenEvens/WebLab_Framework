@@ -33,6 +33,9 @@
         public function update(){
             if( empty( $this->_form ) )
 				return;
+
+            if( !$this->_form->isPostback() )
+                return;
             
             $attr = &$this->_attributes;
             $type = $attr[ 'type' ];
@@ -90,21 +93,22 @@
         	
         	$attr = &$this->_attributes;
         	$type = $attr[ 'type' ];
-        	$value = $this->_form->getValue($this);
+        	//$value = $this->_form->getValue($this);
         	
         	if( $type == 'checkbox' ) {
         		if( empty( $attr[ 'checked' ] ) ) {
         			return '';
-        		} else {
-        			return $attr['value'];
         		}
+        		return $attr['value'];
         	} elseif( $type == 'radio' ) {
         		if( empty( $attr[ 'selected' ] ) ) {
         			return '';
-        		} else {
-        			return $attr[ 'value' ];
         		}
+        		return $attr[ 'value' ];
         	} else {
+                if( empty( $attr[ 'value' ] ) ) {
+                    return '';
+                }
         		return $attr[ 'value' ];
         	}
         }

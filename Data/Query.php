@@ -240,7 +240,7 @@
          * @throws WebLab_Exception_Data
          */
         public function setLimit( $count, $start=0 ) {
-            if( !( is_integer( $count ) && is_integer( $start ) ) ) {
+            if( !( is_numeric( $count ) && is_numeric( $start ) ) ) {
                 throw new WebLab_Exception_Data( 'Count and Start must be numeric.' );
             }
 

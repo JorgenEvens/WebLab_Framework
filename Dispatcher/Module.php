@@ -47,21 +47,24 @@
          * 
          * @return *
          */
-        public function execute()
+        public function execute( $action=null )
         {
-            if( !empty( $this->param[$this->_getName()] ) )
-            {
-                $action = $this->param[$this->_getName()];
-                if( method_exists( $this, $action ) )
-                {
-                    return $this->$action();
-                }else
-                {
-                    $this->_default();
-                }
-            }else
-            {
-                $this->_default();
+            $call_default = false;
+
+            if( empty( $action ) ) {
+                // If no action is supplied, detect it from URL.
+                if( isset( $this->param[ $this->_getName() ] ) )
+                    $action = $this->param[ $this->_getName() ];
+
+                $call_default = true;
+            }
+            
+            if( !empty( $action ) && method_exists( $this, $action ) ) {
+                return $this->$action();
+            }
+
+            if( $call_default ) {
+                return $this->_default();
             }
         }
 
