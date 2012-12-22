@@ -121,6 +121,8 @@
             	throw new WebLab_Exception_Data( 'Alias should be of type string.' );
             
             $this->_alias = $alias;
+            $this->_table->removeField( $this );
+            $this->_table->addField( $this );
 
             return $this;
         }

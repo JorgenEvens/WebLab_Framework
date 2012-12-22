@@ -8,11 +8,11 @@
 	 */
 	class WebLab_Filter_FormInput extends WebLab_Filter {
 		
-		public function isChecked( $testValue, WebLab_Form_Field $value ){
+		public function isChecked( WebLab_Form_Field $value, $testValue ){
 			return $value->checked === 'checked';
 		}
 		
-		public function isSelected( $testValue, WebLab_Form_Field $value ){
+		public function isSelected( WebLab_Form_Field $value, $testValue ){
 			return $value->selected === 'selected';
 		}
 		

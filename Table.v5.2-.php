@@ -8,7 +8,7 @@
 		
 		private static $_properties = array();
 		
-		private static function getProperties( $class_name ) {
+		private static function _getProperties( $class_name ) {
 			$properties = &self::$_properties[$class_name];
 			if( empty( $properties ) ) {
 				$class = new ReflectionClass( $class_name  );
@@ -18,15 +18,15 @@
 			return $properties;
 		}
 		
-		private static function &getProperty( $class, $name ) {
-			$props = self::getProperties( $class );
+		private static function &_getProperty( $class, $name ) {
+			$props = self::_getProperties( $class );
 			
 			return $props[$name];
 		}
 		
 		public static function getInstance(){
 			$class_name = get_called_class();
-			$instance = &self::getProperty( get_called_class(), '_instance' );
+			$instance = &self::_getProperty( get_called_class(), '_instance' );
 			
 			if( empty( $instance ) ){
 				$instance = new $class_name();
@@ -42,14 +42,29 @@
 		public static function quitTransaction( $commit=true ) {
 			db(self::getProperty( get_called_class(), '_database'))->quitTransaction( $commit );
 		}
+
+		public static function table() {
+			$db = self::getProperty( get_called_class(), '_database');
+			$table = self::getProperty( get_called_class(), '_table');
+
+			return db($db)->getPrefix() . $table;
+		}
+		
+		protected static function _hasField( $field ) {
+			return in_array( $field, $this->_getProperty('_fields') );
+		}
+
+		public function _getProperty( $name ) {
+			return $this->_getProperty('_fields')
+		}
 		
 		public function createTable(){
-			$t = new WebLab_Data_Table( self::getProperty( get_class( $this ), '_table') );
-			return $t->addFields( self::getProperty( get_class( $this ), '_fields') );
+			$t = new WebLab_Data_Table( self::table() );
+			return $t->addFields(  );
 		}
 		
 		public function create( &$object ){
-			$q = db(self::getProperty( get_class( $this ), '_database'))->newQuery();
+			$q = db($this->_getProperty('_database'))->newQuery();
 			
 			$table = $q->addTable( $this->createTable() );
 			
@@ -60,7 +75,7 @@
 				$object['deleted'] = 0;
 			
 			foreach( $object as $key => &$value )
-				if( in_array( $key, self::getProperty( get_class( $this ), '_fields') ) )
+				if( in_array( $key, $this->_getProperty('_fields') ) )
 					$table->getField($key)->setValue( $value );
 				
 			$q->insert();
@@ -69,76 +84,129 @@
 		}
 		
 		public function delete( &$object ){
-			$q = db(self::getProperty( get_class( $this ), '_database'))->newQuery();
+			$q = db($this->_getProperty('_database'))->newQuery();
 			
-			$table = $q->addTable( self::getProperty( get_class( $this ), '_table') )->addFields( 'id', 'online', 'deleted' );
+			$table = $q->addTable( self::table() )->addFields( 'id', 'online', 'deleted' );
 			
 			$q->getCriteria()->addAnd( $table->id->eq( $object['id'] ) );
 			
-			$table->deleted->setValue( 1 );
-			$table->online->setValue( 0 );
+			if( self::_hasField( 'online' ) )
+				$table->online->setValue( 0 );
 			
-			$q->update();
+			if( self::_hasField( 'deleted' ) ) {
+				$table->deleted->setValue( 1 );
+				$q->update();
+			} else {
+				$q->delete();
+			}
 		}
 		
 		public function update( &$object ){
-			$q = db(self::getProperty( get_class( $this ), '_database'))->newQuery();
+			$q = db($this->_getProperty('_database'))->newQuery();
 			
-			$table = $q->addTable( self::getProperty( get_class( $this ), '_table') )->addFields( 'id' );
+			$table = $q->addTable( self::table() )->addFields( 'id' );
 			
 			$q->getCriteria()->addAnd( $table->id->eq( $object['id'] ) );
 			
 			foreach( $object as $key => &$value )
-				if( $key != 'id' && in_array( $key, self::getProperty( get_class( $this ), '_fields') ) )
+				if( $key != 'id' && in_array( $key, $this->_getProperty('_fields') ) )
 					$table->addField($key)->setValue( $value );
 			
 			$q->update();
 		}
 		
 		public function find( $id ) {
-			$q = db(self::getProperty( get_class( $this ), '_database'))->newQuery();
+			$q = db($this->_getProperty('_database'))->newQuery();
 			
 			$table = $q->addTable( $this->createTable() );
 			
-			$q->getCriteria()->addAnd( $table->id->eq( $id ) )
-				->addAnd( $table->online->eq( 1 ) )
-				->addAnd( $table->deleted->eq( 0 ) );
+			$criteria = $q->getCriteria();
+			$criteria->addAnd( $table->id->eq( $id ) );
+
+			if( self::_hasField( 'online' ) )
+				$criteria->addAnd( $table->online->eq( 1 ) );
+			
+			if( self::_hasField( 'deleted' ) )
+				$criteria->addAnd( $table->deleted->eq( 0 ) );
 			
 			return $q->select()->current();
 		}
-		
-		public function findAll( $count=null, $start=0, &$result_count=0 ){
-			$q = db(self::getProperty( get_class( $this ), '_database'))->newQuery();
-			$q->countLimitless( true );
+
+		public function findBy( $field, $value=null, &$result_count=0 ) {
+			if( !is_array( $field ) ) {
+				$field = array(
+					$field => $value
+				);
+			}
+
+			$q = db($this->_getProperty('_database'))->newQuery();
 			
 			$table = $q->addTable( $this->createTable() );
 			
-			$q->getCriteria()->addAnd( $table->online->eq( 1 ) )
-				->addAnd( $table->deleted->eq( 0 ) );
+			$criteria = $q->getCriteria()->addAnd( $table->id->eq( $id ) );
+
+			foreach( $field as $field_name => $value ) {
+				if( self::_hasField( $field_name ) )
+					$criteria->addAnd( $table->get( $field_name )->eq( $value ) );
+			}
+
+			if( self::_hasField( 'online' ) )
+				$criteria->addAnd( $table->online->eq( 1 ) );
+			
+			if( self::_hasField( 'deleted' ) )
+				$criteria->addAnd( $table->deleted->eq( 0 ) );
+			
+			$result = $q->select();
+			$result_count = $result->getTotalRows();
+
+			return $result->fetch_all();
+		}
+		
+		public function findAll( $count=null, $start=0, &$result_count=false ){
+			$q = db($this->_getProperty('_database'))->newQuery();
+
+			if( $result_count !== false )
+				$q->countLimitless( true );
+			
+			$table = $q->addTable( $this->createTable() );
+			
+			$criteria = $q->getCriteria();
+			if( self::_hasField( 'online' ) )
+				$criteria->addAnd( $table->online->eq( 1 ) );
+			
+			if( self::_hasField( 'deleted' ) )
+				$criteria->addAnd( $table->deleted->eq( 0 ) );
 			
 			if( $count != null )
 				$q->setLimit( $count, $start );
 				
 			$result = $q->select();
-			$result_count = $result->getTotalRows();
+
+			if( $result_count !== false )
+				$result_count = $result->getTotalRows();
 				
 			return $result->fetch_all();
 		}
 		
 		public function countAll(){
-			$q = db(self::getProperty( get_class( $this ), '_database'))->newQuery();
+			$q = db($this->_getProperty('_database'))->newQuery();
 			
-			$table = $q->addTable( self::getProperty( get_class( $this ), '_table') )
-				->addFields( 'id', 'online', 'deleted' );
-			$table->online->setSelect( false );
-			$table->deleted->setSelect( false );
-				
+			$table = $q->addTable( self::table() )
+				->addFields( 'id' );				
 				
 			$table->id->setFunction( 'COUNT' )
 				->setAlias( 'count' );
 			
-			$q->getCriteria()->addAnd( $table->online->eq( 1 ) )
-				->addAnd( $table->deleted->eq( 0 ) );
+			$criteria = $q->getCritera();
+			if( self::_hasField( 'online' ) ) {
+				$table->addField('online')->setSelect( false );
+				$criteria->addAnd( $table->online->eq( 1 ) );
+			}
+			
+			if( self::_hasField( 'deleted' ) ) {
+				$table->addField('deleted')->setSelect( false );
+				$criteria->addAnd( $table->deleted->eq( 0 ) );
+			}
 			
 			return $q->select()->current()->count;
 		}

@@ -62,7 +62,11 @@
             	return null;
                 
             $field->setTable( $this );
-            $this->_fields[ $field->getName() ] = $field;
+            $name = $field->getAlias();
+            if( empty( $name ) ) {
+                $name = $field->getName();
+            }
+            $this->_fields[ $name ] = $field;
 
             return $field;
         }
@@ -74,6 +78,13 @@
          */
         public function removeField( $name )
         {
+            if( $name instanceof WebLab_Data_Field ) {
+                $field = $name;
+                $name = $field->getAlias();
+                if( empty( $name ) ) {
+                    $name = $field->getName();
+                }
+            }
             unset( $this->_fields[ $name ] );
 
             return $this;

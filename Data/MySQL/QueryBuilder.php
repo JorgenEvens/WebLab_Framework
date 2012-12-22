@@ -36,12 +36,12 @@
 				$q .= ' WHERE ' . $criteria->get( $query->getAdapter()->getAdapterSpecs() ) . ' ';
 			}
 			
-			if( count( $parse->order ) > 0 ) {
-				$q .= 'ORDER BY ' . implode( ', ', $parse->order ) . ' ';
-			}
-			
 			if( count( $parse->group ) > 0 ) {
 				$q .= 'GROUP BY ' . implode( ', ', $parse->group ) . ' ';
+			}
+
+			if( count( $parse->order ) > 0 ) {
+				$q .= 'ORDER BY ' . implode( ', ', $parse->order ) . ' ';
 			}
 			
 			$limit = $query->getLimit();

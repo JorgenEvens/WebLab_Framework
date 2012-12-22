@@ -124,10 +124,42 @@
 			
 			return $q->select()->current();
 		}
-		
-		public function findAll( $count=null, $start=0, &$result_count=0 ){
+
+		public function findBy( $field, $value=null, &$result_count=0 ) {
+			if( !is_array( $field ) ) {
+				$field = array(
+					$field => $value
+				);
+			}
+
 			$q = db(static::$_database)->newQuery();
-			$q->countLimitless( true );
+			
+			$table = $q->addTable( $this->createTable() );
+			
+			$criteria = $q->getCriteria()->addAnd( $table->id->eq( $id ) );
+
+			foreach( $field as $field_name => $value ) {
+				if( self::_hasField( $field_name ) )
+					$criteria->addAnd( $table->get( $field_name )->eq( $value ) );
+			}
+
+			if( self::_hasField( 'online' ) )
+				$criteria->addAnd( $table->online->eq( 1 ) );
+			
+			if( self::_hasField( 'deleted' ) )
+				$criteria->addAnd( $table->deleted->eq( 0 ) );
+			
+			$result = $q->select();
+			$result_count = $result->getTotalRows();
+
+			return $result->fetch_all();
+		}
+		
+		public function findAll( $count=null, $start=0, &$result_count=false ){
+			$q = db(static::$_database)->newQuery();
+			
+			if( $result_count !== false )
+				$q->countLimitless( true );
 			
 			$table = $q->addTable( $this->createTable() );
 			
@@ -143,7 +175,9 @@
 				$q->setLimit( $count, $start );
 				
 			$result = $q->select();
-			$result_count = $result->getTotalRows();
+
+			if( $result_count !== false )
+				$result_count = $result->getTotalRows();
 				
 			return $result->fetch_all();
 		}
