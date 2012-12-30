@@ -1,11 +1,56 @@
 <?php
+    /**
+     * Table.php
+     *
+     * This file contains the implementation of the WebLab_Table class.
+     * This version of WebLab_Table provides support for PHP 5.2.6 and higher.
+     * @see WebLab_Table
+     */
+    /**
+     * An abstraction to retrieve data form a database.
+     * This version of WebLab_Table provides support for PHP 5.2.6 and higher.
+     *
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
+     *
+     */
 	abstract class WebLab_Table {
 		
+		/**
+		 * Holds the name of the database as found in the configuration.
+		 *
+		 * @see WebLab_Config
+		 * @see WebLab_Database
+		 * @var string The key by which the databaseconfiguration is identified.
+		 */
 		protected static $_database = 'main';
+
+		/**
+		 * Holds the name of the table to use, without the prefix.
+		 *
+		 * @var string The key by which the databaseconfiguration is identified.
+		 */
 		protected static $_table;
+
+		/**
+		 * The available columns in the table.
+		 *
+		 * @var mixed Names of the columns.
+		 */
 		protected static $_fields;
+
+		/**
+		 * Holds the singleton instance.
+		 *
+		 * @var WebLab_Table
+		 */
 		protected static $_instance;
 		
+		/**
+		 * Singleton method to retrieve an instance.
+		 *
+		 * @return WebLab_Table
+		 */
 		public static function getInstance(){
 			if( empty( static::$_instance ) ){
 				static::$_instance = new static();
@@ -14,28 +59,59 @@
 			return static::$_instance;
 		}
 		
+		/**
+		 * Start a transaction on the database.
+		 *
+		 */
 		public static function startTransaction() {
 			db(static::$_database)->startTransaction();
 		}
 		
+		/**
+		 * End the transaction on the database.
+		 *
+		 * @param boolean $commit Should changes be committed or discarded.
+		 */
 		public static function quitTransaction( $commit=true ) {
 			db(static::$_database)->quitTransaction( $commit );
 		}
 		
+		/**
+		 * Retrieve the name of the table using the prefix set for this database.
+		 *
+		 * @see WebLab_Database
+		 * @return string The full table name
+		 */
 		public static function table() {
 			return db(static::$_database)->getPrefix() . static::$_table;
 		}
 		
+		/**
+		 * Detect if a field is in the column list.
+		 * 
+		 * @param $field The name of the column to test for.
+		 * @return boolean True if field is present.
+		 */
 		protected static function _hasField( $field ) {
 			return in_array( $field, static::$_fields );
 		}
 
+		/**
+		 * Create an instance of a WebLab_Data_Table to be used internally.
+		 *
+		 * @return WebLab_Data_Table An instance of the abstraction layer Table class.
+		 */
 		public function createTable(){
 			$t = new WebLab_Data_Table( static::table() );
 			return $t->addFields( static::$_fields );
 		}
 		
-		public function save( &$object ){
+		/**
+		 * Update a record if it already exists, insert it otherwise.
+		 *
+		 * @param mixed $object The object to insert as a record.
+		 */
+		public function save( $object ){
 			$q = db(static::$_database)->newQuery();
 				
 			$table = $q->addTable( $this->createTable() );
@@ -55,7 +131,13 @@
 			$object['id'] = $q->getAdapter()->insert_id();
 		}
 		
-		public function create( &$object ){
+		/**
+		 * Create a record for this table.
+		 * The id of the new record will be set in $object
+		 *
+		 * @param mixed $object The object to insert as a record.
+		 */
+		public function create( $object ){
 			$q = db(static::$_database)->newQuery();
 			
 			$table = $q->addTable( $this->createTable() );
@@ -75,7 +157,13 @@
 			$object['id'] = $q->getAdapter()->insert_id();
 		}
 		
-		public function delete( &$object ){
+		/**
+		 * Delete a record from the table.
+		 * If soft-delete is used it will only update the deleted and online field.
+		 * 
+		 * @param mixed $object The object to delete from the table.
+		 */
+		public function delete( $object ){
 			$has_deleted = self::_hasField( 'deleted' );
 			$has_online = self::_hasField( 'online' );
 			$q = db(static::$_database)->newQuery();
@@ -95,7 +183,12 @@
 			}
 		}
 		
-		public function update( &$object ){
+		/**
+		 * Update a record in the table.
+		 *
+		 * @param mixed $object The new values for this record, including the unaltered primary key.
+		 */
+		public function update( $object ){
 			$q = db(static::$_database)->newQuery();
 			
 			$table = $q->addTable( static::table() )->addFields( 'id' );
@@ -109,6 +202,12 @@
 			$q->update();
 		}
 		
+		/**
+		 * Find a record by its primary key.
+		 *
+		 * @param int $id ID of the record to find.
+		 * @return mixed The record as an object.
+		 */
 		public function find( $id ){
 			$q = db(static::$_database)->newQuery();
 			
@@ -125,7 +224,15 @@
 			return $q->select()->current();
 		}
 
-		public function findBy( $field, $value=null, &$result_count=0 ) {
+		/**
+		 * Find records by a set of filters.
+		 *
+		 * @param mixed $field The fieldname or a list of filters to use as $column => $value pairs.
+		 * @param mixed $value If field is a fieldname, the value it should match.
+		 * @param int &$result_count If different from false, will be set to the amount of records.
+		 * @return mixed An array of objects representing a record.
+		 */
+		public function findBy( $field, $value=null, &$result_count=false ) {
 			if( !is_array( $field ) ) {
 				$field = array(
 					$field => $value
@@ -150,11 +257,20 @@
 				$criteria->addAnd( $table->deleted->eq( 0 ) );
 			
 			$result = $q->select();
-			$result_count = $result->getTotalRows();
+			if( $result_count !== false )
+				$result_count = $result->count();
 
 			return $result->fetch_all();
 		}
 		
+		/**
+		 * Find all the records in the table from $start to $start+$count.
+		 *
+		 * @param int $count The amount of records to retrieve.
+		 * @param int $start The offset to start retrieving from.
+		 * @param int &$result_count If different from false, will be set to the total amount of records in the table.
+		 * @return mixed An array of objects representing a record.
+		 */
 		public function findAll( $count=null, $start=0, &$result_count=false ){
 			$q = db(static::$_database)->newQuery();
 			
@@ -182,6 +298,11 @@
 			return $result->fetch_all();
 		}
 		
+		/**
+		 * Count the number of records in a table.
+		 *
+		 * @return int The amount of records found.
+		 */
 		public function countAll(){
 			$q = db(static::$_database)->newQuery();
 			

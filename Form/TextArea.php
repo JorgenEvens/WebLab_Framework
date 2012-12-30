@@ -1,11 +1,18 @@
 <?php
-	/**
-	 * 
-	 * @author jorgen
-	 * @package WebLab
-	 * @subpackage WebLab_Form
-	 *
-	 */
+    /**
+     * TextArea.php
+     *
+     * This file contains the implementation of the WebLab_Form_TextArea class.
+     * @see WebLab_Form_TextArea
+     */
+    /**
+     * Field representation of a TextArea field in HTML.
+     * 
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
+     * @subpackage Form
+     *
+     */
 	class WebLab_Form_TextArea extends WebLab_Form_Field {
 
 		public $value;

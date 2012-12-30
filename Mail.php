@@ -1,13 +1,17 @@
 <?php
     /**
+     * Mail.php
+     * 
+     * This files contains the implementation of the WebLab_Mail class.
      *
-     * Mail wrapper
-     *
+     * @see WebLab_Mail
+     */
+    /**
      * Send mails based on WebLab_Template.
      * Joins images into the e-mail for optimal viewing.
      *
-     * @author  Jorgen Evens <jorgen@wlab.be>
-     * @version 0.1
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
      *
      */
     class WebLab_Mail extends WebLab_Template
@@ -51,6 +55,7 @@
          * @param String $to The recipients
          * @param String $subject The subject of this e-mail. Defaults to 'Automated mail'
          * @param String $from From who the receiver gets this message. Defaults to 'admin@server'
+         * @param String $content_type The content type to set in the headers.
          */
         public function __construct( $template, $to, $subject='Automated mail', $from='admin@server', $content_type='text/html' ){
             parent::__construct($template);

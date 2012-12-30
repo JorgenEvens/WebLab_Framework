@@ -1,9 +1,14 @@
 <?php
-
+    /**
+     * Application.php
+     *
+     * This file contains the implementation of the WebLab_Application class.
+     * @see WebLab_Application
+     */
     /**
      * The main class to start an application using WebLab Framework
      *
-     * @author  Jorgen Evens <jorgen@wlab.be>
+     * @author Jorgen Evens <jorgen@wlab.be>
      * @package WebLab
      */
     class WebLab_Application

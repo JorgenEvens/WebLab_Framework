@@ -2,9 +2,9 @@
 	/**
 	 * Read data from the resource.
 	 * 
-	 * @author jorgen
-	 * @package WebLab
-	 * @subpackage WebLab_Data
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
+     * @subpackage Data
 	 *
 	 */
     abstract class WebLab_Data_Result

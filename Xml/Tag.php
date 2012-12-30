@@ -1,4 +1,11 @@
 <?php
+	/**
+	 * 
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
+	 * @subpackage Xml
+	 *
+	 */
 	class WebLab_Xml_Tag {
 		
 		public $name;

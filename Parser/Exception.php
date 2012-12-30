@@ -1,11 +1,11 @@
 <?php
-	/**
-	 * 
-	 * @author jorgen
-	 * @package WebLab
-	 * @subpackage WebLab_Parser
-	 *
-	 */
+    /**
+     * 
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
+     * @subpackage Parser
+     *
+     */
     class WebLab_Parser_Exception
     {
 

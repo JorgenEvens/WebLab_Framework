@@ -1,4 +1,19 @@
 <?php
+    /**
+     * DataProvider.php
+     *
+     * This file contains the implementation of the WebLab_Dispatcher_DataProvider class.
+     * @see WebLab_Dispatcher_DataProvider
+     */
+	/**
+	 * This class is a REST interface to WebLab_Table instances.
+	 * 
+	 * @see WebLab_Table
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
+	 * @subpackage Dispatcher
+	 *
+	 */
 	abstract class WebLab_Dispatcher_DataProvider extends WebLab_Dispatcher_WebService {
 
 		/**

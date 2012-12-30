@@ -1,4 +1,18 @@
 <?php
+    /**
+     * Set.php
+     *
+     * This file contains the implementation of the WebLab_Form_Set class.
+     * @see WebLab_Form_Set
+     */
+	/**
+	 * A group of multiple fields, used as an array ( name[] ).
+	 * 
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
+	 * @subpackage Form
+	 *
+	 */
 	class WebLab_Form_Set extends WebLab_Form_Field {
 		
 		/**

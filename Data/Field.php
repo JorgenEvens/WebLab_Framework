@@ -1,9 +1,10 @@
 <?php
 	/**
-	 * 
-	 * @author jorgen
-	 * @package WebLab
-	 * @subpackage WebLab_Data
+	 * Represents a column in a table.
+     *
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
+     * @subpackage Data
 	 *
 	 */
     class WebLab_Data_Field

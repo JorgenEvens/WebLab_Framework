@@ -1,12 +1,9 @@
 <?php
     /**
-     *
-     * Template
-     *
      * Represents a PHP Template file
      *
-     * @author  Jorgen Evens <jorgen@wlab.be>
-     * @version 0.1
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
      *
      */
     class WebLab_Template

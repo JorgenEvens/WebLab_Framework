@@ -1,25 +1,21 @@
 <?php
     /**
+     * A base implementation for exceptions thrown by the framework.
      *
-     * Configuration Exception
-     *
-     * This class gets called whenever an exception occures within the
-     * WebLab_Config class.
-     *
-     * @author  Jorgen Evens <jorgen@wlab.be>
-     * @version 0.1
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
+     * @subpackage Exception
      *
      */
-
-     /**
-      * WebLab_Exception_Config gets called whenever an exception occures within
-      * WebLab_Config class.
-      *
-      */
     abstract class WebLab_Exception extends Exception {
         
     	protected $_trace;
     	
+        public static function reporting() {
+            $error_reporting = WebLab_Config::getApplicationConfig()->get( 'Application.Error.reporting' );
+            error_reporting( $error_reporting );
+        }
+
     	protected function _updateTrace() {
     		if( empty( $this->_trace ) )
     			$this->_trace = $this->getTrace();

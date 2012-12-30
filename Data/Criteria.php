@@ -1,10 +1,16 @@
 <?php
+    /**
+     * Criteria.php
+     *
+     * This file contains the implementation of the WebLab_Data_Criteria class.
+     * @see WebLab_Data_Criteria
+     */
 	/**
 	 * Defines a criteria used in the WHERE statement.
 	 * 
-	 * @author jorgen
-	 * @package WebLab
-	 * @subpackage WebLab_Data
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
+     * @subpackage Data
 	 *
 	 */
     class WebLab_Data_Criteria {

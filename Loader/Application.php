@@ -1,9 +1,9 @@
 <?php
 	/**
 	 * 
-	 * @author jorgen
-	 * @package WebLab
-	 * @subpackage WebLab_Loader
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
+	 * @subpackage Loader
 	 *
 	 */
     abstract class WebLab_Loader_Application

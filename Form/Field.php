@@ -1,9 +1,16 @@
 <?php
+    /**
+     * Field.php
+     *
+     * This file contains the implementation of the WebLab_Form_Field class.
+     * @see WebLab_Form_Field
+     */
 	/**
-	 * 
-	 * @author jorgen
-	 * @package WebLab
-	 * @subpackage WebLab_Form
+	 * Abstract implementation of a form field.
+     *
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
+	 * @subpackage Form
 	 *
 	 */
     abstract class WebLab_Form_Field

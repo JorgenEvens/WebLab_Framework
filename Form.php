@@ -1,8 +1,15 @@
 <?php
-	// TODO: Review entire WebLab_Form tree for cleanup & optimizations
+    /**
+     * Form.php
+     *
+     * This file contains the implementation of the WebLab_Form class.
+     * @see WebLab_Form
+     */
 	/**
 	 * Provides form abstraction, integrating retrieval and validation into one package.
-	 * @author Jorgen
+     *
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
 	 *
 	 */
     abstract class WebLab_Form

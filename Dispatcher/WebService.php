@@ -1,4 +1,18 @@
 <?php
+    /**
+     * WebService.php
+     *
+     * This file contains the implementation of the WebLab_Dispatcher_WebService class.
+     * @see WebLab_Dispatcher_WebService
+     */
+	/**
+	 * A base implementation for a REST WebService.
+	 *
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
+	 * @subpackage Dispatcher
+	 *
+	 */
 	abstract class WebLab_Dispatcher_WebService extends WebLab_Dispatcher_Module {
 		
 		/**

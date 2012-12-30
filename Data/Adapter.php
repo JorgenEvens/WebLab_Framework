@@ -1,12 +1,20 @@
 <?php
-	/**
-	 * Base logic for a database adapter.
-	 * 
-	 * @author jorgen
-	 * @package WebLab
-	 * @subpackage WebLab_Data
-	 *
-	 */
+    /**
+     * Adapter.php
+     *
+     * This file contains the implementation of the WebLab_Data_Adapter class.
+     * @see WebLab_Data_Adapter
+     */
+    /**
+     *
+     * Implementation of an adapter using the mySQL functions.
+     *
+     * @see WebLab_Data_Adapter
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
+     * @subpackage Data
+     *
+     */
     abstract class WebLab_Data_Adapter
     {
     	/**

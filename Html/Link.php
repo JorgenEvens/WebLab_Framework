@@ -1,4 +1,11 @@
 <?php
+	/**
+	 * 
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
+	 * @subpackage Html
+	 *
+	 */
 	class WebLab_Html_Link extends WebLab_Xml_Tag {
 		
 		public function __construct( $path, $type='text/css', $relation='stylesheet' ) {

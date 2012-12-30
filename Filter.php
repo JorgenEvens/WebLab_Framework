@@ -1,4 +1,12 @@
 <?php
+    /**
+     * Abstract implementation of a Filter.
+     *
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
+     * @subpackage Filter
+     *
+     */
     abstract class WebLab_Filter
     {
 

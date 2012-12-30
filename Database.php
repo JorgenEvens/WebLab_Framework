@@ -1,4 +1,10 @@
 <?php
+    /**
+     * Database.php
+     *
+     * This file contains the implementation of the WebLab_Database class.
+     * @see WebLab_Database
+     */
 	/**
 	 * This class manages database connections and generation of their adapters.
 	 * Lazy loading of the adapters is used.

@@ -3,9 +3,9 @@
 	 * 
 	 * Represents a table in the database.
 	 * 
-	 * @author Jorgen Evens
-	 * @package WebLab
-	 * @subpackage WebLab_Data
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
+     * @subpackage Data
 	 *
 	 */
    class WebLab_Data_Table

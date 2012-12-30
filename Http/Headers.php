@@ -1,4 +1,11 @@
 <?php
+	/**
+	 * 
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
+	 * @subpackage Http
+	 *
+	 */
 	class WebLab_Http_Headers {
 		
 		/**

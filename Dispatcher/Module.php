@@ -1,9 +1,9 @@
 <?php
 	/**
 	 * 
-	 * @author jorgen
-	 * @package WebLab
-	 * @subpackage WebLab_Dispatcher
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
+	 * @subpackage Dispatcher
 	 *
 	 */
     abstract class WebLab_Dispatcher_Module implements WebLab_Dispatcher

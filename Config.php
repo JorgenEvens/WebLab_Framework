@@ -1,4 +1,10 @@
 <?php
+    /**
+     * Config.php
+     *
+     * This file contains the implementation of the WebLab_Config class.
+     * @see WebLab_Config
+     */
 	/**
 	 * Hold configuration form a specified configuration file.
 	 * 

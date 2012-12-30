@@ -1,10 +1,16 @@
 <?php
+    /**
+     * CriteriaChain.php
+     *
+     * This file contains the implementation of the WebLab_Data_CriteriaChain class.
+     * @see WebLab_Data_CriteriaChain
+     */
 	/**
 	 * Combines a set of criteria using AND or OR.
 	 * 
-	 * @author jorgen
-	 * @package WebLab
-	 * @subpackage WebLab_Data
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
+     * @subpackage Data
 	 *
 	 */
     class WebLab_Data_CriteriaChain {
@@ -72,6 +78,11 @@
             return $q;
         }
         
+        /**
+         * Retrieves if there are criteria in this chain.
+         *
+         * @return boolean Are there criteria in this chain?
+         */
         public function hasCriteria() {
         	return !empty( $this->_criteria );
         }

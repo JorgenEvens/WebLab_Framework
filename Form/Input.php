@@ -1,9 +1,16 @@
 <?php
+    /**
+     * Input.php
+     *
+     * This file contains the implementation of the WebLab_Form_Input class.
+     * @see WebLab_Form_Input
+     */
 	/**
-	 * 
-	 * @author jorgen
-	 * @package WebLab
-	 * @subpackage WebLab_Form
+	 * Field representation of an input field in HTML.
+     *
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
+     * @subpackage Form
 	 *
 	 */
     class WebLab_Form_Input extends WebLab_Form_Field
@@ -116,6 +123,7 @@
         /**
          * (non-PHPdoc)
          * @see WebLab_Form_Field::setValue()
+         * @param string $value Set the value of a field to this.
          */
         public function setValue( $value ) {
         	$this->_attributes['value'] = $value;

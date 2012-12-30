@@ -1,10 +1,16 @@
 <?php
     /**
+     * Query.php
+     *
+     * This file contains the implementation of the WebLab_Data_Query class.
+     * @see WebLab_Data_Query
+     */
+    /**
      * Abstract representation of a query to the database.
      * 
-     * @author jorgen
+     * @author Jorgen Evens <jorgen@wlab.be>
      * @package WebLab
-	 * @subpackage WebLab_Data
+     * @subpackage Data
      */
     abstract class WebLab_Data_Query
     {
@@ -222,7 +228,6 @@
         /**
          * Get all table instances in this query.
          * 
-         * @param String $table
          * @return WebLab_Data_Table[]
          */
         public function getTables() {
@@ -247,6 +252,12 @@
             $this->_limit = (object) array( 'count' => $count, 'start' => $start );
         }
         
+
+        /**
+         * Get the limit that has been set on this query.
+         *
+         * @return mixed An object with keys count and start.
+         */
         public function getLimit() {
         	return $this->_limit;
         }

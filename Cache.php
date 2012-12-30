@@ -1,4 +1,11 @@
 <?php
+	/**
+	 * Allows for full page caching, straight form the configurationfile.
+	 * 
+	 * @author jorgen
+	 * @package WebLab
+	 *
+	 */
 	class WebLab_Cache {
 	
 		protected static $_cached;

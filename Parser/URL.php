@@ -1,12 +1,10 @@
 <?php
 	/**
-	 * URL Parser class
-	 * 
 	 * Parses the url and makes it accessible through an instance of this object.
 	 * 
-     * @author  Jorgen Evens <jorgen@wlab.be>
+     * @author Jorgen Evens <jorgen@wlab.be>
      * @package WebLab
-     * @subpackage WebLab_Parser
+     * @subpackage Parser
 	 *
 	 */
     class WebLab_Parser_URL
@@ -118,8 +116,16 @@
          * @return String Returns the full URL.
          */
         public function getFullURL() {
-            $fullUrl = $this->getProtocol() . '://' .
-                $this->getHostname() . ':' . $this->getPort() .
+            $protocol = $this->getProtocol();
+            $port = $this->getPort();
+            if( ( $port == 80 && $protocol == 'http' ) || ( $port == 443 && $protocol == 'https' ) ) {
+                $port = '';
+            } else {
+                $port = ':' . $port;
+            }
+
+            $fullUrl = $protocol . '://' .
+                $this->getHostname() . $port .
                 $this->getPath();
 
             return $fullUrl;
@@ -139,7 +145,7 @@
          * This path exists out of
          * document_root/folder/to/application/
          * @return String Path to the current application root.
-         * @deprecated
+         * @deprecated use BASE_PATH instead.
          */
         public function getBasePath() {
             $urlParts = explode( '/', $_SERVER[ 'SCRIPT_NAME'] );

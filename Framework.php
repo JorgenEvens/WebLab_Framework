@@ -1,12 +1,16 @@
 <?php
+    /*
+     * Disable error reporting as soon as the framework is loaded.
+     * Can be overwritten by loading WebLab_Exception::reporting in the configuration file
+     * and defining the key Error.reporting in the configuration file.
+     */
+    error_reporting( 0 );
+    
     /**
-     *
-     * Framework Initialization
-     *
      * Initialisation of the WebLab Framework.
      *
-     * @author  Jorgen Evens <jorgen@wlab.be>
-     * @version 0.1
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
      *
      */
 

@@ -1,9 +1,9 @@
 <?php
 	/**
 	 * 
-	 * @author jorgen
-	 * @package WebLab
-	 * @subpackage WebLab_Filter
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
+     * @subpackage Filter
 	 *
 	 */
     class WebLab_Filter_Email extends WebLab_Filter

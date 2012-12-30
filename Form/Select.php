@@ -1,9 +1,16 @@
 <?php
+    /**
+     * Select.php
+     *
+     * This file contains the implementation of the WebLab_Form_Select class.
+     * @see WebLab_Form_Select
+     */
 	/**
+	 * Field representation of a select field in HTML.
 	 * 
-	 * @author jorgen
-	 * @package WebLab
-	 * @subpackage WebLab_Form
+     * @author Jorgen Evens <jorgen@wlab.be>
+     * @package WebLab
+	 * @subpackage Form
 	 *
 	 */
 	class WebLab_Form_Select extends WebLab_Form_Field {
