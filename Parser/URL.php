@@ -116,6 +116,14 @@
          * @return String Returns the full URL.
          */
         public function getFullURL() {
+            return $this->getBaseURL() . ltrim( $this->getPath(), '/' );
+        }
+
+        /**
+         * The Full Base URL of the website.
+         * @return String Returns the full base URL.
+         */
+        public function getBaseURL() {
             $protocol = $this->getProtocol();
             $port = $this->getPort();
             if( ( $port == 80 && $protocol == 'http' ) || ( $port == 443 && $protocol == 'https' ) ) {
@@ -124,11 +132,10 @@
                 $port = ':' . $port;
             }
 
-            $fullUrl = $protocol . '://' .
-                $this->getHostname() . $port .
-                $this->getPath();
+            $base_url = $protocol . '://' .
+                $this->getHostname() . $port . '/';
 
-            return $fullUrl;
+            return $base_url;
         }
 
         /**

@@ -91,9 +91,9 @@
          * @return String The HTML code parsed to include images.
          */
         protected function _parseTemplate( $html_code ){
-            $regExp = "/(background|src)=\"(.*)\.(jpeg|png|gif|jpg)\"/i";
+            $regExp = "/(background|src)=\"((.*)\.(jpeg|png|gif|jpg))\"/i";
 
-            preg_match( $regExp, $html_code, $matches );
+            preg_match_all( $regExp, $html_code, $matches, PREG_SET_ORDER );
 
             $images = array();
             foreach( $matches as $match ){
@@ -106,25 +106,26 @@
             } else {
             	$this->_boundary = md5( uniqid( time() ) );
             	
-	            $html = '--' . $this->_boundary . "\n";
-	            $html .= 'Content-Type: ' . $this->_content_type . ';' ."\n\n" . $html_code;
+	            $html = '--' . $this->_boundary . "\r\n";
+	            $html .= 'Content-Type: ' . $this->_content_type . ';' .
+                    "\r\n\r\n" . $html_code . "\r\n\r\n";
 	
 	            foreach( $images as $key => $image )
 	            {
-	                $html .= '--' . $this->_boundary . "\n";
+	                $html .= '--' . $this->_boundary . "\r\n";
 	                $img = file_get_contents( $image );
 	                $name = basename( $image );
 	                $contentType = array_pop( explode( '.', $name ) );
 	
-	                $html .= 'Content-Type: image/' . $contentType . '; name="' . $name . '"' . "\n" .
-	                            'Content-ID: <img' . $key . '>' . "\n" .
-	                            'Content-Transfer-Encoding: base64' . "\n" .
-	                            'Content-Disposition: inline' . "\n\n";
-	                $html .= chunk_split( base64_encode( $img ), 68, "\n" );
-	                $html .= "\n";
+	                $html .= 'Content-Type: image/' . $contentType . '; name="' . $name . '"' . "\r\n" .
+	                            'Content-ID: <img' . $key . '>' . "\r\n" .
+	                            'Content-Transfer-Encoding: base64' . "\r\n" .
+	                            'Content-Disposition: inline' . "\r\n\r\n";
+	                $html .= chunk_split( base64_encode( $img ), 68, "\r\n" );
+	                $html .= "\r\n";
 	            }
-	            $html = trim( $html, "\n" );
-	            $html .= "\n\n" . '--' . $this->_boundary . '--' . "\n";
+	            $html = trim( $html, "\r\n" );
+	            $html .= "\r\n\r\n" . '--' . $this->_boundary . '--' . "\r\n";
             }
             return $html;
         }
@@ -134,21 +135,31 @@
          * @return bool Indicates whether the send operation was successful.
          */
         public function send(){
-            if( !empty( $this->_from ) ) {
-            	$headers = 'FROM:' . $this->_from . "\n";
-            	if( !empty( $this->_boundary ) ) {
-            		$headers .= 'Content-Type: multipart/related; ' .
-            			'boundary=' . $this->_boundary . "\n";
-            	} else {
-            		$headers .= 'Content-Type: ' . $this->_content_type . "\n";
-            	}
-            			
+            if( empty( $this->_from ) ) {
+                return false;
             }
-                    
+
             $content = $this->render();
+
+        	$headers = 'From:' . $this->_from . "\r\n" .
+                'X-Mailer: WebLab_Mailer' . "\r\n" . 
+                'Message-ID: <' . md5( time() ) . '@' . $_SERVER['SERVER_ADDR'] . ">\r\n" .
+                'Date: ' . date('r') . "\r\n" . 
+                'Mime-Version: 1.0' . "\r\n";
+                
+        	if( !empty( $this->_boundary ) ) {
+        		$headers .= 'Content-Type: multipart/related; ' .
+        			'boundary=' . $this->_boundary . "\r\n";
+        	} else {
+        		$headers .= 'Content-Type: ' . $this->_content_type . "\r\n";
+        	}
 
 			$error_address = array();
             foreach( $this->_to as $email ){
+                if( strpos( $email, '<' ) === false ) {
+                    $email = '<' . $email . '>';
+                }
+
             	if( !mail( $email, $this->_subject, $content, $headers ) )
             		$error_address[] = $email;
             }
