@@ -11,6 +11,8 @@
 
 	$archive->buildFromIterator( $iterator, $path );
 	$archive->setStub( $archive->createDefaultStub( 'WebLab/Framework.php' ) );
+	
+	rename( 'WebLab.phar', '../WebLab.phar' );
 
 	echo "Archive build!\n";
 
