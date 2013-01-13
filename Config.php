@@ -85,10 +85,11 @@
 		 */
 		public function __construct( $file ) {
 			if( is_string( $file ) ) {
-				if( !file_exists( $file ) )
+				$file = file_get_contents( $file, true );
+				if( $file === false )
 	                throw new WebLab_Exception_Config( 'Could not locate config file. ( ' . $file . ' )' );
 		            
-			    $config = json_decode( file_get_contents( $file ), true );
+			    $config = json_decode( $file, true );
 			    if( !isset( $config ) )
 					throw new WebLab_Exception_Config( 'There seems to be an error in your config file. ( ' . $file . ')' );
 			} else {
