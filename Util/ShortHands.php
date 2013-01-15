@@ -6,7 +6,7 @@
 				try {
 					$activate = WebLab_Config::getApplicationConfig()->get( 'Util.ShortHands', WebLab_Config::RAW );
 				} catch( WebLab_Exception_Config $ex ) {
-					$activate = array( 'db', 'table', 'config', 'extension' );
+					$activate = array( 'db', 'table', 'config' );
 				}
 			}
 			

@@ -243,11 +243,11 @@
 			
 			$table = $q->addTable( $this->createTable() );
 			
-			$criteria = $q->getCriteria()->addAnd( $table->id->eq( $id ) );
+			$criteria = $q->getCriteria();
 
 			foreach( $field as $field_name => $value ) {
 				if( self::_hasField( $field_name ) )
-					$criteria->addAnd( $table->get( $field_name )->eq( $value ) );
+					$criteria->addAnd( $table->$field_name->eq( $value ) );
 			}
 
 			if( self::_hasField( 'online' ) )
