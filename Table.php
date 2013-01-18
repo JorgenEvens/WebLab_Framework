@@ -40,6 +40,15 @@
 		protected static $_fields;
 
 		/**
+		 * Specifies the primary key fields.
+		 * If there is a auto_increment field, it should be the first in this list.
+		 * find( $id ) calls will be matched against the first field in this array.
+		 *
+		 * @var mixed Names of primary key columns
+		 */
+		protected static $_primary_keys = array( 'id' );
+
+		/**
 		 * Holds the singleton instance.
 		 *
 		 * @var WebLab_Table
@@ -126,9 +135,15 @@
 				if( in_array( $key, static::$_fields ) )
 				$table->getField($key)->setValue( $value );
 		
-			$q->insert( true, array( $table->getField( 'id' ) ) );
+			$no_update = array();
+			foreach( static::$_primary_keys as $field ) {
+				$no_update[] = $table->getField( $field );
+			}
+
+			$q->insert( true, $no_update ) );
 				
-			$object['id'] = $q->getAdapter()->insert_id();
+			if( count( static::$_primary_keys ) == 1 )
+				$object[array_pop( static::$_primary_keys )] = $q->getAdapter()->insert_id();
 		}
 		
 		/**
@@ -154,7 +169,8 @@
 				
 			$q->insert();
 			
-			$object['id'] = $q->getAdapter()->insert_id();
+			if( count( static::$_primary_keys ) == 1 )
+				$object[array_pop( static::$_primary_keys )] = $q->getAdapter()->insert_id();
 		}
 		
 		/**
@@ -167,8 +183,11 @@
 			$has_deleted = self::_hasField( 'deleted' );
 			$has_online = self::_hasField( 'online' );
 			$q = db(static::$_database)->newQuery();
-			$table = $q->addTable( static::table() )->addFields( 'id' );
-			$q->getCriteria()->addAnd( $table->id->eq( $object['id'] ) );
+
+			$table = $q->addTable( static::table() )->addFields( static::$_primary_keys );
+			foreach( static::$_primary_keys as $field ) {
+				$q->getCriteria()->addAnd( $table->$field->eq( $object[$field] ) );
+			}
 			
 			if( $has_deleted || $has_online ) {
 				if( $has_deleted )
@@ -191,12 +210,14 @@
 		public function update( $object ){
 			$q = db(static::$_database)->newQuery();
 			
-			$table = $q->addTable( static::table() )->addFields( 'id' );
+			$table = $q->addTable( static::table() )->addFields( static::$_primary_keys );
 			
-			$q->getCriteria()->addAnd( $table->id->eq( $object['id'] ) );
+			foreach( static::$_primary_keys as $field ) {
+				$q->getCriteria()->addAnd( $table->$field->eq( $object[$field] ) );
+			}
 			
 			foreach( $object as $key => &$value )
-				if( $key != 'id' && in_array( $key, static::$_fields ) )
+				if( !in_array( $key, static::$_primary_keys ) && in_array( $key, static::$_fields ) )
 					$table->addField($key)->setValue( $value );
 			
 			$q->update();
@@ -208,12 +229,18 @@
 		 * @param int $id ID of the record to find.
 		 * @return mixed The record as an object.
 		 */
-		public function find( $id ){
+		public function find( $key ){
+			if( is_array( $key ) ) {
+				return $this->findBy( $key );
+			}
+
 			$q = db(static::$_database)->newQuery();
 			
 			$table = $q->addTable( $this->createTable() );
 			
-			$criteria = $q->getCriteria()->addAnd( $table->id->eq( $id ) );
+			$id_field = array_pop( static::$_primary_keys );
+
+			$criteria = $q->getCriteria()->addAnd( $table->$id_field->eq( $key ) );
 			
 			if( self::_hasField( 'online' ) )
 				$criteria->addAnd( $table->online->eq( 1 ) );
@@ -306,10 +333,12 @@
 		public function countAll(){
 			$q = db(static::$_database)->newQuery();
 			
-			$table = $q->addTable( static::table() )
-				->addFields( 'id' );
+			$table = $q->addTable( static::table() );
 
-			$table->id->setFunction( 'COUNT' )
+			$count = empty( static::$_primary_keys ) ? array_pop( static::$_primary_keys ) : array_pop( static::$_fields );
+			$count = $table->addField( $count );
+
+			$count->setFunction( 'COUNT' )
 				->setAlias( 'count' );
 			
 			$criteria = $q->getCriteria();
