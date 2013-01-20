@@ -31,15 +31,27 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <h2>Downloading source</h2>
+        <h2>Download</h2>
+        <h3>Source</h3>
 
 <pre><code>$ git clone git://github.com/NoSTaBoNN/WebLab_Framework WebLab
 </code></pre>
 
+<h2>PHP Archive</h2>
+A download of the latest stable version compiled into a PHP archive is available for <a href="weblab.phar">Download</a>.
+
 <h2>Usage</h2>
 
 <h3>index.php</h3>
+When using the PHP Archive
+<pre><code>&lt;?php
+include( 'weblab.phar' );
 
+$app = new WebLab_Framework( 'config.json' );
+$app-&gt;run();
+</code></pre>
+<br />
+When using the source
 <pre><code>&lt;?php
 include( 'WebLab/Framework.php' );
 
