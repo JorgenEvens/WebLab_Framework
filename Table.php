@@ -140,7 +140,7 @@
 				$no_update[] = $table->getField( $field );
 			}
 
-			$q->insert( true, $no_update ) );
+			$q->insert( true, $no_update );
 				
 			if( count( static::$_primary_keys ) == 1 )
 				$object[array_pop( static::$_primary_keys )] = $q->getAdapter()->insert_id();

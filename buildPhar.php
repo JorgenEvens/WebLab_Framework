@@ -10,8 +10,19 @@
 	$iterator = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $dir ) );
 
 	$archive->buildFromIterator( $iterator, $path );
-	$archive->setStub( $archive->createDefaultStub( 'WebLab/Framework.php' ) );
-	
+	$stub = file_get_contents( $dir . DIRECTORY_SEPARATOR . 'Framework.php' );
+	$stub .= '
+		try {
+			Phar::mapPhar( \'WebLab.phar\' );
+		} catch( Exception $ex ) {
+			var_dump( $ex );
+		}
+		set_include_path( \'phar://WebLab.phar\' . PATH_SEPARATOR . get_include_path() );
+		__HALT_COMPILER();';
+
+	$archive->setStub( $stub );
+	$archive->setSignatureAlgorithm( Phar::SHA1 );
+
 	rename( 'WebLab.phar', '../WebLab.phar' );
 
 	echo "Archive build!\n";

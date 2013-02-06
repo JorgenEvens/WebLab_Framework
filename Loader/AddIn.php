@@ -52,6 +52,7 @@
         	if( $path[0] != '/' ) {
         		$path = getcwd() . '/' . $path;
         	}
+            $path = realpath( $path );
             set_include_path( $path . PATH_SEPARATOR . get_include_path() );
         }
 
