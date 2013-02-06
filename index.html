@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Web-lab framework : Web-lab's web application framework" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Web-lab framework</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/NoSTaBoNN/WebLab_Framework">View on GitHub</a>
+
+          <h1 id="project_title">Web-lab framework</h1>
+          <h2 id="project_tagline">Web-lab's web application framework</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/NoSTaBoNN/WebLab_Framework/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/NoSTaBoNN/WebLab_Framework/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h2>Download</h2>
+        <h3>Source</h3>
+
+<pre><code>$ git clone git://github.com/NoSTaBoNN/WebLab_Framework WebLab
+</code></pre>
+
+<h2>PHP Archive</h2>
+A download of the latest stable version compiled into a PHP archive is available for <a href="weblab.phar">Download</a>.
+
+<h2>Usage</h2>
+
+<h3>index.php</h3>
+When using the PHP Archive
+<pre><code>&lt;?php
+include( 'weblab.phar' );
+
+$app = new WebLab_Framework( 'config.json' );
+$app-&gt;run();
+</code></pre>
+<br />
+When using the source
+<pre><code>&lt;?php
+include( 'WebLab/Framework.php' );
+
+$app = new WebLab_Framework( 'config.json' );
+$app-&gt;run();
+</code></pre>
+
+<h3>config.json</h3>
+
+<pre><code>{
+    "Application": {
+        "Loader": {
+            "name": "Loader",
+            "location": "Application/Loader.php",
+            "load": {
+                "WebLab_Exception::reporting": true,
+                "WebLab_Loader_AddIn::init": true,
+                "WebLab_Parser_URL::getForRequest": true,
+                "WebLab_Util_ShortHands::init": true,
+                "environment": true,
+                "controlDispatcher": true,
+                "shutdown": true
+            },
+            "includePaths": []
+        },
+        "Modules": {
+            "Aliasses": {
+                "": "Index",
+                "Home": "Index"
+            },
+            "Dispatcher": {
+                "Visit": {
+                    "default": "404",
+                    "prefix": "Control"
+                }
+            }
+        },
+        "Data": {
+            "DB": {
+                "main": {
+                    "auto": false,
+                    "type": "MySQLi",
+                    "username": "dev",
+                    "password": "dev",
+                    "host": "localhost",
+                    "database": "database_dev",
+                    "port": "3306",
+                    "prefix": "dev_"
+                }
+            }
+        },
+        "Templates": {
+            "directory": "Template",
+            "theme": "frontend",
+            "extract_vars": true
+        },
+        "Error": {
+            "reporting": 30719
+        }
+    }
+}
+</code></pre>
+
+<h3>Application/Loader.php</h3>
+
+<pre><code>&lt;?php
+    class Loader extends WebLab_Loader_Application
+    {
+        protected function environment() {
+            session_start();
+
+            WebLab_Template::setRootTemplate( new WebLab_Template( 'main/index' ) );
+
+        }
+
+        protected function controlDispatcher() {
+            $dispatcher = new WebLab_Dispatcher_Visit();
+            $dispatcher-&gt;execute();
+        }
+
+        protected function shutdown() {
+            echo WebLab_Template::getRootTemplate();
+        }
+    }
+</code></pre>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Web-lab framework maintained by <a href="https://github.com/NoSTaBoNN">NoSTaBoNN</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-23224122-7");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+
+  </body>
+</html>
