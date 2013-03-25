@@ -215,27 +215,20 @@
         /**
          * Renders the template to its compiled HTML form.
          * @param bool $show Whether to send the output to the browser requesting it. Defaults to false.
-         * @return String The HTML code rendered.
+         * @return mixed The HTML code rendered or true if $show==true
          */
-        public function render( $show=false ) {
-            $code = $this->_getCode();
-            if( $show ) {
-                echo $code;
-            }
-            
-            return $code;
-        }
-
-        /**
-         * Running the template file and thus obtaining the HTML code.
-         * @return String The HTML code rendered.
-         */
-        protected function _getCode() {       	
+        public function render( $flush=true ) {     	
         	if( !$this->_setup ) {
         		$this->_setup = true;
         		$this->_load( 'setup' );
         	}
         	
+            if( $flush ) {
+                $this->_load();
+                flush();
+                return true;
+            }
+
             ob_start();
             $this->_load();
             return ob_get_clean();
@@ -313,7 +306,7 @@
         		 * Hot path for uncached templates.
         		 */
 	        	if( empty( $this->max_cache_age ) ) {
-	        		return $this->render();
+	        		return $this->render( false );
 	        	} else {
 	        		/*
 	        		 * Slower path, cache lookup
@@ -333,7 +326,7 @@
 	        			return $cache;
 	        		}
 	        		
-	        		$code = $this->render();
+	        		$code = $this->render( false );
 	        		$this->_putCache( $cache_file, $code );
 	        		return $code;
 	        	}
