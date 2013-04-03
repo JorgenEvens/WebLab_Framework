@@ -22,9 +22,9 @@
       */
     function __autoload( $className )
     {
-    	// TODO: place this code in a loader class.
-    	// TODO: Create a loader manager.
-
-        $c = strtr( $className, '_', '/' ) . '.php';
+        $error_report = error_reporting();
+        $c = preg_replace( '#_(_*)#', '/$1', $className ) . '.php';
+        error_reporting( $error_report & ( E_ALL ^ E_WARNING ) );
         return !!include_once( $c );
+        error_reporting( $error_report );
     }

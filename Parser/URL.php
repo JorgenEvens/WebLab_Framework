@@ -203,6 +203,16 @@
             
             return $this->_parameters;
         }
+
+        /**
+         * Retrieve a single parameter by $key
+         *
+         * @param String $key The key to retrieve.
+         */
+        public function getParameter( $key ) {
+            $param = $this->getParameters();
+            return isset( $param[ $key ] ) ? $param[ $key ] : '';
+        }
 		
         /**
          * Get the protocol used to load this page.

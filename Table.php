@@ -120,7 +120,7 @@
 		 *
 		 * @param mixed $object The object to insert as a record.
 		 */
-		public function save( $object ){
+		public function save( &$object ){
 			$q = db(static::$_database)->newQuery();
 				
 			$table = $q->addTable( $this->createTable() );
@@ -143,7 +143,7 @@
 			$q->insert( true, $no_update );
 				
 			if( count( static::$_primary_keys ) == 1 )
-				$object[array_pop( static::$_primary_keys )] = $q->getAdapter()->insert_id();
+				$object[static::$_primary_keys[0]] = $q->getAdapter()->insert_id();
 		}
 		
 		/**
@@ -152,7 +152,7 @@
 		 *
 		 * @param mixed $object The object to insert as a record.
 		 */
-		public function create( $object ){
+		public function create( &$object ){
 			$q = db(static::$_database)->newQuery();
 			
 			$table = $q->addTable( $this->createTable() );
@@ -170,7 +170,7 @@
 			$q->insert();
 			
 			if( count( static::$_primary_keys ) == 1 )
-				$object[array_pop( static::$_primary_keys )] = $q->getAdapter()->insert_id();
+				$object[static::$_primary_keys[0]] = $q->getAdapter()->insert_id();
 		}
 		
 		/**
@@ -234,21 +234,10 @@
 				return $this->findBy( $key );
 			}
 
-			$q = db(static::$_database)->newQuery();
-			
-			$table = $q->addTable( $this->createTable() );
-			
-			$id_field = array_pop( static::$_primary_keys );
+			$result = $this->findBy( static::$_primary_keys[0], $key );
+			if( empty( $result ) ) return null;
 
-			$criteria = $q->getCriteria()->addAnd( $table->$id_field->eq( $key ) );
-			
-			if( self::_hasField( 'online' ) )
-				$criteria->addAnd( $table->online->eq( 1 ) );
-			
-			if( self::_hasField( 'deleted' ) )
-				$criteria->addAnd( $table->deleted->eq( 0 ) );
-			
-			return $q->select()->current();
+			return array_pop( $result );
 		}
 
 		/**
@@ -335,7 +324,7 @@
 			
 			$table = $q->addTable( static::table() );
 
-			$count = empty( static::$_primary_keys ) ? array_pop( static::$_primary_keys ) : array_pop( static::$_fields );
+			$count = empty( static::$_primary_keys ) ? static::$_fields[0] : static::$_primary_keys[0];
 			$count = $table->addField( $count );
 
 			$count->setFunction( 'COUNT' )

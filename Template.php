@@ -103,9 +103,9 @@
             	$this->setTheme( $theme );
             }
             
-            $variables['variables'] = array();
+            //$variables['variables'] = array();
             
-            $this->_variables = $variables;
+            $this->_variables = array();
 
             if( !is_string( $template ) ) {
                 throw new WebLab_Exception_Template( 'Template name shoud refer to the path within the theme.' );

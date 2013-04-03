@@ -53,7 +53,7 @@
 			ini_set( 'html_errors', false );
 			
 			// TODO: XML template
-			$t = new WebLab_Template( 'data/json.php' );
+			$t = new WebLab_Template( 'data/json' );
 				
 			WebLab_Template::setRootTemplate( $t );
 			$this->layout = $t;

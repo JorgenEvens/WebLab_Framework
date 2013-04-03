@@ -16,7 +16,7 @@
     			return;
     		}
 
-    		self::$_config = WebLab_Config::getApplicationConfig()->get( 'Application.Modules.Dispatcher.Visit', WebLab_Config::OBJECT, false );
+    		self::$_config = WebLab_Config::getApplicationConfig()->get( 'Application.Dispatcher.Visit', WebLab_Config::OBJECT, false );
     		
     		if( !isset( self::$_config->default ) || !isset( self::$_config->prefix ) ) {
     			throw new WebLab_Exception_Dispatcher( 'Incomplete configuration.' );
@@ -29,7 +29,7 @@
         }
         
         public function execute() {
-        	$alias = WebLab_Config::getApplicationConfig()->get( 'Application.Modules.Aliasses', WebLab_Config::RAW, false );
+        	$alias = WebLab_Config::getApplicationConfig()->get( 'Application.Dispatcher.Aliasses', WebLab_Config::RAW, false );
         	$path = array_filter( array_keys( self::$_param ), create_function( '&$input', '$input=ucfirst($input); return !is_numeric($input) && !empty($input);' ) );
         	$i = count( $path );
         	

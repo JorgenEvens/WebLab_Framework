@@ -39,7 +39,8 @@
          * @return String
          */
         protected function _getName() {
-        	return 1;
+            preg_match( '#_([a-z0-9]+)$#i', get_class( $this ), $class );
+        	return isset( $class[1] ) ? strtolower( $class[1] ) : 1;
         }
 
         /**
