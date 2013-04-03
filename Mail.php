@@ -139,7 +139,7 @@
                 return false;
             }
 
-            $content = $this->render();
+            $content = $this->render( false );
 
         	$headers = 'From:' . $this->_from . "\r\n" .
                 'X-Mailer: WebLab_Mailer' . "\r\n" . 
