@@ -21,7 +21,7 @@
             $this->_name = $name;
             
             if( is_array( $fields ) )
-                call_user_func_array( array( $this, 'addFields'), $fields );
+                $this->addFields( $fields );
             
         }
 
@@ -34,9 +34,10 @@
          * 
          * Add a series of fields to this table.
          */
-        public function addFields()
+        public function addFields($fields=false)
         {
-            $fields = func_get_args();
+            if( $fields === false )
+                $fields = func_get_args();
             
             if( count( $fields ) === 1 && is_array( $fields[0] ) )
             	$fields = $fields[0];

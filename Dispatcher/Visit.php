@@ -56,33 +56,6 @@
         	}
         	
         	return new $module();
-        	
-        	/*
-            
-            $aliasses = config( 'Application.Modules.Aliasses', WebLab_Config::RAW );
-            $module = isset( $this->_param[$depth] ) ? $this->_param[$depth] : '';
-
-            if( isset( $aliasses[ $module ] ) ) {
-                $module = $aliasses[ $module ];
-            }
-
-            if( $module ) {
-                $module = $this->_generateClass( $module );
-                if( class_exists( $module ) ) {
-                    return new $module( $this->_param );
-                } else {
-                    $module = $this->classFromPattern( $this->_default );
-                    if( !class_exists( $module ) ) {
-                    	throw new WebLab_Exception_Dispatcher( 'The requested and default modules could not be found!' );
-                    }
-                    return new $module( $this->_param );
-                }
-            } else {
-                $module = $this->classFromPattern( self::$_config->default );
-                return new $module( $this->_param );
-            }
-            
-            */
         }
         
         protected function _parseParam( $param ) {
