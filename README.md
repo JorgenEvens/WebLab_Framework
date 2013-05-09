@@ -17,4 +17,4 @@ Note that this may not be up-to-date.
 You can check out the latest version of the framework from this github repository.
 > git clone https://github.com/JorgenEvens/WebLab_Framework.git
 
-A version of the framework in Phar format can be downloaded [here](http://jenkins.evens.eu/weblab%20framework).
+A version of the framework in Phar format can be downloaded [here](http://jenkins.evens.eu:8080/weblab%20framework).
