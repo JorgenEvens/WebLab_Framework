@@ -1,4 +1,10 @@
 <?php
+    /**
+     * Create a constant that represents the namespace separator.
+     * This is used throughout the application, like the dispatcer.
+     */
+    if( !defined( 'NAMESPACE_SEPARATOR' ) )
+        define( 'NAMESPACE_SEPARATOR', '\\' );
     /*
      * Disable error reporting as soon as the framework is loaded.
      * Can be overwritten by loading WebLab_Exception::reporting in the configuration file

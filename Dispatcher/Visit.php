@@ -45,10 +45,16 @@
         		if( isset( $alias[$module_name] ) ) {
         			$module_name = $alias[$module_name];
         		}
-        		
-        		$module_name = self::$_config->prefix . '_' . $module_name;
 
-        		if( class_exists( $module_name ) ) {
+                $module_namespace = explode( NAMESPACE_SEPARATOR, trim( $module_name, NAMESPACE_SEPARATOR ) );
+                $module_name = array_pop( $module_namespace );
+                $module_namespace = implode( NAMESPACE_SEPARATOR, $module_namespace );
+                if( !empty( $module_namespace ) )
+                    $module_namespace .= NAMESPACE_SEPARATOR;
+        		
+        		$module_name = $module_namespace . self::$_config->prefix . '_' . $module_name;
+
+                if( class_exists( $module_name ) ) {
         			$module = $module_name;
         			break;
         		}
