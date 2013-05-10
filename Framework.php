@@ -22,8 +22,10 @@
       */
     function __autoload( $className )
     {
+        // Handle namespaces as directories.
+        $className = strtr( $className, '\\', DIRECTORY_SEPARATOR );
         $error_report = error_reporting();
-        $c = preg_replace( '#_(_*)#', '/$1', $className ) . '.php';
+        $c = preg_replace( '#_(_*)#', DIRECTORY_SEPARATOR . '$1', $className ) . '.php';
         error_reporting( $error_report & ( E_ALL ^ E_WARNING ) );
         return !!include_once( $c );
         error_reporting( $error_report );
