@@ -73,7 +73,7 @@
         /**
          * @var String The directory of a specific theme. Defaults to 'source'.
          */
-        protected $_theme = 'source';
+        protected $_theme = null;
         
         /**
          * @var string Determines if logic should be called.
@@ -245,21 +245,33 @@
         	if( !empty( $component ) ) {
         		$component = '.' . $component;
         	}
+
+            $namespace = explode( NAMESPACE_SEPARATOR, $this->_template );
+            $name = array_pop( $namespace );
+            $namespace = implode( DIRECTORY_SEPARATOR, $namespace );
+
+            $theme = $this->_theme;
+            if( !empty( $theme ) )
+                $theme .= '/';
         	
-        	$path = $this->_dir . ( empty( $this->_theme ) ? '/' : '/' . $this->_theme . '/' ) . $this->_template . $component . '.php';
-        	
-        	$exists = @fopen( $path, 'r', true );
-        	if( $exists === false ) {
-        		if( empty( $component ) ) throw new WebLab_Exception_Template( 'Template (' . $this->_template . ') not found!' );
-        		return;
-        	}
-        	fclose( $exists );
+        	$path = $this->_dir . '/' . $theme . $name . $component . '.php';
         	
         	if( isset( self::_getConfig()->extract_vars ) && self::_getConfig()->extract_vars && $extract ) {
         		extract( $this->_variables );
         	}
-        	
-        	include( $path );
+
+            // Load the template
+            $error_report = error_reporting();
+            error_reporting( $error_report & ( E_ALL ^ E_WARNING ) );
+            $exists = !!include_once( $path );
+            if( !$exists && !empty( $namespace ) ) {
+                $exists = !!include_once( $namespace . DIRECTORY_SEPARATOR . $path );
+            }
+            error_reporting( $error_report );
+
+            if( $exists === false && empty( $component ) ) {
+                throw new WebLab_Exception_Template( 'Template (' . $this->_template . ') not found!' );
+            }
         }
         
         /**
