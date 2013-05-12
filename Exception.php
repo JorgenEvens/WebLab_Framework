@@ -13,6 +13,9 @@
     	
         public static function reporting() {
             $error_reporting = WebLab_Config::getApplicationConfig()->get( 'Application.Error.reporting' );
+            if( is_string( $error_reporting ) ) {
+                $error_reporting = constant( $error_reporting );
+            }
             error_reporting( $error_reporting );
         }
 
