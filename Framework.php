@@ -31,7 +31,8 @@
         // Handle namespaces as directories.
         $className = strtr( $className, NAMESPACE_SEPARATOR, DIRECTORY_SEPARATOR );
         $error_report = error_reporting();
-        $c = preg_replace( '#_(_*)#', DIRECTORY_SEPARATOR . '$1', $className ) . '.php';
+        $c = preg_replace( '#_(_*)#', '/$1', $className ) . '.php';
+        $c = strtr( $c, '/', DIRECTORY_SEPARATOR );
         error_reporting( $error_report & ( E_ALL ^ E_WARNING ) );
         $result = !!include_once( $c );
         error_reporting( $error_report );
