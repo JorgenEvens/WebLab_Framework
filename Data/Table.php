@@ -34,9 +34,9 @@
          * 
          * Add a series of fields to this table.
          */
-        public function addFields($fields=false)
+        public function addFields($fields)
         {
-            if( $fields === false )
+            if( !is_array( $fields ) )
                 $fields = func_get_args();
             
             if( count( $fields ) === 1 && is_array( $fields[0] ) )

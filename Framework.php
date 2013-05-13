@@ -36,5 +36,5 @@
         error_reporting( $error_report & ( E_ALL ^ E_WARNING ) );
         $result = !!include_once( $c );
         error_reporting( $error_report );
-	return $result;
+	   return $result;
     }

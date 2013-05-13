@@ -59,8 +59,8 @@
 		protected function _readResponse( $stream ) {
 			$meta = stream_get_meta_data( $stream );
 			$body = '';
-			if( $meta['unread_bytes'] > 0 ) {
-				$body = stream_get_contents( $stream );
+			while( is_resource( $stream ) && !feof( $stream ) ) {
+				$body .= stream_get_contents( $stream );
 			}
 
 			$response = new WebLab_Http_Response(500);

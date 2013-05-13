@@ -70,14 +70,19 @@
             	
         	$basepath = $this->getBasePath();
       		$url_config = WebLab_Config::getApplicationConfig()->get( 'Application.Parser.URL', WebLab_Config::OBJECT, false );
-        	
-        	if( empty( $url_config ) || $url_config->mod_rewrite ) {
-            	DEFINE( 'BASE', $basepath );
-            	DEFINE( 'RES_BASE', $basepath );
-        	} else {
-        		DEFINE( 'BASE', $basepath . ( $url_config->entrypoint ? $url_config->entrypoint : 'index.php' ) . '/' );
-        		DEFINE( 'RES_BASE', $basepath . ( $url_config->resources ? $url_config->resources : 'www' ) . '/' );
+
+            $base = $basepath;
+            $resources = $basepath;
+
+        	if( !empty( $url_config ) && !$url_config->mod_rewrite ) {
+        		$base .= ( $url_config->entrypoint ? $url_config->entrypoint : 'index.php' ) . '/';
+        		$resources .= ( $url_config->resources ? $url_config->resources : 'www' ) . '/';
         	}
+
+            if( !defined( 'BASE' ) )
+                define( 'BASE', $base );
+            if( !defined( 'RES_BASE' ) )
+                define( 'RES_BASE', $resources );
         }
 
         /**

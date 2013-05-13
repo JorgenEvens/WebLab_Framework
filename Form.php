@@ -99,7 +99,7 @@
          * 
          */
         protected function _setupPostback(){
-        	$this->postback = new WebLab_Form_Input( $this->getFormId(), 'hidden', 'postback' );
+        	$this->postback = new WebLab_Form_Input( $this->getFormId(), 'hidden', null, 'postback' );
         }
 
         /**
@@ -168,7 +168,7 @@
         	$fields = array_keys( $this->_fields );
         	$fields = implode( ',', $fields );
 
-        	return substr( md5( $this->_action . '-' . $this->_method . '-' . $fields ), 0, 6 );
+        	return md5( $this->_action . '-' . $this->_method . '-' . $fields );
         }
         
         /**
