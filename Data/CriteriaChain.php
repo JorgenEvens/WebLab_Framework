@@ -26,12 +26,12 @@
          * Add a criteria to the end of the chain using the AND keyword.
          * 
          * @param WebLab_Data_Criteria $criteria
-         * @throws WebLab_Data_Exception If neither a criteria nor a criteriachain is supplied as $criteria.
+         * @throws WebLab_Exception_Data If neither a criteria nor a criteriachain is supplied as $criteria.
          * @return WebLab_Data_CriteriaChain
          */
         public function addAnd( $criteria ) {
             if( !( $criteria instanceof WebLab_Data_Criteria || $criteria instanceof WebLab_Data_CriteriaChain ) ) {
-                throw new WebLab_Data_Exception( 'Must supply a Criteria or a CriteriaChain' );
+                throw new WebLab_Exception_Data( 'Must supply a Criteria or a CriteriaChain' );
             }
             
             $this->_criteria[] = (object) array( 'criteria' => $criteria, 'operator' => 'AND' );
@@ -43,12 +43,12 @@
          * Add a criteria to the end of the chain using the OR keyword.
          * 
          * @param WebLab_Data_Criteria $criteria
-         * @throws WebLab_Data_Exception If neither a criteria nor a criteriachain is supplied as $criteria.
+         * @throws WebLab_Exception_Data If neither a criteria nor a criteriachain is supplied as $criteria.
          * @return WebLab_Data_CriteriaChain
          */
         public function addOr( $criteria ) {
             if( !( $criteria instanceof WebLab_Data_Criteria || $criteria instanceof WebLab_Data_CriteriaChain ) ) {
-                throw new Exception( 'Must supply a Criteria or a CriteriaChain' );
+                throw new WebLab_Exception_Data( 'Must supply a Criteria or a CriteriaChain' );
             }
             
             $this->_criteria[] = (object) array( 'criteria' => $criteria, 'operator' => 'OR' );
