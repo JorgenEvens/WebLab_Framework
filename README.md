@@ -18,3 +18,6 @@ You can check out the latest version of the framework from this github repositor
 > git clone https://github.com/JorgenEvens/WebLab_Framework.git
 
 A version of the framework in Phar format can be downloaded [here](http://jenkins.evens.eu:8080/weblab%20framework).
+
+## License ##
+This project is licensed under the [New BSD license](https://github.com/JorgenEvens/WebLab_Framework/blob/master/LICENSE).
