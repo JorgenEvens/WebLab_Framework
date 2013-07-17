@@ -1,68 +1,108 @@
 <?php
-	
+
 	/**
-	 * Manages the initialization of PHP session.
+	 * Provides more efficient session management.
+	 * 
 	 */
 	class WebLab_Session {
 
 		/**
-		 * Flag that remembers if a session has been started.
-		 * 
-		 * @var boolean
-		 */
-		protected static $_initialized = false;
+         * Flag that remembers if a session has been started.
+         * 
+         * @var boolean
+         */
+		protected static $_started = false;
 
 		/**
-		 * Set key to a specified value, and initialize the session when
-		 * it has not been started yet.
+		 * Check whether a key is contained within the current session.
+		 * This will start the session if it was not started before.
 		 * 
-		 * @param string $key   The key to store the value under.
-		 * @param mixed  $value The value to store under the key.
+		 * @param  string $key
+		 * @return boolean
 		 */
-		public static function set( $key, $value ) {
-			self::init();
-			$_SESSION[$key] = $value;
+		public static function contains( $key ) {
+			self::start();
+
+			return isset( $_SESSION[$key] );
 		}
 
 		/**
-		 * Get the value stored under this key, initialize the session when
-		 * it has not been started yet.
+		 * Set the value of a key in the session.
+		 * This will start the session if it was not started before.
 		 * 
-		 * @param  string $key The key to retrieve the value for.
-		 * @return mixed       The value stored under this key.
+		 * @param array|string $key
+		 * @param null|mixed $value
+		 */
+		public static function set( $key, $value=null ) {
+			self::start();
+
+			if( !is_array( $key ) ) {
+				$_SESSION[$key] = $value;
+				return;
+			}
+
+			foreach( $key as $name => $value )
+				self::set( $name, $value );
+		}
+
+		/**
+		 * Retrieve the value of a key in the current session.
+		 * This will start the session if it was not started before.
+		 * 
+		 * @param  array|string $key
+		 * @return array|mixed
 		 */
 		public static function get( $key ) {
-			self::init();
-			return isset( $_SESSION[$key] ) : $_SESSION[$key] : null;
+			self::start();
+
+			if( !is_array( $key ) )
+				return self::contains($key) ? $_SESSION[$key] : null;
+
+			$result = array();
+			foreach( $key as $name )
+				$result[$name] = $_SESSION[$name];
+
+			return $result;
 		}
 
 		/**
-		 * Initialize the session if it has not been started yet.
+		 * Remove a key from the current session.
+		 * This will start the session if it was not started before.
 		 * 
+		 * @param  string $key
 		 */
-		public static function init() {
-			if( !self::$_initialized ) {
-				session_start();
-				self::$_initialized = true;
+		public static function remove( $key ) {
+			self::start();
+
+			if( !is_array( $key ) ) {
+				unset( $_SESSION[$key] );
+				return;
 			}
+
+			foreach( $key as $name )
+				unset( $_SESSION[$name] );
 		}
 
 		/**
-		 * Destroy the session and reset this class.
+		 * This will start the session if it was not started before.
 		 * 
 		 */
-		public static function reset() {
-			self::$_initialized = false;
+		public static function start() {
+			if( !self::$_started )
+				session_start();
+
+			self::$_started = true;
+		}
+
+		/**
+		 * This will destroy the current session.
+		 * This will start a session before destroying it.
+		 * 
+		 */
+		public static function destroy() {
+			self::start();
+
 			session_destroy();
-		}
-
-		/**
-		 * Retrieves current status, true if the session has been started.
-		 * 
-		 * @return boolean Has session been started
-		 */
-		public static function isReady() {
-			return self::$_initialized;
 		}
 
 	}
