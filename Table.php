@@ -248,7 +248,7 @@
 		 * @param int &$result_count If different from false, will be set to the amount of records.
 		 * @return mixed An array of objects representing a record.
 		 */
-		public function findBy( $field, $value=null, &$result_count=false ) {
+		public function findBy( $field, $value=null, $count=null, $start=0, &$result_count=false ) {
 			if( !is_array( $field ) ) {
 				$field = array(
 					$field => $value
@@ -261,17 +261,24 @@
 			
 			$criteria = $q->getCriteria();
 
+			$defaults = array();
+
+			if( self::_hasField( 'online' ) )
+				$defaults['online'] = 1;
+			
+			if( self::_hasField( 'deleted' ) )
+				$defaults['deleted'] = 0;
+
+			$field = array_merge( $defaults, $field );
+
 			foreach( $field as $field_name => $value ) {
 				if( self::_hasField( $field_name ) )
 					$criteria->addAnd( $table->$field_name->eq( $value ) );
 			}
+			
+			if( $count != null )
+				$q->setLimit( $count, $start );
 
-			if( self::_hasField( 'online' ) )
-				$criteria->addAnd( $table->online->eq( 1 ) );
-			
-			if( self::_hasField( 'deleted' ) )
-				$criteria->addAnd( $table->deleted->eq( 0 ) );
-			
 			$result = $q->select();
 			if( $result_count !== false )
 				$result_count = $result->count();
@@ -288,30 +295,7 @@
 		 * @return mixed An array of objects representing a record.
 		 */
 		public function findAll( $count=null, $start=0, &$result_count=false ){
-			$q = db(static::$_database)->newQuery();
-			
-			if( $result_count !== false )
-				$q->countLimitless( true );
-			
-			$table = $q->addTable( $this->createTable() );
-			
-			$criteria = $q->getCriteria();
-			
-			if( self::_hasField( 'online' ) )
-				$criteria->addAnd( $table->online->eq( 1 ) );
-			
-			if( self::_hasField( 'deleted' ) )
-				$criteria->addAnd( $table->deleted->eq( 0 ) );
-			
-			if( $count != null )
-				$q->setLimit( $count, $start );
-				
-			$result = $q->select();
-
-			if( $result_count !== false )
-				$result_count = $result->getTotalRows();
-				
-			return $result->fetch_all();
+			return $this->findBy( array(), null, $count, $start, $result_count );
 		}
 		
 		/**
