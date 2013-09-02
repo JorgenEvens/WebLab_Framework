@@ -128,6 +128,56 @@
         }
 
         /**
+         * Sets the criteria to use the greater than or equals operator,
+         * using $value as value.
+         * 
+         * @param  mixed $value
+         * @return WebLab_Data_Criteria
+         */
+        public function greaterThanOrEquals( $value ) {
+            return $this->gte( $value );
+        }
+
+        /**
+         * Shorthand for greaterThanOrEquals
+         *
+         * @see gte( $value )
+         * @param  mixed $value
+         * @return WebLab_Data_Criteria
+         */
+        public function gte( $value ) {
+            $this->_action = '>=';
+            $this->_value = $value;
+
+            return $this;
+        }
+
+        /**
+         * Sets the criteria to use the less than or equals operator,
+         * using $value as value.
+         * 
+         * @param  mixed $value
+         * @return WebLab_Data_Criteria
+         */
+        public function lessThanOrEquals( $value ) {
+            return $this->lte( $value );
+        }
+
+        /**
+         * Shorthand for lessThanOrEquals
+         *
+         * @see lessThanOrEquals( $value )
+         * @param  mixed $value
+         * @return WebLab_Data_Criteria
+         */
+        public function lte( $value ) {
+            $this->_action = '<=';
+            $this->_value = $value;
+
+            return $this;
+        }
+
+        /**
          * Sets the criteria to use the not equals operator, using $value as value.
          * 
          * @param mixed $value
