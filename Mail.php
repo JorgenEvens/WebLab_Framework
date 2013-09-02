@@ -76,7 +76,7 @@
          */
         public function render( $show=false )
         {
-            $code = parent::render();
+            $code = parent::render(false);
 
             $code = $this->_parseTemplate($code);
             if( $show )
