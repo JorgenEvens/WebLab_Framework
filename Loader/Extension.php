@@ -10,7 +10,8 @@
     	}
 
 		public function __construct() {
-			$config = WebLab_Config::getApplicationConfig()->get( 'Application.Extensions', WebLab_Config::RAW, false );
+			$config = WebLab_Config::getApplicationConfig()
+				->get( 'Application.Extensions', WebLab_Config::RAW, false );
 			$dir = ( $config->Location[0] != '/' ) ? realpath( getcwd() . '/' . $path ) : $path;
 
 			$modules = array();
