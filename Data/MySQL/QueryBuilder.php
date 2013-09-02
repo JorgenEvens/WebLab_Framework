@@ -76,7 +76,7 @@
 			$fields = array();
 			foreach( $parse->fields as $field ) {
 				if( $field->isAltered() ) {
-					if( !is_numeric( $field->getValue() ) ) {
+					if( !is_numeric( $field->getValue() ) && !preg_match( '#^0+#', $field->getValue() ) ) {
 						$fields[] = $field . ' = \'' . $query->getAdapter()->escape_string( $field->getValue() ) . '\'';
 					} else {
 						$fields[] = $field . ' = ' . $field->getValue();
@@ -122,7 +122,7 @@
 			
 			$values = array();
 			foreach( $parse->fields as $field ) {
-				if( is_numeric( $field->getValue() ) || $field->getValue() == 'NULL' ) {
+				if( ( is_numeric( $field->getValue() ) && !preg_match( '#^0+#', $field->getValue() ) )|| $field->getValue() == 'NULL' ) {
 					$values[] = $field->getValue();
 				} else {
 					$values[] = '\'' . $query->getAdapter()->escape_string( $field->getValue() ) . '\'';
