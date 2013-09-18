@@ -272,4 +272,19 @@
         		
         	return $dir;
         }
+
+        public function getCurrent( $ignore = array() ) {
+            $param = $this->getParameters();
+            $keys = array_filter( array_keys( $param ), 'is_numeric' );
+            $url = '';
+            
+            for( $i=0; $i<count($keys); $i++ ){
+                if( !in_array( $param[$i], $ignore ) )
+                    $url .= $param[$i] . '/';
+                else
+                    $i++;
+            }
+            
+            return $url;
+        }
     }
