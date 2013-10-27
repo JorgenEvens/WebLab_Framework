@@ -263,9 +263,9 @@
             // Load the template
             $error_report = error_reporting();
             error_reporting( $error_report & ( E_ALL ^ E_WARNING ) );
-            $exists = !!include_once( $path );
+            $exists = !!include( $path );
             if( !$exists && !empty( $namespace ) ) {
-                $exists = !!include_once( $namespace . DIRECTORY_SEPARATOR . $path );
+                $exists = !!include( $namespace . DIRECTORY_SEPARATOR . $path );
             }
             error_reporting( $error_report );
 
