@@ -311,9 +311,7 @@
                     $value = strtr( $value, '*', $adapterSpecs->wildcard );
                 }
 
-                if( !empty( $value ) ) {
-                    $action .= ' \'' . call_user_func( $adapterSpecs->escape_string, $value ) . '\'';
-                }
+                $action .= ' \'' . call_user_func( $adapterSpecs->escape_string, $value ) . '\'';
             } elseif( is_array( $value ) ){
 				$value = array_map($adapterSpecs->escape_string, $value);
 				$action .=' (' . implode( ', ', $value ) . ')';

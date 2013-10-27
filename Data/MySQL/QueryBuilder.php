@@ -76,11 +76,7 @@
 			$fields = array();
 			foreach( $parse->fields as $field ) {
 				if( $field->isAltered() ) {
-					if( !is_numeric( $field->getValue() ) && !preg_match( '#^0+#', $field->getValue() ) ) {
-						$fields[] = $field . ' = \'' . $query->getAdapter()->escape_string( $field->getValue() ) . '\'';
-					} else {
-						$fields[] = $field . ' = ' . $field->getValue();
-					}
+					$fields[] = $field . ' = ' . $this->_escape( $field->getValue(), $query->getAdapter() );
 				}
 			}
 				
@@ -122,11 +118,7 @@
 			
 			$values = array();
 			foreach( $parse->fields as $field ) {
-				if( ( is_numeric( $field->getValue() ) && !preg_match( '#^0+#', $field->getValue() ) )|| $field->getValue() == 'NULL' ) {
-					$values[] = $field->getValue();
-				} else {
-					$values[] = '\'' . $query->getAdapter()->escape_string( $field->getValue() ) . '\'';
-				}
+				$values[] = $this->_escape( $field->getValue(), $query->getAdapter() );
 			}
 			
 			$q .= 'VALUES( ' . implode( ', ', $values ) . ' )';
@@ -135,15 +127,11 @@
 				$q .= ' ON DUPLICATE KEY UPDATE ';
 				$values = array();
 				foreach( $parse->fields as $field ) {
-					if( in_array( $field, $ignoreInUpdate ) ) {
+					if( in_array( $field, $ignoreInUpdate ) || !$field->isAltered() ) {
 						continue;
 					}
-			
-					if( is_numeric( $field->getValue() ) ) {
-						$values[] = $field->getFullName() . '=' . $field->getValue();
-					} else {
-						$values[] = $field->getFullName() . '=\'' . $query->getAdapter()->escape_string( $field->getValue() ) . '\'';
-					}
+
+					$values[] = $field . ' = ' . $this->_escape( $field->getValue(), $query->getAdapter() );
 				}
 			
 				$q .= implode(', ', $values ) . ' ';
@@ -174,6 +162,17 @@
 			}
 			
 			return $q;
+		}
+
+		protected function _escape( $value, $adapter ) {
+			if( $value === 'NULL' ) {
+				return 'NULL';
+			} else if( is_numeric( $value ) && !preg_match( '#^00+#', $value ) ) {
+				return $value;
+			}
+			
+			return '\'' . $adapter->escape_string( $value ) . '\'';
+
 		}
 
 		
