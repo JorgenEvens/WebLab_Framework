@@ -190,7 +190,7 @@
                 $path = str_replace( $base, '', $path );
 
             $params = explode( '/', $path );
-            $params = array_values( array_filter( $params ) );
+            $params = array_values( array_filter( $params, array( $this, 'cleanParameters') ) );
             
             $tmp = array();
 
@@ -207,6 +207,18 @@
             $this->_parameters = array_merge( $tmp, $_GET );
             
             return $this->_parameters;
+        }
+
+        /**
+         * Cleans parameters, is used as callback for array_filter
+         * 
+         * @param  string $value
+         * @return boolean
+         */
+        public function cleanParameters( $value ) {
+            if( empty( $value ) && $value !== 0 && $value !== '0' )
+                return false;
+            return true;
         }
 
         /**
