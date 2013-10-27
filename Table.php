@@ -256,6 +256,9 @@
 			}
 
 			$q = db(static::$_database)->newQuery();
+
+			if( $result_count !== false )
+				$q->countLimitless( true );
 			
 			$table = $q->addTable( $this->createTable() );
 			
@@ -281,7 +284,7 @@
 
 			$result = $q->select();
 			if( $result_count !== false )
-				$result_count = $result->count();
+				$result_count = $result->getTotalRows();
 
 			return $result->fetch_all();
 		}
