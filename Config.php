@@ -34,7 +34,7 @@
 		 * 
 		 * @var string
 		 */
-		const CONFIG_WRAP = 'weblab_config';
+		//const CONFIG_WRAP = 'weblab_config';
 		
 		/**
 		 * Holds the configuration used by the application.
@@ -112,30 +112,42 @@
 		 * @throws WebLab_Exception_Config If the requested node is not available.
 		 * @return mixed
 		 */
-		public function get( $path, $return_type=self::RAW, $throwError=true ) {
+		public function &get( $path, $return_type=self::RAW, $throwError=true ) {
 			$properties = explode( '.', $path );
-			
-			$value = $this->_config;
+
+			$value = &$this->_config;
 			while( count( $properties ) > 0 ) {
-				if( !isset( $value[$properties[0]] ) ) {
+				$isset = false;
+				if( is_array( $value ) ) $isset = isset( $value[$properties[0]] );
+				else if( is_object( $value ) ) $isset = isset( $value->{$properties[0]} );
+
+				if( !$isset ) {
 					if( $throwError ) {
 						throw new WebLab_Exception_Config( 'The node specified is not available, current node is "' . $properties[0] . '". ( ' . $path . ' )' );
 					} else {
-						return null;
+						$tmp = null;
+						$tmp = &$tmp;
+						return $tmp;
 					}
 				}
 				
-				$value = $value[$properties[0]];
+				if( is_array( $value ) ) {
+					$value = &$value[$properties[0]];
+				} else {
+					$value = &$value->{$properties[0]};
+				}
 				array_splice( $properties, 0, 1 );
 			}
 			
 			if( is_array( $value ) && $return_type != self::RAW ) {
 				switch( $return_type ) {
 					case self::OBJECT:
-						return (object)$value;
+						$tmp = (object)$value;
+						$tmp = &$tmp;
+						return $tmp;
 
-					case self::CONFIG_WRAP:
-						return new WebLab_Config( null, $value );
+					/*case self::CONFIG_WRAP:
+						return new WebLab_Config( null, $value );*/
 				}
 			}
 			
