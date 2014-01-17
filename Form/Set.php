@@ -94,7 +94,7 @@
 			unset( $this->fields[ $key ] );
 		}
 		
-		public function setForm( $form ) {
+		public function setForm( WebLab_Form $form ) {
 			parent::setForm( $form );
 			
 			foreach( $this->fields as $field ) {
@@ -123,7 +123,7 @@
 		 * (non-PHPdoc)
 		 * @see WebLab_Form_Field::addFilter()
 		 */
-		public function addFilter( $filter, $error_message ) {
+		public function addFilter( WebLab_Filter $filter, $error_message=NULL ) {
 			parent::addFilter( $filter, $error_message );
 			
 			$this->_type->addFilter( $filter, $error_message );
