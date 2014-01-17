@@ -33,6 +33,13 @@
         protected $_wildcard = '%';
 
         /**
+         * Charset to use on the connection
+         *
+         * @var string Charset to use with connection
+         */
+        protected $_charset = 'unknown';
+
+        /**
          * Constructor for WebLab_Data_MySQLi_Adapter.
          *
          * @param mixed $login Credentials to be used during connection setup.
@@ -45,6 +52,13 @@
                 return;
             }
 
+            if( isset( $login->charset ) ) {
+                $this->_charset = $login->charset;
+                $this->_resource->set_charset( $this->_charset );
+            }
+            $charset = $this->_resource->get_charset();
+            $this->_charset = $charset->charset;
+            
             $this->setPrefix( $login->prefix );
             $this->_connected = true;
         }
@@ -96,6 +110,10 @@
                 'escape_string'   => array( $this, 'escape_string' ),
                 'wildcard'	      => $this->_wildcard
             );
+        }
+
+        public function getCharset() {
+            return $this->_charset;
         }
         
         /**
