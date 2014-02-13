@@ -167,13 +167,16 @@
          * @see WebLab_Form_Field::getValue()
          */
         public function getValue() {
-        	$this->update();
+        	if( $this->_form->isPostback() )
+    			$this->update();
         	
-        	$value = array();
-        	for( $i=count($this->fields); $i--; ) {
-        		$value[ $i ] = $this->fields[ $i ];
-        	}
-        	return $value;
+        	return $this->fields;
+        }
+
+        public function getField( $key ) {
+        	if( isset( $this->fields[$key] ) )
+        		return $this->fields[$key];
+        	return null;
         }
         
         /**
