@@ -184,6 +184,9 @@
 			$has_online = self::_hasField( 'online' );
 			$q = db(static::$_database)->newQuery();
 
+			if( $object instanceof stdClass )
+				$object = get_object_vars( $object );
+
 			$table = $q->addTable( static::table() )->addFields( static::$_primary_keys );
 			foreach( static::$_primary_keys as $field ) {
 				$q->getCriteria()->addAnd( $table->$field->eq( $object[$field] ) );
@@ -231,12 +234,17 @@
 		 */
 		public function find( $key ){
 			if( is_array( $key ) ) {
-				return $this->findBy( $key );
+				$keys = array_filter( array_keys( $key ), 'is_string' );
+				if( !empty( $keys ) )
+					return $this->findBy( $key );
 			}
 
 			$result = $this->findBy( static::$_primary_keys[0], $key );
 			if( empty( $result ) ) return null;
 
+			if( is_array( $key ) )
+				return $result;
+			
 			return array_pop( $result );
 		}
 
