@@ -37,7 +37,7 @@
 			return null;
 		}
 
-		public function set( $key, $value=null ) {
+		public function set( $key, $value=null, $ttl=0 ) {
 			if( !is_array( $key ) )
 				return file_put_contents( $this->getLocation( $key ), serialize( $value ) );
 

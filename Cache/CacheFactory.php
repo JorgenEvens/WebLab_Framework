@@ -12,6 +12,15 @@
 		}
 
 		public static function initCache() {
+			$preference = WebLab_Config::getApplicationConfig()->get( 'Application.Cache.Type', WebLab_Config::OBJECT, false );
+			
+			if( !empty( $preference ) ) {
+				$preference = 'WebLab_Cache_' . ucfirst( $preference );
+			
+				if( class_exists( $preference ) )
+					return $preference::open();
+			}
+
 			if( function_exists( 'apc_fetch' ) )
 				return WebLab_Cache_Apc::open();
 

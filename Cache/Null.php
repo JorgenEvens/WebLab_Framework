@@ -27,7 +27,7 @@
 			return null;
 		}
 
-		public function set( $key, $value=null ) { }
+		public function set( $key, $value=null, $ttl=0 ) { }
 
 		public function delete( $key ) { }
 

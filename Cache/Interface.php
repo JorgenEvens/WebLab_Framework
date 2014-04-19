@@ -6,7 +6,7 @@
 
 		function get( $key );
 
-		function set( $key, $value=null );
+		function set( $key, $value=null, $ttl=0 );
 
 		function delete( $key );
 
