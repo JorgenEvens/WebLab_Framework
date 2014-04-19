@@ -14,6 +14,9 @@
 	 *
 	 */
     class WebLab_Data_Criteria {
+
+        const CUSTOM = '_wl_CUSTOM';
+
     	/**
     	 * Holds the field to which the criteria applies.
     	 * 
@@ -283,6 +286,12 @@
 			return $this;
 		}
 
+        public function custom( $condition ) {
+            $this->_field = null;
+            $this->_action = self::CUSTOM;
+            $this->_value = $condition;
+        }
+
         /**
          * Returns a text representation of the criteria, based on the adapter specifications.
          * 
@@ -296,6 +305,9 @@
             if( !isset( $action ) ) {
                 return '';
             }
+
+            if( $action == self::CUSTOM )
+                return $value;
 
             // Means that there are 2 values AKA -> BETWEEN x AND y
             if( is_array( $value ) && $action == 'BETWEEN' ) {
