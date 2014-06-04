@@ -30,7 +30,8 @@
         
         public function execute() {
         	$alias = WebLab_Config::getApplicationConfig()->get( 'Application.Dispatcher.Aliasses', WebLab_Config::RAW, false );
-        	$path = array_filter( array_keys( self::$_param ), create_function( '&$input', '$input=ucfirst($input); return !is_numeric($input) && !empty($input);' ) );
+            $path = array_diff( self::$_param, $_GET );
+        	$path = array_filter( array_keys( $path ), create_function( '&$input', '$input=ucfirst($input); return !is_numeric($input) && !empty($input);' ) );
         	$i = count( $path );
         	
         	if( empty( $path ) && isset( $alias[""] ) ) {
