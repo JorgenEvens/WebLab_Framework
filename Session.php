@@ -105,4 +105,27 @@
 			session_destroy();
 		}
 
+		/**
+		 * This will set the name of the key used in the cookie
+		 *
+		 * @param  string $name
+		 * @return string
+		 */
+		public static function name( $name=null ) {
+			if( $name === null )
+				return session_name();
+			session_name($name);
+		}
+
+		/**
+		 * Retrieves and sets the session id for current session.
+		 * @param  string $id
+		 * @return string
+		 */
+		public static function id( $id=null ) {
+			if( $id === null )
+				return session_id();
+			session_id( $id );
+		}
+
 	}
