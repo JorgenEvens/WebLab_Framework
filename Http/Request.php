@@ -94,7 +94,7 @@
 					'user_agent' => 'WebLab_Http Extension',
 					'protocol_version' => $this->http_version,
 					'max_redirects' => 0,
-					'ignore_errors' => false
+					'ignore_errors' => true
 				)
 			);
 			return stream_context_create( $stream_ctx );

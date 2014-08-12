@@ -94,7 +94,7 @@
 			unset( $this->fields[ $key ] );
 		}
 		
-		public function setForm( WebLab_Form $form ) {
+		public function setForm( $form ) {
 			parent::setForm( $form );
 			
 			foreach( $this->fields as $field ) {
@@ -123,7 +123,7 @@
 		 * (non-PHPdoc)
 		 * @see WebLab_Form_Field::addFilter()
 		 */
-		public function addFilter( WebLab_Filter $filter, $error_message=NULL ) {
+		public function addFilter( $filter, $error_message ) {
 			parent::addFilter( $filter, $error_message );
 			
 			$this->_type->addFilter( $filter, $error_message );
@@ -147,6 +147,9 @@
          */
         public function update() {
         	$response = $this->_form->getResponse();
+        	if( !isset( $response[ $this->getAttribute( 'name' ) ] ) )
+        		return;
+
         	$response = $response[ $this->getAttribute( 'name' ) ];
         	$keys = array_keys( $response );
         	$fields = &$this->fields;

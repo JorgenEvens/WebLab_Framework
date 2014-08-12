@@ -234,6 +234,9 @@
 		 */
 		public function find( $key ){
 			if( is_array( $key ) ) {
+				if( empty( $key ) )
+					return array();
+				
 				$keys = array_filter( array_keys( $key ), 'is_string' );
 				if( !empty( $keys ) )
 					return $this->findBy( $key );

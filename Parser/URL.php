@@ -204,6 +204,11 @@
             }
 
             $tmp = array_merge( $tmp, $params );
+            if( empty( $tmp ) ) {
+                $tmp[0] = null;
+                $tmp[1] = null;
+            }
+
             $this->_parameters = array_merge( $tmp, $_GET );
             
             return $this->_parameters;
