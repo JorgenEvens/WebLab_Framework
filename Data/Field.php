@@ -122,8 +122,10 @@
             	throw new WebLab_Exception_Data( 'Alias should be of type string.' );
             
             $this->_alias = $alias;
-            $this->_table->removeField( $this );
-            $this->_table->addField( $this );
+            if( isset( $this->_table ) ) {
+                $this->_table->removeField( $this );
+                $this->_table->addField( $this );
+            }
 
             return $this;
         }
@@ -190,6 +192,8 @@
         
         public function setSelect( $select ){
         	$this->_select = $select;
+
+            return $this;
         }
         
         public function getSelect(){
