@@ -2,6 +2,8 @@
 
 	interface WebLab_Cache_Interface {
 
+		function setNamespace( $ns );
+
 		function exists( $key );
 
 		function get( $key );

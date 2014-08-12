@@ -4,6 +4,8 @@
 
 		protected static $_instance = null;
 
+		public function setNamespace( $ns ) {}
+
 		public static function isAvailable() {
 			return true;
 		}
