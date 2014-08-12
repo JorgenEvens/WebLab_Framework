@@ -30,6 +30,13 @@
 		 * @see $_query
 		 */
 		abstract function select();
+
+		/**
+		 * Build a select count(*) query using _query
+		 *
+		 * @see $_query
+		 */
+		abstract function count();
 		
 		/**
 		 * Build an insert query using _query

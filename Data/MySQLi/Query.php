@@ -51,7 +51,8 @@
             $result = $this->_adapter->query( $q );
             
             if( $this->getCountLimitless() ) {
-            	$row_count = $this->_adapter->query( 'SELECT FOUND_ROWS() AS count' );
+
+            	$row_count = $this->_adapter->query( $this->builder()->count() );
             	$result->setTotalRows( $row_count->current()->count );
             }
             

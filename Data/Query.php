@@ -222,7 +222,7 @@
          * @return WebLab_Data_Table
          */
         public function getTable( $table ) {
-            return $this->_tables[ $table ];
+            return isset( $this->_tables[$table] ) ? $this->_tables[ $table ] : null;
         }
 
         /**
