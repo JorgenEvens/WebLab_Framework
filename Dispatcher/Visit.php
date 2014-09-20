@@ -30,39 +30,73 @@
         
         public function execute() {
         	$alias = WebLab_Config::getApplicationConfig()->get( 'Application.Dispatcher.Aliasses', WebLab_Config::RAW, false );
-            $path = array_diff( self::$_param, $_GET );
-        	$path = array_filter( array_keys( $path ), create_function( '&$input', '$input=ucfirst($input); return !is_numeric($input) && !empty($input);' ) );
+            $path = $this->_parsePath();
         	$i = count( $path );
         	
         	if( empty( $path ) && isset( $alias[""] ) ) {
-        		$module = self::$_config->prefix . '_' . $alias[""];
+        		$module = self::$_config->default_namespace . NAMESPACE_SEPARATOR . self::$_config->prefix . '_' . $alias[""];
         	} else {
-        		$module = self::$_config->prefix . '_' . self::$_config->default;
+        		$module = self::$_config->default_namespace . NAMESPACE_SEPARATOR . self::$_config->prefix . '_' . self::$_config->default;
         	}
         	
         	while( $i-- > 0 ) {
-        		$module_name = implode( '_', $path );
+                $module_name = $this->_generateModule( $path );
+                if( $module_name !== false ) {
+                    $module = $module_name;
+                    break;
+                }
 
-        		if( isset( $alias[$module_name] ) ) {
-        			$module_name = $alias[$module_name];
-        		}
+                $root_controller = ( $i == 0 ) ? ['Index'] : array_slice( $path, 1 );
+                $module_name = $this->_generateModule( $root_controller, $path[0] );
+                if( $module_name !== false ) {
+                    $module = $module_name;
+                    break;
+                }
 
-                $module_namespace = explode( NAMESPACE_SEPARATOR, trim( $module_name, NAMESPACE_SEPARATOR ) );
-                $module_name = array_pop( $module_namespace );
-                $module_namespace = implode( NAMESPACE_SEPARATOR, $module_namespace );
-                if( !empty( $module_namespace ) )
-                    $module_namespace .= NAMESPACE_SEPARATOR;
-        		
-        		$module_name = $module_namespace . self::$_config->prefix . '_' . $module_name;
+                $module_name = $this->_generateModule( $path, self::$_config->default_namespace );
+                if( $module_name !== false ) {
+                    $module = $module_name;
+                    break;
+                }
 
-                if( class_exists( $module_name ) ) {
-        			$module = $module_name;
-        			break;
-        		}
                 array_pop( $path );
         	}
         	
         	return new $module();
+        }
+
+        protected function _generateModule( $path, $ns=null ) {
+            $alias = WebLab_Config::getApplicationConfig()->get( 'Application.Dispatcher.Aliasses', WebLab_Config::RAW, false );
+            $module_name = empty( $ns ) ? '' : $ns . NAMESPACE_SEPARATOR;
+            $module_name .= implode( '_', $path );
+
+            if( isset( $alias[$module_name] ) ) {
+                $module_name = $alias[$module_name];
+            }
+
+            $module_namespace = explode( NAMESPACE_SEPARATOR, trim( $module_name, NAMESPACE_SEPARATOR ) );
+            $module_name = array_pop( $module_namespace );
+            $module_namespace = implode( NAMESPACE_SEPARATOR, $module_namespace );
+            if( !empty( $module_namespace ) )
+                $module_namespace .= NAMESPACE_SEPARATOR;
+
+            $module_name = $module_namespace . self::$_config->prefix . '_' . $module_name;
+
+            if( class_exists( $module_name ) )
+                return $module_name;
+
+            return false;
+        }
+
+        protected function _parsePath() {
+            $path = array();
+            $i = 0;
+
+            while( isset( self::$_param[$i] ) )
+                if( !is_numeric( self::$_param[$i++] ) )
+                    $path[] = ucfirst( self::$_param[$i-1] );
+
+            return $path;
         }
         
         protected function _parseParam( $param ) {
