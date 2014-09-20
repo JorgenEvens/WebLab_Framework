@@ -287,7 +287,10 @@
 
 			foreach( $field as $field_name => $value ) {
 				if( self::_hasField( $field_name ) )
-					$criteria->addAnd( $table->$field_name->eq( $value ) );
+					if( is_array( $value ) )
+						$criteria->addAnd( $table->$field_name->in( $value ) );
+					else
+						$criteria->addAnd( $table->$field_name->eq( $value ) );
 			}
 			
 			if( $count != null )
