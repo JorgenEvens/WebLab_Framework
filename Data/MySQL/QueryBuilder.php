@@ -161,7 +161,7 @@
 			return $q;
 		}
 
-		public function delete() {
+		public function delete( $delete_from_table=null ) {
 
 			$query = $this->_query;
 			$parse = $this->_parseQuery();
@@ -170,7 +170,15 @@
 				throw new Exception( 'No tables given' );
 			}
 
-			$q = 'DELETE FROM ' . implode( ', ', $parse->tables ) . ' ';
+			$q = 'DELETE ';
+			if( $delete_from_table !== null ) {
+				if( is_array( $delete_from_table ) )
+					$delete_from_table = implode( ', ', $delete_from_table );
+				
+				$q .= $delete_from_table . ' ';
+			}
+
+			$q .= 'FROM ' . implode( ', ', $parse->tables ) . ' ';
 
 			$criteria = $query->getCriteriaChain();
 			if( !empty( $criteria ) && $criteria->hasCriteria() ) {

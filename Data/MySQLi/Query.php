@@ -99,11 +99,11 @@
          *
          * @return WebLab_Data_MySQLi_Result
          */
-        public function delete()
+        public function delete( $delete_from_table=null )
         {
             $this->_isConnected();
 
-            $this->_last_query = $q = $this->builder()->delete();
+            $this->_last_query = $q = $this->builder()->delete( $delete_from_table );
 
             return $this->_adapter->query( $q );
         }
