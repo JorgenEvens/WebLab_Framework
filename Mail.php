@@ -1,4 +1,7 @@
 <?php
+
+define( 'MAIL_NL', "\r\n" );
+define( 'MAIL_NLNL', MAIL_NL . MAIL_NL );
     /**
      * Mail.php
      * 
@@ -106,26 +109,27 @@
             } else {
             	$this->_boundary = md5( uniqid( time() ) );
             	
-	            $html = '--' . $this->_boundary . "\r\n";
+	            $html = '--' . $this->_boundary . PHP_EOL;
 	            $html .= 'Content-Type: ' . $this->_content_type . ';' .
-                    "\r\n\r\n" . $html_code . "\r\n\r\n";
+                    PHP_EOL . PHP_EOL . $html_code . PHP_EOL . PHP_EOL ;
 	
 	            foreach( $images as $key => $image )
 	            {
-	                $html .= '--' . $this->_boundary . "\r\n";
+	                $html .= '--' . $this->_boundary . PHP_EOL;
 	                $img = file_get_contents( $image );
 	                $name = basename( $image );
-	                $contentType = array_pop( explode( '.', $name ) );
+	                $contentType = explode( '.', $name );
+	                $contentType = array_pop( $contentType );
 	
-	                $html .= 'Content-Type: image/' . $contentType . '; name="' . $name . '"' . "\r\n" .
-	                            'Content-ID: <img' . $key . '>' . "\r\n" .
-	                            'Content-Transfer-Encoding: base64' . "\r\n" .
-	                            'Content-Disposition: inline' . "\r\n\r\n";
-	                $html .= chunk_split( base64_encode( $img ), 68, "\r\n" );
-	                $html .= "\r\n";
+	                $html .= 'Content-Type: image/' . $contentType . '; name="' . $name . '"' . PHP_EOL .
+	                            'Content-ID: <img' . $key . '>' . PHP_EOL .
+	                            'Content-Transfer-Encoding: base64' . PHP_EOL .
+	                            'Content-Disposition: inline' . PHP_EOL . PHP_EOL;
+	                $html .= chunk_split( base64_encode( $img ), 68, PHP_EOL );
+	                $html .= PHP_EOL;
 	            }
-	            $html = trim( $html, "\r\n" );
-	            $html .= "\r\n\r\n" . '--' . $this->_boundary . '--' . "\r\n";
+	            $html = trim( $html, PHP_EOL );
+	            $html .= PHP_EOL . PHP_EOL . '--' . $this->_boundary . '--' . PHP_EOL;
             }
             return $html;
         }
@@ -141,17 +145,17 @@
 
             $content = $this->render( false );
 
-        	$headers = 'From:' . $this->_from . "\r\n" .
-                'X-Mailer: WebLab_Mailer' . "\r\n" . 
-                'Message-ID: <' . md5( time() ) . '@' . $_SERVER['SERVER_ADDR'] . ">\r\n" .
-                'Date: ' . date('r') . "\r\n" . 
-                'Mime-Version: 1.0' . "\r\n";
+        	$headers = 'From:' . $this->_from . MAIL_NL .
+                'X-Mailer: WebLab_Mailer' . MAIL_NL . 
+                'Message-ID: <' . md5( time() ) . '@' . $_SERVER['SERVER_ADDR'] . ">" . MAIL_NL .
+                'Date: ' . date('r') . MAIL_NL . 
+                'Mime-Version: 1.0' . MAIL_NL;
                 
         	if( !empty( $this->_boundary ) ) {
         		$headers .= 'Content-Type: multipart/related; ' .
-        			'boundary=' . $this->_boundary . "\r\n";
+        			'boundary=' . $this->_boundary . MAIL_NL;
         	} else {
-        		$headers .= 'Content-Type: ' . $this->_content_type . "\r\n";
+        		$headers .= 'Content-Type: ' . $this->_content_type . MAIL_NL;
         	}
 
 			$error_address = array();
@@ -160,7 +164,7 @@
                     $email = '<' . $email . '>';
                 }
 
-            	if( !mail( $email, $this->_subject, $content, $headers ) )
+            	if( !mail( $email, $this->_subject, $content, trim( $headers, MAIL_NL ) ) )
             		$error_address[] = $email;
             }
 
