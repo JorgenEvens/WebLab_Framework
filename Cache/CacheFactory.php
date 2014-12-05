@@ -12,7 +12,8 @@
 		}
 
 		public static function initCache() {
-			$preference = WebLab_Config::getApplicationConfig()->get( 'Application.Cache.Type', WebLab_Config::OBJECT, false );
+			if( WebLab_Config::isLoaded() )
+				$preference = WebLab_Config::getApplicationConfig()->get( 'Application.Cache.Type', WebLab_Config::OBJECT, false );
 			
 			if( !empty( $preference ) ) {
 				$preference = 'WebLab_Cache_' . ucfirst( $preference );
@@ -21,7 +22,7 @@
 					return $preference::open();
 			}
 
-			if( function_exists( 'apc_fetch' ) )
+			if( extension_loaded('apc') || extension_loaded('acpu') )
 				return WebLab_Cache_Apc::open();
 
 			if( WebLab_Cache_File::isAvailable() )

@@ -56,8 +56,16 @@
 			if( !empty( self::$_application_config ) && !( self::$_application_config instanceof self ) ) {
 				self::$_application_config = new self( self::$_application_config );
 			}
+
+			self::$_loaded = true;
 			
 			return self::$_application_config;
+		}
+
+		protected static $_loaded;
+
+		public static function isLoaded() {
+			return self::$_loaded;
 		}
 		
 		/**
@@ -84,19 +92,31 @@
 		 * @throws WebLab_Exception_Config If there is an error in the configuration file.
 		 */
 		public function __construct( $file ) {
-			if( is_string( $file ) ) {
-				$file = file_get_contents( $file, true );
-				if( $file === false )
-	                throw new WebLab_Exception_Config( 'Could not locate config file. ( ' . $file . ' )' );
-		            
-			    $config = json_decode( $file, true );
-			    if( !isset( $config ) )
-					throw new WebLab_Exception_Config( 'There seems to be an error in your config file. ( ' . $file . ')' );
+			$cache = WebLab_Cache_CacheFactory::getCache();
+			$cache_key = 'config/' . $file;
+			
+			if( $cache->exists( $cache_key ) ) {
+				$config = $cache->get( $cache_key );
+			} elseif( is_string( $file ) ) {
+				$config = $this->load( $file );
+				$cache->set( $cache_key, $config );
 			} else {
 				$config = $file;
 			}
 			
             $this->_config = $config;
+		}
+
+		public function load( $file ) {
+			$file = file_get_contents( $file, true );
+			if( $file === false )
+                throw new WebLab_Exception_Config( 'Could not locate config file. ( ' . $file . ' )' );
+	            
+		    $config = json_decode( $file, true );
+		    if( !isset( $config ) )
+				throw new WebLab_Exception_Config( 'There seems to be an error in your config file. ( ' . $file . ')' );
+
+			return $config;
 		}
 		
 		/**
