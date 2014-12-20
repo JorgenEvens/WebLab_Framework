@@ -7,7 +7,12 @@
 		public function setNamespace( $ns ) {}
 
 		public static function isAvailable() {
-			$cache_dir = config( 'Application.Cache' );
+			if( !WebLab_Config::isLoaded() )
+				return false;
+
+			$cache_dir = WebLab_Config::getApplicationConfig()
+				->get( 'Application.Cache', WebLab_Config::OBJECT, false );
+
 			return is_dir( $cache_dir );
 		}
 
@@ -21,7 +26,8 @@
 		protected $_cache_dir = null;
 
 		public function __construct() {
-			$this->_cache_dir = config( 'Application.Cache' );
+			$this->_cache_dir = WebLab_Config::getApplicationConfig()
+				->get( 'Application.Cache', WebLab_Config::OBJECT, false );
 		}
 
 		public function getLocation( $key ) {
