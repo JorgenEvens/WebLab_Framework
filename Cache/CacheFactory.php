@@ -31,4 +31,8 @@
 			return WebLab_Cache_Null::open();
 		}
 
+		public static function setCache( WebLab_Cache_Interface $cache ) {
+			self::$_cache = $cache;
+		}
+
 	}
