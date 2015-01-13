@@ -296,7 +296,7 @@
             $url = '';
             
             for( $i=0; $i<count($keys); $i++ ){
-                if( !in_array( $param[$i], $ignore ) )
+                if( !in_array( $param[$i], $ignore ) && !empty( $param[$i] ) )
                     $url .= $param[$i] . '/';
                 else
                     $i++;
