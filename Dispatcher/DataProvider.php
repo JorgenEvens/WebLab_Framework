@@ -29,34 +29,46 @@
 		 */
 		public function _default(){
 			$id = isset( $this->param[ $this->_getName() ] ) ? $this->param[ $this->_getName() ] : null;
-		
-			if( !is_numeric( $id ) ) {
-				return $this->error( 'Method does not exist', 501 );
-			}
-				
-			$p = $this->getTable()->find( $id );
-				
-			$this->put( $p );
+			$id_set = ( is_numeric( $id ) && !empty( $id) );
+			$is_empty = ( $id === '' );
+			
+			if( $this->is( 'GET' ) && ( $is_empty || $id_set ) )
+				return $this->_find();
+
+			if( ( $this->is( 'POST' ) || $this->is( 'PUT' ) ) && $id_set )
+				return $this->_update( $id );
+
+			if( $this->is( 'POST' ) && $is_empty )
+				return $this->_create();
+
+			if( $this->is( 'DELETE' ) && $id_set )
+				return $this->_delete( $id );
+
+			$this->error( 'Method does not exist', 501 );
+
 		}
 		
 		/**
 		 * Performs a search on the table using the equivalent find function.
 		 */
-		public function find() {
+		public function _find() {
 			if( !$this->is( 'GET' ) ) return $this->error( 'This call only supports GET.');
+			
+			$param_name = $this->_getName();
+			$id = isset( $this->param[ $param_name ] ) ? $this->param[ $param_name ] : null;
 				
-			$id = isset( $this->param[ 'find' ] ) ? $this->param[ 'find' ] : null;
-				
-			if( !is_numeric( $id ) && $id !== 'all' ) {
+			if( !is_numeric( $id ) && !empty( $id ) ) {
 				return $this->error( 'Method does not exist', 501 );
 			}
 				
 			$table = $this->getTable();
 				
-			if( $id == 'all' ) {
+			if( empty( $id ) ) {
 				$p = $table->findAll();
 			} else {
 				$p = $table->find( $id );
+				if( empty( $p ) )
+					return $this->error( 'Not found', 404 );
 			}
 				
 			$this->put( $p );
@@ -65,7 +77,7 @@
 		/**
 		 * Performs a create on the table using the equivalent create function.
 		 */
-		public function create() {
+		public function _create() {
 			if( !$this->is( 'POST' ) ) return $this->error( 'This call only supports POST.' );
 				
 			$table = $this->getTable();
@@ -79,26 +91,35 @@
 		/**
 		 * Performs an update on the table using the equivalent update function.
 		 */
-		public function update() {
-			if( !$this->is( 'POST' ) ) return $this->error( 'This call only supports POST.' );
+		public function _update( $id ) {
+			if( !$this->is( 'POST' ) && !$this->is( 'PUT' ) ) return $this->error( 'This call only supports POST.' );
 				
 			$table = $this->getTable();
-			$obj = $_POST;
+			$item = $table->find( $id );
+
+			if( empty( $item ) )
+				return $this->error( 'Not found', 404 );
+
+			$item = array_merge( $item, $_POST );
 				
-			$table->update( $obj );
+			$table->update( $item );
 				
-			$this->put( $obj );
+			$this->put( $item );
 		}
 		
 		/**
 		 * Performs a delete on the table using the equivalent delete function.
 		 */
-		public function delete() {
-			if( !$this->is( 'POST' ) ) return $this->error( 'This call only supports POST.' );
+		public function _delete( $id ) {
+			if( !$this->is( 'DELETE' ) ) return $this->error( 'This call only supports POST.' );
 				
 			$table = $this->getTable();
-				
-			$table->delete( $_POST );
+			$item = $table->find( $id );
+
+			if( empty( $item ) )
+				return $this->error( 'Not found', 404 );
+
+			$table->delete( $item );
 				
 			$this->put( array('succes' => true ) );
 		}
