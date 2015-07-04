@@ -248,7 +248,7 @@
 			if( is_array( $key ) )
 				return $result;
 			
-			return array_pop( $result );
+			return $result->pop();
 		}
 
 		/**

@@ -115,6 +115,15 @@
         abstract protected function _query( $query );
         
         /**
+         * Performs querying logic, but returns a native result object.
+         * 
+         * @param resource $query
+         */
+        abstract protected function _execute( $query );
+        
+        abstract protected function _create_result( $query, $result=null );
+        
+        /**
          * Start a transaction using database specific commands.
          */
         abstract protected function _start_transaction();
@@ -133,7 +142,30 @@
          * @param string $query
          */
         public final function query( $query ) {
+            if( is_string($query) ) {
+                $result = $this->_execute( $query );
+                if( is_scalar($result) )
+                    return $result;
+                    
+                return $this->_create_result( $query, $result );
+            }
+                
+            if( $query->getQueryType() != 'select' ) {
+                $this->_execute( $query );
+                
+                return true;
+            }
+            
             return $this->_query( $query );
+        }
+        
+        /**
+         * Performs a query and returns the native result.
+         * 
+         * @param resource $query
+         */
+        public final function execute( $query ) {
+            return $this->_execute( $query );
         }
 
         /**

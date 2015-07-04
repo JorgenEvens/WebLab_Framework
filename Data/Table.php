@@ -141,6 +141,14 @@
         			
         	return $this;
         }
+
+        public function setSelect( $select ) {
+            foreach( $this->_fields as $field ) {
+                $field->setSelect($select);
+            }
+
+            return $this;
+        }
         
         public function __toString()
         {

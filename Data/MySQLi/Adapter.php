@@ -123,15 +123,21 @@
          * @return WebLab_Data_MySQLi_Result The result of the query.
          */
     	protected function _query( $query ) {
+            return $this->_create_result($query);
+        }
+        
+        protected function _execute( $query ) {
             $result = $this->_resource->query( $query );
 			
             if( strlen( $this->_resource->error ) > 0 || $this->_resource->errno || !$result ) {
                 throw new Exception( $this->_resource->error . '<br /><strong>Query:</strong><br />' . $query . '<br />' );
-            } elseif( !( $result instanceof MySQLi_Result ) ) {
-                return true;
-            } else {
-                return new WebLab_Data_MySQLi_Result( $result );
             }
+            
+            return $result;
+        }
+        
+        protected function _create_result( $query, $result=null ) {
+            return new WebLab_Data_MySQLi_Result($query, $result);
         }
         
         /**

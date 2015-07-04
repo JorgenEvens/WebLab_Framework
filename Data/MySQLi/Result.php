@@ -24,15 +24,12 @@
 		 * @param resource &$result The MySQLi resource to read from.
 		 * @return mixed An array of objects representing the records.
 		 */
-		protected function _read( &$result )
+		protected function _read( $result )
 		{
-			if( $result->num_rows == 0 ) {
-				$this->_rows = array();
-			} else {
-				$this->_rows = array_map( array( $this, '_parse_result' ), array_fill( 0, $result->num_rows, $result ) );
-			}
-
-			return $this->_rows;
+			if( $result->num_rows == 0 )
+				return array();
+			
+			return array_map( array( $this, '_parse_result' ), array_fill( 0, $result->num_rows, $result ) );
 		}
 
 		/**
@@ -41,7 +38,7 @@
 		 * @param resource &$result The MySQLi resource to read from.
 		 * @return mixed An object representing one record.
 		 */
-		private function _parse_result( &$result ){
+		private function _parse_result( $result ){
 			return $result->fetch_object();
 		}
 

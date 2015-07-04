@@ -65,33 +65,94 @@
          */
         protected $_count_limitless = false;
         
+        /**
+         * Which type of query is to be constructed.
+         *
+         * @var string
+         */
+        protected $_query_type;
+        
+        /**
+         * A builder to be used for this query instance.
+         *
+         * @var WebLab_Data_MySQLi_QueryBuilder A builder to be used for this query instance.
+         */
+		protected $_builder;
+        
+        /**
+         * Generates a new Result object for this query.
+         *
+         * @return WebLab_Data_Result
+         */
+        abstract protected function createResult();
+        
+        /**
+         * Returns the builder associated with this query.
+         *
+         * @return WebLab_Data_QueryBuilder
+         */
+        abstract public function builder();
+        
+        public function execute() {
+            $q = $this->_query_type;
+            $q = $this->builder()->$q();
+            return $this->getAdapter()->execute($q);
+        }
+        
+        public function count() {
+            if( !$this->getCountLimitless() )
+                throw new Exception('Counting is disabled for this query.');
+                
+            $q = $this->builder()->count();
+            return $this->getAdapter()->execute($q);
+        }
+        
 		/**
-		 * Execute this query with a SELECT statement.
+		 * Set query type to SELECT, instructs the querybuilder to generate
+		 * a select query when this query is executed.
 		 * 
 		 * @return WebLab_Data_Result
 		 */
-        abstract public function select();
+        public function select() {
+            $this->_query_type = 'select';
+            return $this->createResult();
+        }
         
         /**
-		 * Execute this query with a INSERT statement.
+		 * Set query type to INSERT, instructs the querybuilder to generate
+		 * a select query when this query is executed.
 		 * 
 		 * @return WebLab_Data_Result
 		 */
-        abstract public function insert();
+        public function insert()
+        {
+            $this->_query_type = 'insert';
+            return $this->createResult();
+        }
         
         /**
-		 * Execute this query with a DELETE statement.
+		 * Set query type to DELETE, instructs the querybuilder to generate
+		 * a select query when this query is executed.
 		 * 
 		 * @return WebLab_Data_Result
 		 */
-        abstract public function delete();
+        public function delete()
+        {
+            $this->_query_type = 'delete';
+            return $this->createResult();
+        }
         
         /**
-		 * Execute this query with a UPDATE statement.
+		 * Set query type to DELETE, instructs the querybuilder to generate
+		 * a select query when this query is executed.
 		 * 
 		 * @return WebLab_Data_Result
 		 */
-        abstract public function update();
+        public function update()
+        {
+            $this->_query_type = 'update';
+            return $this->createResult();
+        }
         
         /**
          * Default constructor.

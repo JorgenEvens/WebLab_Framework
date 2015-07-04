@@ -17,95 +17,22 @@
      */
 	class WebLab_Data_MySQLi_Query extends WebLab_Data_Query {
 		
-        /**
-         * A builder to be used for this query instance.
-         *
-         * @var WebLab_Data_MySQLi_QueryBuilder A builder to be used for this query instance.
-         */
-		protected $_builder;
+		protected function createResult()
+		{
+			return new WebLab_Data_MySQLi_Result( $this );
+		}
 		
         /**
          * Retrieve a builder instance for this query, this method ensures lazy loading.
          *
          * @return WebLab_Data_MySQLi_QueryBuilder A builder to be used for this query instance.
          */
-		public function builder() {
-			if( empty( $this->_builder ) ) {
+		public function builder()
+		{
+			if( empty( $this->_builder ) )
 				$this->_builder = new WebLab_Data_MySQLi_QueryBuilder();
-			}
+
 			return $this->_builder->setQuery( $this );
 		}
-		
-        /**
-         * Performs a SELECT query on the underlying database.
-         * The query is created using a QueryBuilder that converts this 
-         * query object into a statement.
-         *
-         * @return WebLab_Data_MySQLi_Result
-         */
-		public function select() {
-            $this->_isConnected();
-
-            $this->_last_query = $q = $this->builder()->select();
-
-            $result = $this->_adapter->query( $q );
-            
-            if( $this->getCountLimitless() ) {
-
-            	$row_count = $this->_adapter->query( $this->builder()->count() );
-            	$result->setTotalRows( $row_count->current()->count );
-            }
-            
-            return $result;
-        }
-
-        /**
-         * Performs an UPDATE query on the underlying database.
-         * The query is created using a QueryBuilder that converts this 
-         * query object into a statement.
-         *
-         * @return WebLab_Data_MySQLi_Result
-         */
-        public function update() {
-            $this->_isConnected();
-
-            $this->_last_query = $q = $this->builder()->update();
-
-            return $this->_adapter->query( $q );
-        }
-
-        /**
-         * Performs an INSERT query on the underlying database.
-         * The query is created using a QueryBuilder that converts this 
-         * query object into a statement.
-         *
-         * @param boolean $update Should the record be updated if it already exists. ( uses ON DUPLICATE KEY syntax )
-         * @param mixed $ignoreInUpdate Fields not to update if $update is set to true.
-         * @return WebLab_Data_MySQLi_Result
-         */
-        public function insert( $update=false, $ignoreInUpdate=array() )
-        {
-            $this->_isConnected();
-
-            $this->_last_query = $q = $this->builder()->insert( $update, $ignoreInUpdate );
-
-            return $this->_adapter->query( $q );
-        }
-
-        /**
-         * Performs a DELETE query on the underlying database.
-         * The query is created using a QueryBuilder that converts this 
-         * query object into a statement.
-         *
-         * @return WebLab_Data_MySQLi_Result
-         */
-        public function delete( $delete_from_table=null )
-        {
-            $this->_isConnected();
-
-            $this->_last_query = $q = $this->builder()->delete( $delete_from_table );
-
-            return $this->_adapter->query( $q );
-        }
 		
 	}
