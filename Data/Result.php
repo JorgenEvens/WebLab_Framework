@@ -1,4 +1,10 @@
 <?php
+    if( !interface_exists('JsonSerializable') ) {
+        interface JsonSerializable {
+            function JsonSerialize();
+        }
+    }
+
 	/**
 	 * Read data from the resource.
 	 * 
@@ -7,7 +13,7 @@
      * @subpackage Data
 	 *
 	 */
-    abstract class WebLab_Data_Result implements ArrayAccess, Iterator, Countable
+    abstract class WebLab_Data_Result implements ArrayAccess, Iterator, Countable, JsonSerializable
     {
         protected $_rows = null;
         protected $_total = -1;
@@ -31,8 +37,8 @@
         {
             if( $this->_rows !== null )
                 return;
-            
-            $this->_rows = $this->_read( $this->getQuery()->execute() );
+
+            $this->_rows = $this->_read( $this->execute() );
         }
         
         protected function _ensureCounted() {
@@ -45,7 +51,11 @@
             $rows = $this->_read( $this->getQuery()->count() );
             $this->_total = current($rows)->count;
         }
-        
+
+        public function execute() {
+            return $this->getQuery()->execute();
+        }
+
         /**
          * Fallback for old code that calls this to get results.
          * 
@@ -77,19 +87,26 @@
             $this->_ensureCounted();
         	return $this->_total;
         }
-        
+
         public function fetch( $id )
         {
             $this->ensureLoaded();
             return $this->_rows[ $id ];
         }
-        
+
         public function &data()
         {
             $this->ensureLoaded();
             return $this->_rows;
         }
-        
+
+        /**
+         * JsonSerializable
+         */
+        public function JsonSerialize() {
+            return $this->data();
+        }
+
         /**
          * Countable
          */
