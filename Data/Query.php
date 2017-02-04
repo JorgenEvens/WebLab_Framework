@@ -71,7 +71,23 @@
          * @var string
          */
         protected $_query_type;
-        
+
+        /**
+         * Should we update when a key is already present.
+         *
+         * @var boolean
+         */
+        protected $_update_on_duplicate_key = false;
+
+        /**
+         * A list of fields that should not be updated
+         * when a duplicate key is detected.
+         *
+         * @see $_on_duplicate_key_update
+         * @var array
+         */
+        protected $_update_on_duplicate_key_ignored = array();
+
         /**
          * A builder to be used for this query instance.
          *
@@ -124,9 +140,11 @@
 		 * 
 		 * @return WebLab_Data_Result
 		 */
-        public function insert()
+        public function insert( $update=false, $no_update=array() )
         {
             $this->_query_type = 'insert';
+            $this->_update_on_duplicate_key = $update;
+            $this->_update_on_duplicate_key_ignored = $no_update;
             return $this->createResult();
         }
         
@@ -184,7 +202,28 @@
         public function getAdapter() {
         	return $this->_adapter;
         }
-        
+
+        /**
+         * Get if an insert query should try to update a record on
+         * duplicate key.
+         *
+         * @return boolean
+         */
+        public function getUpdateOnDuplicateKey() {
+            return $this->_update_on_duplicate_key;
+        }
+
+        /**
+         * Fields to ignore when an insert query tries to update
+         * a record that has a the same key.
+         *
+         * @see getUpdateOnDuplicateKey
+         * @return array
+         */
+        public function getUpdateOnDuplicateKeyIgnoredFields() {
+            return $this->_update_on_duplicate_key_ignored;
+        }
+
         /**
          * Gets the criteriachain for this query.
          * Criteria chain equals the WHERE statement in a query.
