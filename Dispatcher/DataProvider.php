@@ -31,8 +31,11 @@
 			$id = isset( $this->param[ $this->_getName() ] ) ? $this->param[ $this->_getName() ] : null;
 			$id_set = ( is_numeric( $id ) && !empty( $id) );
 			$is_empty = ( $id === '' );
-			
-			if( $this->is( 'GET' ) && ( $is_empty || $id_set ) )
+
+			if( !$this->is( 'POST' ) && !$this->is( 'GET' ) )
+				parse_str(file_get_contents('php://input'), $_POST);
+
+			if( $this->is( 'GET' ) )
 				return $this->_find();
 
 			if( ( $this->is( 'POST' ) || $this->is( 'PUT' ) ) && $id_set )
@@ -70,8 +73,8 @@
 				if( empty( $p ) )
 					return $this->error( 'Not found', 404 );
 			}
-				
-			$this->put( $p );
+
+			$this->put( $p->data() );
 		}
 		
 		/**
@@ -82,9 +85,9 @@
 				
 			$table = $this->getTable();
 			$obj = $_POST;
-				
-			$table->create( $obj );
-				
+
+			$table->save( $obj )->execute();
+
 			$this->put( $obj );
 		}
 		
@@ -100,10 +103,11 @@
 			if( empty( $item ) )
 				return $this->error( 'Not found', 404 );
 
+			$item = get_object_vars($item);
 			$item = array_merge( $item, $_POST );
-				
-			$table->update( $item );
-				
+
+			$table->update( $item )->execute();
+
 			$this->put( $item );
 		}
 		
