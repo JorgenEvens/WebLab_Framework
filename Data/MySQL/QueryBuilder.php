@@ -120,9 +120,11 @@
 			return $q;
 		}
 
-		public function insert( $update=false, $ignoreInUpdate=array() ) {
+		public function insert() {
 
 			$query = $this->_query;
+			$update = $query->getUpdateOnDuplicateKey();
+			$ignoreInUpdate = $query->getUpdateOnDuplicateKeyIgnoredFields();
 			$parse = $this->_parseQuery();
 
 			if( count( $parse->tables ) == 0 ) {
@@ -149,6 +151,9 @@
 				$values = array();
 				foreach( $parse->fields as $field ) {
 					if( in_array( $field, $ignoreInUpdate ) || !$field->isAltered() ) {
+						// TODO: There is no guarantee that this field is actually the ID
+						if( count($ignoreInUpdate) == 1 )
+							$values[] = $field . ' = LAST_INSERT_ID(' . $field . ')';
 						continue;
 					}
 
