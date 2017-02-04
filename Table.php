@@ -140,10 +140,12 @@
 				$no_update[] = $table->getField( $field );
 			}
 
-			$q->insert( true, $no_update );
-				
+			$result = $q->insert( true, $no_update );
+
 			if( count( static::$_primary_keys ) == 1 )
-				$object[static::$_primary_keys[0]] = $q->getAdapter()->insert_id();
+				$q->addExecuteCallback(new UpdateIdCallback( $object, static::$_primary_keys[0]));
+
+			return $result;
 		}
 		
 		/**
@@ -166,11 +168,13 @@
 			foreach( $object as $key => &$value )
 				if( in_array( $key, static::$_fields ) )
 					$table->getField($key)->setValue( $value );
-				
-			$q->insert();
-			
+
+			$result = $q->insert();
+
 			if( count( static::$_primary_keys ) == 1 )
-				$object[static::$_primary_keys[0]] = $q->getAdapter()->insert_id();
+				$q->addExecuteCallback(new UpdateIdCallback( $object, static::$_primary_keys[0]));
+
+			return $result;
 		}
 		
 		/**
@@ -222,8 +226,8 @@
 			foreach( $object as $key => &$value )
 				if( !in_array( $key, static::$_primary_keys ) && in_array( $key, static::$_fields ) )
 					$table->addField($key)->setValue( $value );
-			
-			$q->update();
+
+			return $q->update();
 		}
 		
 		/**
@@ -345,4 +349,20 @@
 			
 			return $q->select()->current()->count;
 		}
+	}
+
+	class UpdateIdCallback implements WebLab_Data_Callback {
+
+		protected $_obj = null;
+		protected $_key = null;
+
+		public function __construct( &$obj, $key ) {
+			$this->_obj = &$obj;
+			$this->_key = $key;
+		}
+
+		public function call( $query ) {
+			$this->_obj[$this->_key] = $query->getAdapter()->insert_id();
+		}
+
 	}

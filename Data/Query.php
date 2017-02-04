@@ -94,7 +94,15 @@
          * @var WebLab_Data_MySQLi_QueryBuilder A builder to be used for this query instance.
          */
 		protected $_builder;
-        
+
+        /**
+         * An array of PostExecuteCallbacks which should be notified
+         * when a query is executed.
+         *
+         * @var array
+         */
+        protected $_post_execute_callback = array();
+
         /**
          * Generates a new Result object for this query.
          *
@@ -112,7 +120,12 @@
         public function execute() {
             $q = $this->_query_type;
             $q = $this->builder()->$q();
-            return $this->getAdapter()->execute($q);
+            $result = $this->getAdapter()->execute($q);
+
+            foreach( $this->_post_execute_callback as $cb )
+                $cb->call($this);
+
+            return $result;
         }
         
         public function count() {
@@ -201,6 +214,11 @@
          */
         public function getAdapter() {
         	return $this->_adapter;
+        }
+
+        public function addExecuteCallback( WebLab_Data_Callback $cb ) {
+            $this->_post_execute_callback[] = $cb;
+            return $this;
         }
 
         /**
