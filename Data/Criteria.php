@@ -327,6 +327,8 @@
             } elseif( is_array( $value ) ){
 				$value = array_map($adapterSpecs->escape_string, $value);
 				$action .=' (' . implode( ', ', $value ) . ')';
+            } elseif( $value instanceof WebLab_Data_Query ) {
+                $action .=' (' . $value->builder()->select() . ')';
             } elseif( $value instanceof WebLab_Data_Field ) {
                 $action .= $value->getFullName();
             } elseif( empty( $value ) ) {
