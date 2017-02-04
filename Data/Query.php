@@ -199,6 +199,16 @@
         }
 
         /**
+         * Destructor
+         * Performs execute on non-select queries when
+         * the object is cleaned.
+         */
+        public function __destruct() {
+            if( !empty($this->_query_type) && $this->_query_type != 'select' )
+                $this->execute();
+        }
+
+        /**
          * Set the database adapter to use.
          * 
          * @param WebLab_Data_Adapter $adapter
